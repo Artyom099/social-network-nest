@@ -11,12 +11,12 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UsersService {
   constructor(protected usersRepository: UsersRepository) {}
-  getUser(term: GetUsersWithPagingAndSearch) {
-    return this.usersRepository.getUser(term);
-  }
-  createUser(InputModel: CreateUserInputModel): UserViewModel {
-    const passwordSalt = bcrypt.genSalt(10);
-    const passwordHash = this._generateHash(InputModel.password, passwordSalt);
+  async createUser(InputModel: CreateUserInputModel): Promise<UserViewModel> {
+    const passwordSalt = await bcrypt.genSalt(10);
+    const passwordHash = await this._generateHash(
+      InputModel.password,
+      passwordSalt,
+    );
     const newUser = {
       id: randomUUID().toString(),
       accountData: {
@@ -29,10 +29,10 @@ export class UsersService {
     };
     return this.usersRepository.createUser(newUser);
   }
-  _generateHash(password: string, salt: string) {
+  async _generateHash(password: string, salt: string) {
     return bcrypt.hash(password, salt);
   }
-  deleteUser(userId: string) {
+  async deleteUser(userId: string) {
     return this.usersRepository.deleteUser(userId);
   }
 }

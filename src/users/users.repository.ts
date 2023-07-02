@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { GetUsersWithPagingAndSearch, UserViewModel } from './users.models';
+import { UserViewModel } from './users.models';
 
 @Injectable()
 export class UsersRepository {
-  getUser(term: GetUsersWithPagingAndSearch) {
-    return [
-      { id: 1, name: 'Dimych' },
-      { id: 2, name: 'Victor' },
-    ];
+  getUser(id: string) {
+    return {
+      id: '1',
+      login: 'login',
+      email: 'email',
+      createdAt: new Date().toISOString(),
+    };
   }
   createUser(user): UserViewModel {
     return {
