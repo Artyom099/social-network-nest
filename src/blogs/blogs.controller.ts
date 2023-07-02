@@ -1,20 +1,20 @@
 import { Body, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import {
-  CreateBlogInputModel,
-  GetBlogsWithPagingAndSearch,
-  UpdateBlogInputModel,
-} from './blogs.models';
+import { BlogInputModel } from './blogs.models';
 import { BlogsService } from './blogs.service';
 import { QueryRepository } from '../query/query.repository';
+import {
+  GetItemsWithPaging,
+  GetItemsWithPagingAndSearch,
+} from '../utils/common.models';
 
 export class BlogsController {
   constructor(protected blogsService: BlogsService) {}
   @Get()
-  async getBlogs(@Query() query: GetBlogsWithPagingAndSearch) {
+  async getBlogs(@Query() query: GetItemsWithPagingAndSearch) {
     return QueryRepository.getSortedBlogs(query);
   }
   @Post()
-  async createBlog(@Body() inputModel: CreateBlogInputModel) {
+  async createBlog(@Body() inputModel: BlogInputModel) {
     return this.blogsService.createBlog(inputModel);
   }
 
@@ -25,7 +25,7 @@ export class BlogsController {
   @Put(':id')
   async updateBlog(
     @Param('id') blogId: string,
-    @Body() inputModel: UpdateBlogInputModel,
+    @Body() inputModel: BlogInputModel,
   ) {
     return this.blogsService.updateBlog(blogId, inputModel);
   }
@@ -35,13 +35,16 @@ export class BlogsController {
   }
 
   @Get(':id/posts')
-  async getPostsCurrentBlog(@Param('id') blogId: string) {
+  async getPostsCurrentBlog(
+    @Param('id') blogId: string,
+    @Query() query: GetItemsWithPaging,
+  ) {
     return QueryRepository.getSortedPostsCurrentBlog(blogId);
   }
   @Post(':id/posts')
   async createPostCurrentBlog(
     @Param('id') blogId: string,
-    @Body() inputModel: CreateBlogInputModel,
+    @Body() inputModel: BlogInputModel,
   ) {
     return this.postsService.createPost(blogId, inputModel);
   }

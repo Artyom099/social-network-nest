@@ -12,7 +12,7 @@ import {
   CreateUserInputModel,
   GetUsersWithPagingAndSearch,
 } from './users.models';
-import { SortBy, SortDirection } from '../constants';
+import { SortBy, SortDirection } from '../utils/constants';
 import { QueryRepository } from '../query/query.repository';
 
 @Controller('users')

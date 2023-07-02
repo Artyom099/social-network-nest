@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PagingViewModel, UserViewModel } from '../users/users.models';
+import { BlogViewModel } from '../blogs/blogs.models';
 
 @Injectable()
 export class QueryRepository {
@@ -10,14 +11,16 @@ export class QueryRepository {
     pageSize: number,
     sortBy: string,
     sortDirection: 'asc' | 'desc',
-  ): Promise<PagingViewModel<UserViewModel>> {
+  ): Promise<PagingViewModel<UserViewModel[]>> {
     const totalCount = 0;
-    const sortedUsers = {
-      id: '',
-      login: 'string',
-      email: 'string',
-      createdAt: 'string',
-    };
+    const sortedUsers = [
+      {
+        id: '',
+        login: 'string',
+        email: 'string',
+        createdAt: 'string',
+      },
+    ];
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
@@ -26,6 +29,8 @@ export class QueryRepository {
       items: sortedUsers,
     };
   }
-  getSortedBlogs() {}
-  getSortedPostsCurrentBlog() {}
+  async getSortedBlogs(): Promise<PagingViewModel<BlogViewModel[]>> {}
+  async getSortedPostsCurrentBlog(): Promise<
+    PagingViewModel<PostViewModel[]>
+  > {}
 }
