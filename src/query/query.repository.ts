@@ -3,7 +3,7 @@ import { PagingViewModel, UserViewModel } from '../users/users.models';
 
 @Injectable()
 export class QueryRepository {
-  async getUser(
+  async getSortedUsers(
     searchEmailTerm: string | null,
     searchLoginTerm: string | null,
     pageNumber: number,
@@ -26,4 +26,6 @@ export class QueryRepository {
       items: sortedUsers,
     };
   }
+  getSortedBlogs() {}
+  getSortedPostsCurrentBlog() {}
 }

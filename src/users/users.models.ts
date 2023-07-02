@@ -1,8 +1,3 @@
-export type CreateUserInputModel = {
-  login: string;
-  password: string;
-  email: string;
-};
 export type GetUsersWithPagingAndSearch = {
   sortBy: string;
   sortDirection: string;
@@ -10,6 +5,11 @@ export type GetUsersWithPagingAndSearch = {
   pageSize: string;
   searchLoginTerm: string;
   searchEmailTerm: string;
+};
+export type CreateUserInputModel = {
+  login: string;
+  password: string;
+  email: string;
 };
 export type UserViewModel = {
   id: string;
