@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PagingViewModel, UserViewModel } from '../users/users.models';
 import { BlogViewModel } from '../blogs/blogs.models';
+import { PostViewModel } from '../posts/posts.models';
 
 @Injectable()
 export class QueryRepository {
@@ -33,4 +34,8 @@ export class QueryRepository {
   async getSortedPostsCurrentBlog(): Promise<
     PagingViewModel<PostViewModel[]>
   > {}
+
+  async getSortedBlogs(query) {}
+  async getSortedPostsCurrentBlog(blogId) {}
+  async getSortedCommentsCurrentPost(postId) {}
 }

@@ -1,10 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../users/users.repository';
-import {
-  BlogViewModel,
-  CreateBlogInputModel,
-  UpdateBlogInputModel,
-} from './blogs.models';
+import { BlogInputModel, BlogViewModel } from './blogs.models';
 import { randomUUID } from 'crypto';
 import { BlogsRepository } from './blogs.repository';
 
@@ -12,9 +7,9 @@ import { BlogsRepository } from './blogs.repository';
 export class BlogsService {
   constructor(protected blogsRepository: BlogsRepository) {}
   async getBlog(blogId: string): Promise<BlogViewModel> {
-    return await this.blogsRepository.getBlog(blogId);
+    return this.blogsRepository.getBlog(blogId);
   }
-  async createBlog(InputModel: CreateBlogInputModel): Promise<BlogViewModel> {
+  async createBlog(InputModel: BlogInputModel): Promise<BlogViewModel> {
     const createdBlog: BlogViewModel = {
       id: randomUUID(),
       name: InputModel.name,
@@ -23,9 +18,9 @@ export class BlogsService {
       createdAt: new Date().toISOString(),
       isMembership: true,
     };
-    return await this.blogsRepository.createBlog(createdBlog);
+    return this.blogsRepository.createBlog(createdBlog);
   }
-  async updateBlog(blogId: string, InputModel: UpdateBlogInputModel) {
+  async updateBlog(blogId: string, InputModel: BlogInputModel) {
     return this.blogsRepository.updateBlog(blogId, InputModel);
   }
   async deleteBlog(blogId: string) {
