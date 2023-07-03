@@ -118,22 +118,20 @@ export class QueryRepository {
     };
   }
 
-  async getCommentsCurrentPost(postId: string): Promise<CommentViewModel[]> {
-    return [
-      {
-        id: 'string',
-        content: 'string',
-        commentatorIno: {
-          userId: 'string',
-          userLogin: 'string',
-        },
-        createdAt: 'string',
-        likesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: LikeStatus.None,
-        },
+  async getCommentCurrentPost(postId: string): Promise<CommentViewModel> {
+    return {
+      id: 'string',
+      content: 'string',
+      commentatorIno: {
+        userId: 'string',
+        userLogin: 'string',
       },
-    ];
+      createdAt: 'string',
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: LikeStatus.None,
+      },
+    };
   }
 }

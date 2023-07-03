@@ -1,6 +1,8 @@
 import { LikeStatus } from '../utils/constants';
 import { CommentViewModel } from './comments.models';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class CommentsRepository {
   async getComment(id: string): Promise<CommentViewModel> {
     return {

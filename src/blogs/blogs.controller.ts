@@ -1,4 +1,13 @@
-import { Body, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Delete,
+  Get,
+  Injectable,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { BlogInputModel } from './blogs.models';
 import { BlogsService } from './blogs.service';
 import { QueryRepository } from '../query/query.repository';
@@ -10,6 +19,7 @@ import { PostsService } from '../posts/posts.service';
 import { PostsRepository } from '../posts/posts.repository';
 import { PostInputModel } from '../posts/posts.models';
 
+@Injectable()
 export class BlogsController {
   constructor(protected blogsService: BlogsService) {}
   @Get()

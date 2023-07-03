@@ -50,6 +50,6 @@ export class PostsController {
   @Get(':id/comments')
   async getCommentsCurrentPost(@Param('id') postId: string) {
     const queryRepository = new QueryRepository();
-    return queryRepository.getCommentsCurrentPost(postId);
+    return queryRepository.getCommentCurrentPost(postId);
   }
 }

@@ -1,7 +1,8 @@
 import { CommentsService } from './comments.service';
-import { Get, Param } from '@nestjs/common';
+import { Get, Injectable, Param } from '@nestjs/common';
 import { CommentViewModel } from './comments.models';
 
+@Injectable()
 export class CommentsController {
   constructor(protected commentsService: CommentsService) {}
   @Get()
