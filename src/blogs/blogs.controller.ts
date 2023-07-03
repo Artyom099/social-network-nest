@@ -11,7 +11,8 @@ export class BlogsController {
   constructor(protected blogsService: BlogsService) {}
   @Get()
   async getBlogs(@Query() query: GetItemsWithPagingAndSearch) {
-    return QueryRepository.getSortedBlogs(query);
+    const queryRepository = new QueryRepository();
+    return queryRepository.getSortedBlogs(query);
   }
   @Post()
   async createBlog(@Body() inputModel: BlogInputModel) {

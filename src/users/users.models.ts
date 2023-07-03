@@ -1,8 +1,8 @@
 export type GetUsersWithPagingAndSearch = {
   sortBy: string;
-  sortDirection: string;
-  pageNumber: string;
-  pageSize: string;
+  sortDirection: 'asc' | 'desc';
+  pageNumber: number;
+  pageSize: number;
   searchLoginTerm: string;
   searchEmailTerm: string;
 };
