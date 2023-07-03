@@ -30,12 +30,14 @@ export class QueryRepository {
       items: sortedUsers,
     };
   }
+
   async getSortedBlogs(): Promise<PagingViewModel<BlogViewModel[]>> {}
+
+  async getSortedPosts(query) {}
+
   async getSortedPostsCurrentBlog(): Promise<
     PagingViewModel<PostViewModel[]>
   > {}
 
-  async getSortedBlogs(query) {}
-  async getSortedPostsCurrentBlog(blogId) {}
   async getSortedCommentsCurrentPost(postId) {}
 }

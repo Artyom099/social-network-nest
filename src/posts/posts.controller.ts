@@ -20,10 +20,12 @@ export class PostsController {
   constructor(protected postsService: PostsService) {}
   @Get()
   async getPosts(@Query() query: GetItemsWithPaging) {
-    return QueryRepository.getSortedPosts(query);
+    const queryRepository = new QueryRepository();
+    return queryRepository.getSortedPosts(query);
   }
   @Post()
   async createPost(@Body() inputModel: PostInputModel) {
+    // todo – правильно ли я делаю, когда мне надо в PostsController использовать метод BlogsService?
     const blog = new BlogsService(new BlogsRepository());
     const foundBLog = await blog.getBlog(inputModel.blogId);
     return this.postsService.createPost(inputModel, foundBLog);
@@ -47,6 +49,7 @@ export class PostsController {
 
   @Get(':id/comments')
   async getCommentsCurrentPost(@Param('id') postId: string) {
-    return QueryRepository.getSortedCommentsCurrentPost(postId);
+    const queryRepository = new QueryRepository();
+    return queryRepository.getSortedCommentsCurrentPost(postId);
   }
 }
