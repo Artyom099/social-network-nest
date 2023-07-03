@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PagingViewModel, UserViewModel } from '../users/users.models';
+import { UserViewModel } from '../users/users.models';
 import { BlogViewModel } from '../blogs/blogs.models';
 import { PostViewModel } from '../posts/posts.models';
+import { CommentViewModel } from '../comments/comments.models';
+import { GetItemsWithPaging, PagingViewModel } from '../utils/common.models';
+import { LikeStatus } from '../utils/constants';
 
 @Injectable()
 export class QueryRepository {
@@ -13,7 +16,7 @@ export class QueryRepository {
     sortBy: string,
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<UserViewModel[]>> {
-    const totalCount = 0;
+    const totalCount = 1;
     const sortedUsers = [
       {
         id: '',
@@ -31,13 +34,91 @@ export class QueryRepository {
     };
   }
 
-  async getSortedBlogs(query): Promise<PagingViewModel<BlogViewModel[]>> {}
+  async getSortedBlogs(
+    query: GetItemsWithPaging,
+  ): Promise<PagingViewModel<BlogViewModel[]>> {
+    const totalCount = 1;
+    const sortedBlogs = [
+      {
+        id: 'string',
+        name: 'string',
+        description: 'string',
+        websiteUrl: 'string',
+        createdAt: 'string',
+        isMembership: true,
+      },
+    ];
+    return {
+      pagesCount: Math.ceil(totalCount / query.pageSize), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество пользователей на странице
+      totalCount, // общее количество пользователей
+      items: sortedBlogs,
+    };
+  }
 
-  async getSortedPosts(query) {}
+  async getSortedPosts(
+    query: GetItemsWithPaging,
+  ): Promise<PagingViewModel<PostViewModel[]>> {
+    const totalCount = 1;
+    const sortedPosts = [
+      {
+        id: 'string',
+        title: 'string',
+        shortDescription: 'string',
+        content: 'string',
+        blogId: 'string',
+        blogName: 'string',
+        createdAt: 'string',
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: LikeStatus.None,
+          newestLikes: [],
+        },
+      },
+    ];
+    return {
+      pagesCount: Math.ceil(totalCount / query.pageSize), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество пользователей на странице
+      totalCount, // общее количество пользователей
+      items: sortedPosts,
+    };
+  }
 
-  async getSortedPostsCurrentBlog(): Promise<
-    PagingViewModel<PostViewModel[]>
-  > {}
+  async getSortedPostsCurrentBlog(
+    blogId,
+    query,
+  ): Promise<PagingViewModel<PostViewModel[]>> {
+    const totalCount = 1;
+    const sortedPosts = [
+      {
+        id: 'string',
+        title: 'string',
+        shortDescription: 'string',
+        content: 'string',
+        blogId,
+        blogName: 'string',
+        createdAt: 'string',
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: LikeStatus.None,
+          newestLikes: [],
+        },
+      },
+    ];
+    return {
+      pagesCount: Math.ceil(totalCount / query.pageSize), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество пользователей на странице
+      totalCount, // общее количество пользователей
+      items: sortedPosts,
+    };
+  }
 
-  async getSortedCommentsCurrentPost(postId) {}
+  async getCommentsCurrentPost(
+    postId: string,
+  ): Promise<PagingViewModel<CommentViewModel[]>> {}
 }

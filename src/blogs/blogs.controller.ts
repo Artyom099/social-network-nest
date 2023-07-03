@@ -6,6 +6,9 @@ import {
   GetItemsWithPaging,
   GetItemsWithPagingAndSearch,
 } from '../utils/common.models';
+import { PostsService } from '../posts/posts.service';
+import { PostsRepository } from '../posts/posts.repository';
+import { PostInputModel } from '../posts/posts.models';
 
 export class BlogsController {
   constructor(protected blogsService: BlogsService) {}
@@ -40,13 +43,16 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    return QueryRepository.getSortedPostsCurrentBlog(blogId);
+    const queryRepository = new QueryRepository();
+    return queryRepository.getSortedPostsCurrentBlog(blogId, query);
   }
   @Post(':id/posts')
   async createPostCurrentBlog(
     @Param('id') blogId: string,
-    @Body() inputModel: BlogInputModel,
+    @Body() inputModel: PostInputModel,
   ) {
-    return this.postsService.createPost(blogId, inputModel);
+    const blog = await this.blogsService.getBlog(blogId);
+    const postsService = new PostsService(new PostsRepository());
+    return postsService.createPost(blog, inputModel);
   }
 }

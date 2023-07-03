@@ -12,8 +12,8 @@ export class PostsService {
     return this.postsRepository.getPost(postId);
   }
   async createPost(
-    InputModel: PostInputModel,
     bLog: BlogViewModel,
+    InputModel: PostInputModel,
   ): Promise<PostViewModel> {
     const createdPost = {
       id: randomUUID(),
