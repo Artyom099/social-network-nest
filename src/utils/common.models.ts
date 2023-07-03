@@ -1,12 +1,14 @@
+import { SortBy, SortDirection } from './constants';
+
 export type GetItemsWithPaging = {
-  sortBy: string;
-  sortDirection: string;
+  sortBy: SortBy;
+  sortDirection: SortDirection;
   pageNumber: number;
   pageSize: number;
 };
 export type GetItemsWithPagingAndSearch = {
-  sortBy: string;
-  sortDirection: string;
+  sortBy: SortBy;
+  sortDirection: SortDirection;
   pageNumber: number;
   pageSize: number;
   searchNameTerm: string;

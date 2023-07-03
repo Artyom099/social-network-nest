@@ -51,8 +51,8 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    const blog = await this.blogsService.getBlog(blogId);
+    const foundBlog = await this.blogsService.getBlog(blogId);
     const postsService = new PostsService(new PostsRepository());
-    return postsService.createPost(blog, inputModel);
+    return postsService.createPost(foundBlog, inputModel);
   }
 }

@@ -28,7 +28,7 @@ export class PostsController {
     // todo – правильно ли я делаю, когда мне надо в PostsController использовать метод BlogsService?
     const blog = new BlogsService(new BlogsRepository());
     const foundBLog = await blog.getBlog(inputModel.blogId);
-    return this.postsService.createPost(inputModel, foundBLog);
+    return this.postsService.createPost(foundBLog, inputModel);
   }
 
   @Get(':id')

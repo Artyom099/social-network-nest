@@ -1,6 +1,8 @@
+import { SortBy, SortDirection } from '../utils/constants';
+
 export type GetUsersWithPagingAndSearch = {
-  sortBy: string;
-  sortDirection: 'asc' | 'desc';
+  sortBy: SortBy;
+  sortDirection: SortDirection;
   pageNumber: number;
   pageSize: number;
   searchLoginTerm: string;
