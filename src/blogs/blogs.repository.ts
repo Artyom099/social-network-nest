@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  BlogViewModel,
-  CreateBlogInputModel,
-  UpdateBlogInputModel,
-} from './blogs.models';
+import { BlogInputModel, BlogViewModel } from './blogs.models';
 
 @Injectable()
 export class BlogsRepository {
@@ -20,7 +16,7 @@ export class BlogsRepository {
   async createBlog(blog: BlogViewModel): Promise<BlogViewModel> {
     return blog;
   }
-  async updateBlog(id: string, InputModel: UpdateBlogInputModel) {
+  async updateBlog(id: string, InputModel: BlogInputModel) {
     return;
   }
   async deleteBlog(id: string) {

@@ -13,6 +13,9 @@ import { PostsService } from './posts/posts.service';
 import { PostsRepository } from './posts/posts.repository';
 import { TestController } from './test/test.controller';
 import { TestRepository } from './test/test.repository';
+import { CommentsController } from './comments/comments.controller';
+import { CommentsService } from './comments/comments.service';
+import { CommentsRepository } from './comments/comments.repository';
 
 @Module({
   imports: [],
@@ -22,17 +25,20 @@ import { TestRepository } from './test/test.repository';
     UsersController,
     BlogsController,
     PostsController,
+    CommentsController,
   ],
   providers: [
     AppService,
     TestRepository,
+    QueryRepository,
     UsersService,
     UsersRepository,
     BlogsService,
     BlogsRepository,
     PostsService,
     PostsRepository,
-    QueryRepository,
+    CommentsService,
+    CommentsRepository,
   ],
 })
 export class AppModule {}
