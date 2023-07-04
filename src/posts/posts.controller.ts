@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -15,7 +17,7 @@ import { BlogsService } from '../blogs/blogs.service';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
 
-@Controller()
+@Controller('posts')
 export class PostsController {
   constructor(
     protected postsService: PostsService,
@@ -23,21 +25,26 @@ export class PostsController {
     private postsQueryRepository: PostsQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
   ) {}
+
   @Get()
+  @HttpCode(HttpStatus.OK)
   async getPosts(@Query() query: GetItemsWithPaging) {
     return this.postsQueryRepository.getSortedPosts(query);
   }
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() inputModel: PostInputModel) {
     const foundBLog = await this.blogService.getBlog(inputModel.blogId);
     return this.postsService.createPost(foundBLog, inputModel);
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   async getPost(@Param('id') postId: string) {
     return this.postsService.getPost(postId);
   }
   @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Param('id') postId: string,
     @Body() inputModel: PostInputModel,
@@ -45,11 +52,13 @@ export class PostsController {
     return this.postsService.updatePost(postId, inputModel);
   }
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') postId: string) {
     return this.postsService.deletePost(postId);
   }
 
   @Get(':id/comments')
+  @HttpCode(HttpStatus.OK)
   async getCommentsCurrentPost(@Param('id') postId: string) {
     return this.commentsQueryRepository.getCommentCurrentPost(postId);
   }

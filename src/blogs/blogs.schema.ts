@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { BlogInputModel } from './blogs.models';
+import { randomUUID } from 'crypto';
 
 export type BlogDocument = HydratedDocument<Blog>;
 
@@ -14,15 +15,20 @@ export class Blog {
   @Prop({ required: true })
   websiteUrl: string;
   @Prop({ required: true })
-  createdAt: number;
+  createdAt: string;
   @Prop({ required: true, default: false })
   isMembership: boolean;
+
+  static create(InputModel: BlogInputModel) {
+    const blog = new Blog();
+    blog.id = randomUUID();
+    blog.name = InputModel.name;
+    blog.description = InputModel.description;
+    blog.websiteUrl = InputModel.websiteUrl;
+    blog.createdAt = new Date().toISOString();
+    blog.isMembership = true;
+    return blog;
+  }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
-
-export type BlogModelStaticType = {
-  createBlog: (blog: BlogInputModel) => any;
-};
-
-export type BlogModelType = Model<BlogDocument> & BlogModelStaticType;

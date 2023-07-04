@@ -1,13 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import {
-  CreateUserInputModel,
-  GetUsersWithPagingAndSearch,
-  User,
-  UserViewModel,
-} from './users.models';
-import { randomUUID } from 'crypto';
+import { CreateUserInputModel, UserViewModel } from './users.models';
 import * as bcrypt from 'bcrypt';
+import { User } from './users.schema';
 
 @Injectable()
 export class UsersService {
@@ -19,9 +14,7 @@ export class UsersService {
       InputModel.password,
       passwordSalt,
     );
-
     const newUser = User.create(InputModel, passwordSalt, passwordHash);
-
     return this.usersRepository.createUser(newUser);
   }
 

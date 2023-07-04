@@ -33,7 +33,6 @@ export class UsersController {
     const pageSize = query.pageSize ?? 10;
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
-
     return this.queryRepository.getSortedUsers(
       searchEmailTerm,
       searchLoginTerm,
@@ -43,6 +42,7 @@ export class UsersController {
       sortDirection,
     );
   }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: CreateUserInputModel) {
