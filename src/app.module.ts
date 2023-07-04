@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { UsersController } from './users/users.controller';
 import { UsersService } from './users/users.service';
 import { UsersRepository } from './users/users.repository';
-import { QueryRepository } from './query/query.repository';
 import { BlogsController } from './blogs/blogs.controller';
 import { BlogsService } from './blogs/blogs.service';
 import { BlogsRepository } from './blogs/blogs.repository';
@@ -16,9 +15,21 @@ import { TestRepository } from './test/test.repository';
 import { CommentsController } from './comments/comments.controller';
 import { CommentsService } from './comments/comments.service';
 import { CommentsRepository } from './comments/comments.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Blog, BlogSchema } from './blogs/blogs.schema';
+import { User, UserSchema } from './users/users.models';
+import { CommentsQueryRepository } from './comments/comments.query.repository';
 
 @Module({
-  imports: [],
+  imports: [
+    MongooseModule.forRoot(
+      'mongodb+srv://admin:vgy78uhb@cluster0.txdijud.mongodb.net/network-dev?retryWrites=true&w=majority',
+    ),
+    MongooseModule.forFeature([
+      { name: Blog.name, schema: BlogSchema },
+      { name: User.name, schema: UserSchema },
+    ]),
+  ],
   controllers: [
     AppController,
     TestController,
@@ -30,7 +41,7 @@ import { CommentsRepository } from './comments/comments.repository';
   providers: [
     AppService,
     TestRepository,
-    QueryRepository,
+    CommentsQueryRepository,
     UsersService,
     UsersRepository,
     BlogsService,

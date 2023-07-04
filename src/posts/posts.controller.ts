@@ -1,8 +1,8 @@
 import {
   Body,
+  Controller,
   Delete,
   Get,
-  Injectable,
   Param,
   Post,
   Put,
@@ -11,23 +11,25 @@ import {
 import { PostsService } from './posts.service';
 import { GetItemsWithPaging } from '../utils/common.models';
 import { PostInputModel } from './posts.models';
-import { QueryRepository } from '../query/query.repository';
 import { BlogsService } from '../blogs/blogs.service';
-import { BlogsRepository } from '../blogs/blogs.repository';
+import { PostsQueryRepository } from './posts.query.repository';
+import { CommentsQueryRepository } from '../comments/comments.query.repository';
 
-@Injectable()
+@Controller()
 export class PostsController {
-  constructor(protected postsService: PostsService) {}
+  constructor(
+    protected postsService: PostsService,
+    private blogService: BlogsService,
+    private postsQueryRepository: PostsQueryRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
+  ) {}
   @Get()
   async getPosts(@Query() query: GetItemsWithPaging) {
-    const queryRepository = new QueryRepository();
-    return queryRepository.getSortedPosts(query);
+    return this.postsQueryRepository.getSortedPosts(query);
   }
   @Post()
   async createPost(@Body() inputModel: PostInputModel) {
-    // todo – правильно ли я делаю, когда мне надо в PostsController использовать метод BlogsService?
-    const blog = new BlogsService(new BlogsRepository());
-    const foundBLog = await blog.getBlog(inputModel.blogId);
+    const foundBLog = await this.blogService.getBlog(inputModel.blogId);
     return this.postsService.createPost(foundBLog, inputModel);
   }
 
@@ -49,7 +51,6 @@ export class PostsController {
 
   @Get(':id/comments')
   async getCommentsCurrentPost(@Param('id') postId: string) {
-    const queryRepository = new QueryRepository();
-    return queryRepository.getCommentCurrentPost(postId);
+    return this.commentsQueryRepository.getCommentCurrentPost(postId);
   }
 }

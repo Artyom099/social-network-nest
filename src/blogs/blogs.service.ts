@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { BlogInputModel, BlogViewModel } from './blogs.models';
 import { randomUUID } from 'crypto';
 import { BlogsRepository } from './blogs.repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { Blog, BlogDocument } from './blogs.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class BlogsService {

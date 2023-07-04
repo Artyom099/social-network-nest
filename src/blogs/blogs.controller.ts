@@ -1,8 +1,8 @@
 import {
   Body,
+  Controller,
   Delete,
   Get,
-  Injectable,
   Param,
   Post,
   Put,
@@ -10,23 +10,29 @@ import {
 } from '@nestjs/common';
 import { BlogInputModel } from './blogs.models';
 import { BlogsService } from './blogs.service';
-import { QueryRepository } from '../query/query.repository';
 import {
   GetItemsWithPaging,
   GetItemsWithPagingAndSearch,
 } from '../utils/common.models';
 import { PostsService } from '../posts/posts.service';
-import { PostsRepository } from '../posts/posts.repository';
 import { PostInputModel } from '../posts/posts.models';
+import { BlogsQueryRepository } from './blogs.query.repository';
+import { PostsQueryRepository } from '../posts/posts.query.repository';
 
-@Injectable()
+@Controller()
 export class BlogsController {
-  constructor(protected blogsService: BlogsService) {}
+  constructor(
+    protected blogsService: BlogsService,
+    private postsService: PostsService,
+    private blogsQueryRepository: BlogsQueryRepository,
+    private postsQueryRepository: PostsQueryRepository,
+  ) {}
+
   @Get()
   async getBlogs(@Query() query: GetItemsWithPagingAndSearch) {
-    const queryRepository = new QueryRepository();
-    return queryRepository.getSortedBlogs(query);
+    return this.blogsQueryRepository.getSortedBlogs(query);
   }
+
   @Post()
   async createBlog(@Body() inputModel: BlogInputModel) {
     return this.blogsService.createBlog(inputModel);
@@ -53,8 +59,7 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    const queryRepository = new QueryRepository();
-    return queryRepository.getSortedPostsCurrentBlog(blogId, query);
+    return this.postsQueryRepository.getSortedPostsCurrentBlog(blogId, query);
   }
   @Post(':id/posts')
   async createPostCurrentBlog(
@@ -62,7 +67,6 @@ export class BlogsController {
     @Body() inputModel: PostInputModel,
   ) {
     const foundBlog = await this.blogsService.getBlog(blogId);
-    const postsService = new PostsService(new PostsRepository());
-    return postsService.createPost(foundBlog, inputModel);
+    return this.postsService.createPost(foundBlog, inputModel);
   }
 }
