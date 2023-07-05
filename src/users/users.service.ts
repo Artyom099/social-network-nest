@@ -18,7 +18,7 @@ export class UsersService {
     return this.usersRepository.createUser(newUser);
   }
 
-  private async _generateHash(password: string, salt: string) {
+  private async _generateHash(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt);
   }
 

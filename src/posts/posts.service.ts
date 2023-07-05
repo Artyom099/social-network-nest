@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PostsRepository } from './posts.repository';
 import { PostInputModel, PostViewModel } from './posts.models';
-import { LikeStatus } from '../utils/constants';
-import { randomUUID } from 'crypto';
 import { BlogViewModel } from '../blogs/blogs.models';
+import { Post } from './posts.schema';
 
 @Injectable()
 export class PostsService {
@@ -15,21 +14,7 @@ export class PostsService {
     bLog: BlogViewModel,
     InputModel: PostInputModel,
   ): Promise<PostViewModel> {
-    const createdPost = {
-      id: randomUUID(),
-      title: InputModel.title,
-      shortDescription: InputModel.shortDescription,
-      content: InputModel.content,
-      blogId: InputModel.blogId,
-      blogName: bLog.name,
-      createdAt: new Date().toISOString(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: LikeStatus.None,
-        newestLikes: [],
-      },
-    };
+    const createdPost = Post.create(bLog, InputModel);
     return this.postsRepository.createPost(createdPost);
   }
   async updatePost(postId: string, InputModel: PostInputModel) {

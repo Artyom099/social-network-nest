@@ -21,7 +21,7 @@ import { UsersQueryRepository } from './users.query.repository';
 export class UsersController {
   constructor(
     protected usersService: UsersService,
-    private queryRepository: UsersQueryRepository,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
   @Get()
@@ -33,7 +33,7 @@ export class UsersController {
     const pageSize = query.pageSize ?? 10;
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
-    return this.queryRepository.getSortedUsers(
+    return this.usersQueryRepository.getSortedUsers(
       searchEmailTerm,
       searchLoginTerm,
       pageNumber,
