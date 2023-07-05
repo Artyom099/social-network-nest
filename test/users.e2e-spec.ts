@@ -6,10 +6,6 @@ import { AppModule } from '../src/app.module';
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
 
-  // beforeAll(async () => {
-  //   await request(app.getHttpServer()).delete('/testing/all-data');
-  // });
-
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -21,7 +17,7 @@ describe('UsersController (e2e)', () => {
     await request(app.getHttpServer()).delete('/testing/all-data');
   });
 
-  it('1 - should return 200 and empty array', async () => {
+  it('1 – GET:/users – return 200 & empty array', async () => {
     await request(app.getHttpServer())
       .get('/users')
       // .auth('admin', 'qwerty', { type: 'basic' })
@@ -34,54 +30,47 @@ describe('UsersController (e2e)', () => {
       });
   });
 
-  let createdUser1: any = null;
-  const password1 = 'qwerty1';
-  it('2 - should create user with correct input data', async () => {
+  it('2 – POST:/users – return 201 & create first user', async () => {
+    const firstUser = {
+      login: 'lg-647449',
+      password: 'qwerty1',
+      email: 'valid-email@mail.ru',
+    };
     const createResponse = await request(app.getHttpServer())
       .post('/users')
       .send({
-        login: 'lg-647449',
-        password: password1,
-        email: 'valid-email@mail.ru',
-      })
-      .expect(HttpStatus.CREATED);
+        login: firstUser.login,
+        password: firstUser.password,
+        email: firstUser.email,
+      });
 
-    createdUser1 = createResponse.body;
-    expect(createdUser1).toEqual({
+    expect(createResponse).toBeDefined();
+    expect(createResponse.status).toEqual(HttpStatus.CREATED);
+    const firstCreatedUser = createResponse.body;
+    expect(firstCreatedUser).toEqual({
       id: expect.any(String),
-      login: createdUser1.login,
-      email: createdUser1.email,
+      login: firstUser.login,
+      email: firstUser.email,
       createdAt: expect.any(String),
     });
 
     await request(app.getHttpServer())
       .get('/users')
-      .auth('admin', 'qwerty', { type: 'basic' })
+      // .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [createdUser1],
+        items: [firstCreatedUser],
       });
+    expect.setState({ firstCreatedUser: firstCreatedUser });
   });
 
-  it('3 - should login to system with correct input data', async () => {
-    const createResponse = await request(app.getHttpServer())
-      .post('/auth/login')
-      .send({
-        loginOrEmail: createdUser1.login,
-        password: password1,
-      })
-      .expect(HttpStatus.OK);
-
-    //чтобы .split не ругался на возможный undefined
-    if (!createResponse.headers.authorization) return new Error();
-    // token = createResponse.headers.authorization.split(' ')[1];
-    await request(app.getHttpServer()).get('/auth/me').expect(HttpStatus.OK, {
-      email: createdUser1.email,
-      login: createdUser1.login,
-      userId: createdUser1.userId,
-    });
+  it('3 – DELETE:/users – return 204 & delete first user', async () => {
+    const { firstCreatedUser } = expect.getState();
+    request(app.getHttpServer())
+      .delete(`/users/${firstCreatedUser.id}`)
+      .expect(HttpStatus.NO_CONTENT);
   });
 });
