@@ -10,10 +10,9 @@ export type CommentDBModel = {
   };
   createdAt: string;
   likesInfo: {
-    likesCount: number;
-    dislikesCount: number;
-    myStatus: LikeStatus;
-  };
+    userId: string;
+    status: LikeStatus;
+  }[];
 };
 export type CommentViewModel = {
   id: string;
