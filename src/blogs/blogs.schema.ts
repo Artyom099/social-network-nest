@@ -26,7 +26,7 @@ export class Blog {
     blog.description = InputModel.description;
     blog.websiteUrl = InputModel.websiteUrl;
     blog.createdAt = new Date().toISOString();
-    blog.isMembership = true;
+    blog.isMembership = false;
     return blog;
   }
 }
