@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommentViewModel } from './comments.models';
-import { GetItemsWithPaging, PagingViewModel } from '../utils/common.models';
+import { PagingViewModel } from '../utils/common.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment, CommentDocument } from './comments.schema';
@@ -14,15 +14,18 @@ export class CommentsQueryRepository {
 
   async getCommentsCurrentPost(
     postId: string,
-    query: GetItemsWithPaging,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<CommentViewModel[]>> {
     const filter = { postId };
     const totalCount = await this.commentModel.countDocuments(filter);
     const sortedComments = await this.commentModel
       .find(filter)
-      .sort({ [query.sortBy]: query.sortDirection })
-      .skip((query.pageNumber - 1) * query.pageSize)
-      .limit(query.pageSize)
+      .sort({ [sortBy]: sortDirection })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
       .lean()
       .exec();
     const items = sortedComments.map((c) => {
@@ -51,9 +54,9 @@ export class CommentsQueryRepository {
       };
     });
     return {
-      pagesCount: Math.ceil(totalCount / query.pageSize), // общее количество страниц
-      page: query.pageNumber, // текущая страница
-      pageSize: query.pageSize, // количество пользователей на странице
+      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
+      page: pageNumber, // текущая страница
+      pageSize: pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
       items,
     };

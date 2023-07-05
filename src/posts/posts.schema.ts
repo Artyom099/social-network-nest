@@ -20,7 +20,7 @@ const ExtendedLikesInfoSchema =
 
 export type PostDocument = HydratedDocument<Post>;
 
-@Schema({ versionKey: false })
+@Schema({ _id: false, versionKey: false })
 export class Post {
   id: string;
   @Prop({ required: true })

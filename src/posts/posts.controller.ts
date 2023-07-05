@@ -16,6 +16,7 @@ import { PostInputModel } from './posts.models';
 import { BlogsService } from '../blogs/blogs.service';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
+import { SortBy, SortDirection } from '../utils/constants';
 
 @Controller('posts')
 export class PostsController {
@@ -29,7 +30,16 @@ export class PostsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async getPosts(@Query() query: GetItemsWithPaging) {
-    return this.postsQueryRepository.getSortedPosts(query);
+    const pageNumber = query.pageNumber ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const sortBy = query.sortBy ?? SortBy.default;
+    const sortDirection = query.sortDirection ?? SortDirection.default;
+    return this.postsQueryRepository.getSortedPosts(
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    );
   }
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -63,6 +73,16 @@ export class PostsController {
     @Param('id') postId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    return this.commentsQueryRepository.getCommentsCurrentPost(postId, query);
+    const pageNumber = query.pageNumber ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const sortBy = query.sortBy ?? SortBy.default;
+    const sortDirection = query.sortDirection ?? SortDirection.default;
+    return this.commentsQueryRepository.getCommentsCurrentPost(
+      postId,
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    );
   }
 }

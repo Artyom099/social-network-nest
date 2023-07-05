@@ -20,6 +20,7 @@ import { PostsService } from '../posts/posts.service';
 import { PostInputModel } from '../posts/posts.models';
 import { BlogsQueryRepository } from './blogs.query.repository';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
+import { SortBy, SortDirection } from '../utils/constants';
 
 @Controller('blogs')
 export class BlogsController {
@@ -33,7 +34,18 @@ export class BlogsController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async getBlogs(@Query() query: GetItemsWithPagingAndSearch) {
-    return this.blogsQueryRepository.getSortedBlogs(query);
+    const searchNameTerm = query.searchNameTerm ?? null;
+    const pageNumber = query.pageNumber ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const sortBy = query.sortBy ?? SortBy.default;
+    const sortDirection = query.sortDirection ?? SortDirection.default;
+    return this.blogsQueryRepository.getSortedBlogs(
+      searchNameTerm,
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    );
   }
 
   @Post()
@@ -67,7 +79,17 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    return this.postsQueryRepository.getSortedPostsCurrentBlog(blogId, query);
+    const pageNumber = query.pageNumber ?? 1;
+    const pageSize = query.pageSize ?? 10;
+    const sortBy = query.sortBy ?? SortBy.default;
+    const sortDirection = query.sortDirection ?? SortDirection.default;
+    return this.postsQueryRepository.getSortedPostsCurrentBlog(
+      blogId,
+      pageNumber,
+      pageSize,
+      sortBy,
+      sortDirection,
+    );
   }
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)

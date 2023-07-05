@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GetItemsWithPaging, PagingViewModel } from '../utils/common.models';
+import { PagingViewModel } from '../utils/common.models';
 import { ExtendedLikesInfoDBModel, PostViewModel } from './posts.models';
 import { LikeStatus } from '../utils/constants';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,14 +11,17 @@ export class PostsQueryRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
   async getSortedPosts(
-    query: GetItemsWithPaging,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<PostViewModel[]>> {
     const totalCount = await this.postModel.countDocuments();
     const sortedPosts = await this.postModel
       .find()
-      .sort({ [query.sortBy]: query.sortDirection })
-      .skip((query.pageNumber - 1) * query.pageSize)
-      .limit(query.pageSize)
+      .sort({ [sortBy]: sortDirection })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
       .lean()
       .exec();
     const items = sortedPosts.map((p) => {
@@ -59,25 +62,28 @@ export class PostsQueryRepository {
       };
     });
     return {
-      pagesCount: Math.ceil(totalCount / query.pageSize), // общее количество страниц
-      page: query.pageNumber, // текущая страница
-      pageSize: query.pageSize, // количество пользователей на странице
+      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
+      page: pageNumber, // текущая страница
+      pageSize: pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
       items,
     };
   }
 
   async getSortedPostsCurrentBlog(
-    blogId,
-    query,
+    blogId: string,
+    pageNumber: number,
+    pageSize: number,
+    sortBy: string,
+    sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<PostViewModel[]>> {
     const filter = { blogId };
     const totalCount = await this.postModel.countDocuments(filter);
     const sortedPosts = await this.postModel
       .find(filter)
-      .sort({ [query.sortBy]: query.sortDirection })
-      .skip((query.pageNumber - 1) * query.pageSize)
-      .limit(query.pageSize)
+      .sort({ [sortBy]: sortDirection })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
       .lean()
       .exec();
     const items = sortedPosts.map((p) => {
@@ -118,9 +124,9 @@ export class PostsQueryRepository {
       };
     });
     return {
-      pagesCount: Math.ceil(totalCount / query.pageSize), // общее количество страниц
-      page: query.pageNumber, // текущая страница
-      pageSize: query.pageSize, // количество пользователей на странице
+      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
+      page: pageNumber, // текущая страница
+      pageSize: pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
       items,
     };
