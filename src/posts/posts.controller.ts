@@ -59,7 +59,10 @@ export class PostsController {
 
   @Get(':id/comments')
   @HttpCode(HttpStatus.OK)
-  async getCommentsCurrentPost(@Param('id') postId: string) {
-    return this.commentsQueryRepository.getCommentCurrentPost(postId);
+  async getCommentsCurrentPost(
+    @Param('id') postId: string,
+    @Query() query: GetItemsWithPaging,
+  ) {
+    return this.commentsQueryRepository.getCommentsCurrentPost(postId, query);
   }
 }

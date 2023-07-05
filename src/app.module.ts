@@ -17,8 +17,11 @@ import { CommentsService } from './comments/comments.service';
 import { CommentsRepository } from './comments/comments.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './blogs/blogs.schema';
-import { User, UserSchema } from './users/users.models';
+import { User, UserSchema } from './users/users.schema';
 import { CommentsQueryRepository } from './comments/comments.query.repository';
+import { PostsQueryRepository } from './posts/posts.query.repository';
+import { BlogsQueryRepository } from './blogs/blogs.query.repository';
+import { UsersQueryRepository } from './users/users.query.repository';
 
 @Module({
   imports: [
@@ -41,15 +44,22 @@ import { CommentsQueryRepository } from './comments/comments.query.repository';
   providers: [
     AppService,
     TestRepository,
-    CommentsQueryRepository,
+
     UsersService,
     UsersRepository,
+    UsersQueryRepository,
+
     BlogsService,
     BlogsRepository,
+    BlogsQueryRepository,
+
     PostsService,
     PostsRepository,
+    PostsQueryRepository,
+
     CommentsService,
     CommentsRepository,
+    CommentsQueryRepository,
   ],
 })
 export class AppModule {}

@@ -1,12 +1,5 @@
 import { CommentsService } from './comments.service';
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Injectable,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
 import { CommentViewModel } from './comments.models';
 
 @Controller('comments')
