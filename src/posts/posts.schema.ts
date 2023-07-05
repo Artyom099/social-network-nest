@@ -4,17 +4,6 @@ import { LikeStatus } from '../utils/constants';
 import { BlogViewModel } from '../blogs/blogs.models';
 import { PostInputModel } from './posts.models';
 
-// @Schema({ _id: false, versionKey: false })
-// class NewestLikes {
-//   @Prop()
-//   addedAt: string;
-//   @Prop()
-//   userId: string;
-//   @Prop()
-//   login: string;
-// }
-// const NewestLikesSchema = SchemaFactory.createForClass(NewestLikes);
-
 @Schema({ _id: false, versionKey: false })
 class ExtendedLikesInfo {
   @Prop({ required: true })
