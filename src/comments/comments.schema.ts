@@ -18,7 +18,7 @@ class LikesInfo {
   @Prop({ required: true, default: LikeStatus.None })
   status: LikeStatus;
 }
-const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
+const LikesInfoSchema = SchemaFactory.createForClass<LikesInfo>(LikesInfo);
 
 export type CommentDocument = HydratedDocument<Comment>;
 
@@ -34,6 +34,6 @@ export class Comment {
   @Prop({ required: true })
   createdAt: string;
   @Prop({ type: [LikesInfoSchema], required: true })
-  likesInfo: [LikesInfo] | [];
+  likesInfo: LikesInfo[];
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);

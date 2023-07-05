@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { GetItemsWithPaging, PagingViewModel } from '../utils/common.models';
-import { PostViewModel } from './posts.models';
+import {
+  extendedLikesInfoDBModel,
+  NewestLikes,
+  PostViewModel,
+} from './posts.models';
 import { LikeStatus } from '../utils/constants';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from './posts.schema';
@@ -84,9 +88,9 @@ export class PostsQueryRepository {
       const myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
-      const newestLikes = [];
+      const newestLikes: any[] = [];
       // todo - как узнать currentUserId без мидлвейр?
-      p.extendedLikesInfo.forEach((s) => {
+      p.extendedLikesInfo.forEach((s: extendedLikesInfoDBModel) => {
         // if (s.userId === currentUserId) myStatus = s.status;
         if (s.status === LikeStatus.Dislike) dislikesCount++;
         if (s.status === LikeStatus.Like) {
@@ -111,7 +115,7 @@ export class PostsQueryRepository {
           dislikesCount,
           myStatus,
           newestLikes: newestLikes
-            .sort((a, b) => a.addedAt - b.addedAt)
+            .sort((a, b) => parseInt(a.addedAt) - parseInt(b.addedAt))
             .slice(-3)
             .reverse(),
         },

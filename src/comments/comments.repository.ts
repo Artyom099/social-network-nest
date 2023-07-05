@@ -2,7 +2,7 @@ import { LikeStatus } from '../utils/constants';
 import { CommentViewModel } from './comments.models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CommentDocument } from './comments.schema';
+import { Comment, CommentDocument } from './comments.schema';
 import { Model } from 'mongoose';
 
 @Injectable()

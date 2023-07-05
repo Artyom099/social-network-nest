@@ -2,7 +2,7 @@ import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeStatus } from '../utils/constants';
 import { BlogViewModel } from '../blogs/blogs.models';
-import { PostInputModel } from './posts.models';
+import { extendedLikesInfoDBModel, PostInputModel } from './posts.models';
 
 // @Schema({ _id: false, versionKey: false })
 // class NewestLikes {
@@ -26,7 +26,8 @@ class ExtendedLikesInfo {
   @Prop({ required: true, default: LikeStatus.None })
   status: LikeStatus;
 }
-const ExtendedLikesInfoSchema = SchemaFactory.createForClass(ExtendedLikesInfo);
+const ExtendedLikesInfoSchema =
+  SchemaFactory.createForClass<ExtendedLikesInfo>(ExtendedLikesInfo);
 
 export type PostDocument = HydratedDocument<Post>;
 
@@ -46,7 +47,7 @@ export class Post {
   @Prop({ required: true })
   createdAt: string;
   @Prop({ type: [ExtendedLikesInfoSchema], required: true })
-  extendedLikesInfo: [ExtendedLikesInfo] | [];
+  extendedLikesInfo: ExtendedLikesInfo[];
 
   static create(bLog: BlogViewModel, InputModel: PostInputModel) {
     const post = new Post();

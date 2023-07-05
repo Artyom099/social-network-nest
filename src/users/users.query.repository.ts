@@ -23,14 +23,22 @@ export class UsersQueryRepository {
       .sort({ [sortBy]: sortDirection })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .lean();
-    // .exec();
+      .lean()
+      .exec();
+    const items = sortedUsers.map((u) => {
+      return {
+        id: u.id,
+        login: u.accountData.login,
+        email: u.accountData.email,
+        createdAt: u.accountData.createdAt,
+      };
+    });
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
       pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
-      items: sortedUsers,
+      items,
     };
   }
 }

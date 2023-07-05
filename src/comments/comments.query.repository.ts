@@ -3,7 +3,7 @@ import { CommentViewModel } from './comments.models';
 import { GetItemsWithPaging, PagingViewModel } from '../utils/common.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CommentDocument } from './comments.schema';
+import { Comment, CommentDocument } from './comments.schema';
 import { LikeStatus } from '../utils/constants';
 
 @Injectable()

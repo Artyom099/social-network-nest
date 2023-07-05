@@ -24,6 +24,8 @@ import { BlogsQueryRepository } from './blogs/blogs.query.repository';
 import { UsersQueryRepository } from './users/users.query.repository';
 import { Post, PostSchema } from './posts/posts.schema';
 import { Comment, CommentSchema } from './comments/comments.schema';
+import { config } from 'dotenv';
+config();
 
 @Module({
   imports: [

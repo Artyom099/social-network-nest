@@ -33,10 +33,17 @@ export type PostDBModel = {
   blogId: string;
   blogName: string;
   createdAt: string;
-  extendedLikesInfo: {
-    userId: string;
-    login: string;
-    addedAt: string;
-    status: LikeStatus;
-  }[];
+  extendedLikesInfo: extendedLikesInfoDBModel[];
 };
+export type extendedLikesInfoDBModel = {
+  userId: string;
+  login: string;
+  addedAt: string;
+  status: LikeStatus;
+};
+
+export type NewestLikes = {
+  addedAt: string;
+  userId: string;
+  login: string;
+}[];
