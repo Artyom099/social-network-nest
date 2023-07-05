@@ -11,11 +11,23 @@ export class PostsRepository {
 
   async getPost(id: string): Promise<PostViewModel> {
     const post = await this.postModel.findOne({ id }).exec();
-    const likesCount = 0;
-    const dislikesCount = 0;
+    let likesCount = 0;
+    let dislikesCount = 0;
     const myStatus = LikeStatus.None;
     const newestLikes = [];
-    // todo - написать подсчет лайков, дизлайков, нахождение статуса
+    // todo - как узнать currentUserId без мидлвейр?
+    post.extendedLikesInfo.forEach((s) => {
+      // if (s.userId === currentUserId) myStatus = s.status;
+      if (s.status === LikeStatus.Dislike) dislikesCount++;
+      if (s.status === LikeStatus.Like) {
+        likesCount++;
+        newestLikes.push({
+          addedAt: s.addedAt,
+          userId: s.userId,
+          login: s.login,
+        });
+      }
+    });
     return {
       id: post.id,
       title: post.title,
@@ -28,7 +40,10 @@ export class PostsRepository {
         likesCount,
         dislikesCount,
         myStatus,
-        newestLikes,
+        newestLikes: newestLikes
+          .sort((a, b) => a.addedAt - b.addedAt)
+          .slice(-3)
+          .reverse(),
       },
     };
   }

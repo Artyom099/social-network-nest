@@ -13,10 +13,15 @@ export class CommentsRepository {
 
   async getComment(id: string): Promise<CommentViewModel> {
     const comment = await this.commentModel.findOne({ id }).exec();
-    const likesCount = 0;
-    const dislikesCount = 0;
     const myStatus = LikeStatus.None;
-    // todo - написать подсчет лайков, дизлайков, нахождение статуса
+    let likesCount = 0;
+    let dislikesCount = 0;
+    // todo - как узнать currentUserId без мидлвейр?
+    comment.likesInfo.forEach((s) => {
+      // if (s.userId === currentUserId) myStatus = s.status;
+      if (s.status === LikeStatus.Like) likesCount++;
+      if (s.status === LikeStatus.Dislike) dislikesCount++;
+    });
     return {
       id: comment.id,
       content: comment.content,
