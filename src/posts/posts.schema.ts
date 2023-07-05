@@ -2,7 +2,7 @@ import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeStatus } from '../utils/constants';
 import { BlogViewModel } from '../blogs/blogs.models';
-import { extendedLikesInfoDBModel, PostInputModel } from './posts.models';
+import { PostInputModel } from './posts.models';
 
 // @Schema({ _id: false, versionKey: false })
 // class NewestLikes {

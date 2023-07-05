@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
-  extendedLikesInfoDBModel,
-  NewestLikes,
+  NewestLikesViewModel,
   PostDBModel,
   PostInputModel,
   PostViewModel,
@@ -20,7 +19,7 @@ export class PostsRepository {
     let likesCount = 0;
     let dislikesCount = 0;
     const myStatus = LikeStatus.None;
-    const newestLikes: any[] = [];
+    const newestLikes: NewestLikesViewModel[] = [];
     // todo - как узнать currentUserId без мидлвейр?
     post.extendedLikesInfo.forEach((s) => {
       // if (s.userId === currentUserId) myStatus = s.status;

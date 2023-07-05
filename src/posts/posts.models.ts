@@ -6,6 +6,7 @@ export type PostInputModel = {
   content: string;
   blogId: string;
 };
+
 export type PostViewModel = {
   id: string;
   title: string;
@@ -14,17 +15,20 @@ export type PostViewModel = {
   blogId: string;
   blogName: string;
   createdAt: string;
-  extendedLikesInfo: {
-    likesCount: number;
-    dislikesCount: number;
-    myStatus: LikeStatus;
-    newestLikes: {
-      addedAt: string;
-      userId: string;
-      login: string;
-    }[];
-  };
+  extendedLikesInfo: ExtendedLikesInfoViewModel;
 };
+export type ExtendedLikesInfoViewModel = {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: LikeStatus;
+  newestLikes: NewestLikesViewModel[];
+};
+export type NewestLikesViewModel = {
+  addedAt: string;
+  userId: string;
+  login: string;
+};
+
 export type PostDBModel = {
   id: string;
   title: string;
@@ -33,17 +37,11 @@ export type PostDBModel = {
   blogId: string;
   blogName: string;
   createdAt: string;
-  extendedLikesInfo: extendedLikesInfoDBModel[];
+  extendedLikesInfo: ExtendedLikesInfoDBModel[];
 };
-export type extendedLikesInfoDBModel = {
+export type ExtendedLikesInfoDBModel = {
   userId: string;
   login: string;
   addedAt: string;
   status: LikeStatus;
 };
-
-export type NewestLikes = {
-  addedAt: string;
-  userId: string;
-  login: string;
-}[];
