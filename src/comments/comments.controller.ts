@@ -8,7 +8,9 @@ export class CommentsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getComment(@Param('id') commentId: string): Promise<CommentViewModel> {
+  async getComment(
+    @Param('id') commentId: string,
+  ): Promise<CommentViewModel | null> {
     return this.commentsService.getComment(commentId);
   }
 }

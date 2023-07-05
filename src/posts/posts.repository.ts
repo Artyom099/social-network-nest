@@ -14,8 +14,9 @@ import { Model } from 'mongoose';
 export class PostsRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
-  async getPost(id: string): Promise<PostViewModel> {
+  async getPost(id: string): Promise<PostViewModel | null> {
     const post = await this.postModel.findOne({ id }).exec();
+    if (!post) return null;
     let likesCount = 0;
     let dislikesCount = 0;
     const myStatus = LikeStatus.None;

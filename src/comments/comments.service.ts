@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 export class CommentsService {
   constructor(protected commentsRepository: CommentsRepository) {}
 
-  async getComment(commentId: string): Promise<CommentViewModel> {
+  async getComment(commentId: string): Promise<CommentViewModel | null> {
     return this.commentsRepository.getComment(commentId);
   }
 }

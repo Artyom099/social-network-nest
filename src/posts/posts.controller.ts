@@ -45,7 +45,9 @@ export class PostsController {
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() inputModel: PostInputModel) {
     const foundBLog = await this.blogService.getBlog(inputModel.blogId);
-    return this.postsService.createPost(foundBLog, inputModel);
+    if (foundBLog) {
+      return this.postsService.createPost(foundBLog, inputModel);
+    }
   }
 
   @Get(':id')

@@ -7,7 +7,7 @@ import { Post } from './posts.schema';
 @Injectable()
 export class PostsService {
   constructor(protected postsRepository: PostsRepository) {}
-  async getPost(postId: string): Promise<PostViewModel> {
+  async getPost(postId: string): Promise<PostViewModel | null> {
     return this.postsRepository.getPost(postId);
   }
   async createPost(

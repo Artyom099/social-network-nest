@@ -25,12 +25,14 @@ import { UsersQueryRepository } from './users/users.query.repository';
 import { Post, PostSchema } from './posts/posts.schema';
 import { Comment, CommentSchema } from './comments/comments.schema';
 import { config } from 'dotenv';
+import { ConfigModule } from '@nestjs/config';
+
 config();
 
 @Module({
   imports: [
-    // ConfigModule.forRoot(),
-    MongooseModule.forRoot(process.env.MONGO_URL),
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGO_URL || ''),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },

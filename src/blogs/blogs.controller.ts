@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -57,7 +58,10 @@ export class BlogsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getBlog(@Param('id') blogId: string) {
-    return this.blogsService.getBlog(blogId);
+    const blog = await this.blogsService.getBlog(blogId);
+    if (!blog) {
+      throw new NotFoundException('blog not found');
+    }
   }
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -98,6 +102,8 @@ export class BlogsController {
     @Body() inputModel: PostInputModel,
   ) {
     const foundBlog = await this.blogsService.getBlog(blogId);
-    return this.postsService.createPost(foundBlog, inputModel);
+    if (foundBlog) {
+      return this.postsService.createPost(foundBlog, inputModel);
+    }
   }
 }

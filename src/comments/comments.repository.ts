@@ -11,8 +11,9 @@ export class CommentsRepository {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
   ) {}
 
-  async getComment(id: string): Promise<CommentViewModel> {
+  async getComment(id: string): Promise<CommentViewModel | null> {
     const comment = await this.commentModel.findOne({ id }).exec();
+    if (!comment) return null;
     const myStatus = LikeStatus.None;
     let likesCount = 0;
     let dislikesCount = 0;
