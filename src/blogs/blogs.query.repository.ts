@@ -12,17 +12,14 @@ export class BlogsQueryRepository {
   async getSortedBlogs(
     query: GetItemsWithPaging,
   ): Promise<PagingViewModel<BlogViewModel[]>> {
-    const totalCount = 1;
-    const sortedBlogs = [
-      {
-        id: 'string',
-        name: 'string',
-        description: 'string',
-        websiteUrl: 'string',
-        createdAt: 'string',
-        isMembership: true,
-      },
-    ];
+    const totalCount = await this.blogModel.countDocuments();
+    const sortedBlogs = await this.blogModel
+      .find()
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .limit(query.pageSize)
+      .lean()
+      .exec();
     return {
       pagesCount: Math.ceil(totalCount / query.pageSize), // общее количество страниц
       page: query.pageNumber, // текущая страница
