@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../blogs/blogs.schema';
 import { Model } from 'mongoose';
+import { Blog, BlogDocument } from '../blogs/blogs.schema';
 import { User, UserDocument } from '../users/users.schema';
 import { Post, PostDocument } from '../posts/posts.schema';
-import { CommentDocument } from '../comments/comments.schema';
+import { Comment, CommentDocument } from '../comments/comments.schema';
 
 @Injectable()
 export class TestRepository {

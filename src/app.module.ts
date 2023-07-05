@@ -22,15 +22,18 @@ import { CommentsQueryRepository } from './comments/comments.query.repository';
 import { PostsQueryRepository } from './posts/posts.query.repository';
 import { BlogsQueryRepository } from './blogs/blogs.query.repository';
 import { UsersQueryRepository } from './users/users.query.repository';
+import { Post, PostSchema } from './posts/posts.schema';
+import { Comment, CommentSchema } from './comments/comments.schema';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb+srv://admin:vgy78uhb@cluster0.txdijud.mongodb.net/network-dev?retryWrites=true&w=majority',
-    ),
+    // ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGO_URL),
     MongooseModule.forFeature([
-      { name: Blog.name, schema: BlogSchema },
       { name: User.name, schema: UserSchema },
+      { name: Blog.name, schema: BlogSchema },
+      { name: Post.name, schema: PostSchema },
+      { name: Comment.name, schema: CommentSchema },
     ]),
   ],
   controllers: [
