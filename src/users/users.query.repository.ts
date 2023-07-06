@@ -27,10 +27,18 @@ export class UsersQueryRepository {
         },
       ],
     };
+    const _sortBy = 'accountData.' + sortBy;
     const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel
-      .find(filter)
-      .sort({ [sortBy]: sortDirection })
+      .find(filter, {
+        // _id: 0,
+        // accountData: 0,
+        // id: 1,
+        // login: '$accountData.login',
+        // email: '$accountData.email',
+        // createdAt: '$accountData.createdAt',
+      })
+      .sort({ [_sortBy]: sortDirection })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .lean()

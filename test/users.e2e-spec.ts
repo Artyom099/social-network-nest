@@ -98,7 +98,7 @@ describe('UsersController (e2e)', () => {
         page: 1,
         pageSize: 10,
         totalCount: 2,
-        items: [firstCreatedUser, secondCreatedUser],
+        items: [secondCreatedUser, firstCreatedUser],
       });
     expect.setState({ secondCreatedUser: secondCreatedUser });
   });
@@ -135,7 +135,7 @@ describe('UsersController (e2e)', () => {
         page: 1,
         pageSize: 10,
         totalCount: 3,
-        items: [firstCreatedUser, secondCreatedUser, thirdCreatedUser],
+        items: [thirdCreatedUser, secondCreatedUser, firstCreatedUser],
       });
     expect.setState({ thirdCreatedUser: thirdCreatedUser });
   });
@@ -174,10 +174,10 @@ describe('UsersController (e2e)', () => {
         pageSize: 10,
         totalCount: 4,
         items: [
-          firstCreatedUser,
-          secondCreatedUser,
-          thirdCreatedUser,
           fourthCreatedUser,
+          thirdCreatedUser,
+          secondCreatedUser,
+          firstCreatedUser,
         ],
       });
     expect.setState({ fourthCreatedUser: fourthCreatedUser });
