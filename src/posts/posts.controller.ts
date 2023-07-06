@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -45,7 +46,9 @@ export class PostsController {
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() inputModel: PostInputModel) {
     const foundBLog = await this.blogService.getBlog(inputModel.blogId);
-    if (foundBLog) {
+    if (!foundBLog) {
+      throw new NotFoundException('blog not found');
+    } else {
       return this.postsService.createPost(foundBLog, inputModel);
     }
   }
@@ -53,7 +56,12 @@ export class PostsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getPost(@Param('id') postId: string) {
-    return this.postsService.getPost(postId);
+    const foundPost = this.postsService.getPost(postId);
+    if (!foundPost) {
+      throw new NotFoundException('post not found');
+    } else {
+      return foundPost;
+    }
   }
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -66,7 +74,12 @@ export class PostsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') postId: string) {
-    return this.postsService.deletePost(postId);
+    const foundPost = this.postsService.getPost(postId);
+    if (!foundPost) {
+      throw new NotFoundException('post not found');
+    } else {
+      return this.postsService.deletePost(postId);
+    }
   }
 
   @Get(':id/comments')
@@ -75,16 +88,21 @@ export class PostsController {
     @Param('id') postId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 10;
-    const sortBy = query.sortBy ?? SortBy.default;
-    const sortDirection = query.sortDirection ?? SortDirection.default;
-    return this.commentsQueryRepository.getCommentsCurrentPost(
-      postId,
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-    );
+    const foundPost = this.postsService.getPost(postId);
+    if (!foundPost) {
+      throw new NotFoundException('post not found');
+    } else {
+      const pageNumber = query.pageNumber ?? 1;
+      const pageSize = query.pageSize ?? 10;
+      const sortBy = query.sortBy ?? SortBy.default;
+      const sortDirection = query.sortDirection ?? SortDirection.default;
+      return this.commentsQueryRepository.getCommentsCurrentPost(
+        postId,
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+      );
+    }
   }
 }
