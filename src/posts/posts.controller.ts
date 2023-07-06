@@ -69,7 +69,12 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    return this.postsService.updatePost(postId, inputModel);
+    const foundPost = this.postsService.getPost(postId);
+    if (!foundPost) {
+      throw new NotFoundException('post not found');
+    } else {
+      return this.postsService.updatePost(postId, inputModel);
+    }
   }
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
