@@ -8,7 +8,7 @@ import { User } from './users.schema';
 export class UsersService {
   constructor(protected usersRepository: UsersRepository) {}
 
-  async getUser(userId: string): Promise<UserViewModel> {
+  async getUser(userId: string): Promise<UserViewModel | null> {
     return this.usersRepository.getUser(userId);
   }
 

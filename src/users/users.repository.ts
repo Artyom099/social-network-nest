@@ -8,7 +8,7 @@ import { User, UserDocument } from './users.schema';
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async getUser(id: string): Promise<UserViewModel> {
+  async getUser(id: string): Promise<UserViewModel | null> {
     return this.userModel.findOne({ id });
   }
 
