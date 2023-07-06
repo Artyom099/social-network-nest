@@ -83,17 +83,22 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 10;
-    const sortBy = query.sortBy ?? SortBy.default;
-    const sortDirection = query.sortDirection ?? SortDirection.default;
-    return this.postsQueryRepository.getSortedPostsCurrentBlog(
-      blogId,
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-    );
+    const foundBlog = await this.blogsService.getBlog(blogId);
+    if (!foundBlog) {
+      throw new NotFoundException('blog not found');
+    } else {
+      const pageNumber = query.pageNumber ?? 1;
+      const pageSize = query.pageSize ?? 10;
+      const sortBy = query.sortBy ?? SortBy.default;
+      const sortDirection = query.sortDirection ?? SortDirection.default;
+      return this.postsQueryRepository.getSortedPostsCurrentBlog(
+        blogId,
+        pageNumber,
+        pageSize,
+        sortBy,
+        sortDirection,
+      );
+    }
   }
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)
@@ -102,7 +107,9 @@ export class BlogsController {
     @Body() inputModel: PostInputModel,
   ) {
     const foundBlog = await this.blogsService.getBlog(blogId);
-    if (foundBlog) {
+    if (!foundBlog) {
+      throw new NotFoundException('blog not found');
+    } else {
       return this.postsService.createPost(foundBlog, inputModel);
     }
   }
