@@ -40,7 +40,7 @@ export class UsersQueryRepository {
         id: u.id,
         login: u.accountData.login,
         email: u.accountData.email,
-        createdAt: u.accountData.createdAt,
+        createdAt: u.accountData.createdAt.toISOString(),
       };
     });
     return {

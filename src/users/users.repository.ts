@@ -18,7 +18,7 @@ export class UsersRepository {
       id: user.id,
       login: user.accountData.login,
       email: user.accountData.email,
-      createdAt: user.accountData.createdAt,
+      createdAt: user.accountData.createdAt.toISOString(),
     };
   }
   async deleteUser(id: string) {

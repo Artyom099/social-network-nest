@@ -13,8 +13,8 @@ class AccountData {
   passwordSalt: string;
   @Prop({ required: true, type: String })
   passwordHash: string;
-  @Prop({ required: true, type: String })
-  createdAt: string;
+  @Prop({ required: true, type: Date })
+  createdAt: Date;
 }
 const AccountDataSchema = SchemaFactory.createForClass(AccountData);
 
@@ -37,7 +37,7 @@ export class User {
     accountData.email = createUserInputModel.email;
     accountData.passwordSalt = passwordSalt;
     accountData.passwordHash = passwordHash;
-    accountData.createdAt = new Date().toISOString();
+    accountData.createdAt = new Date();
     const user = new User();
     user.id = randomUUID();
     user.accountData = accountData;
