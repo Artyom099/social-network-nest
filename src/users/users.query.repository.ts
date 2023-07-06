@@ -4,8 +4,6 @@ import { UserViewModel } from './users.models';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import Filter = module;
-import module from 'node:module';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -19,7 +17,7 @@ export class UsersQueryRepository {
     sortBy: string,
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<UserViewModel[]>> {
-    const filter: Filter<UserViewModel> = {
+    const filter = {
       $or: [
         {
           'accountData.login': { $regex: searchLoginTerm ?? '', $options: 'i' },
