@@ -56,7 +56,7 @@ export class PostsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getPost(@Param('id') postId: string) {
-    const foundPost = this.postsService.getPost(postId);
+    const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
@@ -69,7 +69,7 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    const foundPost = this.postsService.getPost(postId);
+    const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
@@ -79,7 +79,7 @@ export class PostsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') postId: string) {
-    const foundPost = this.postsService.getPost(postId);
+    const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
@@ -93,7 +93,7 @@ export class PostsController {
     @Param('id') postId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    const foundPost = this.postsService.getPost(postId);
+    const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {

@@ -287,7 +287,7 @@ describe('/posts', () => {
       .put('/posts/123')
       .expect(HttpStatus.NOT_FOUND);
   });
-  it('12 – PUT:/posts/:id – return 404 with not existing postId', async () => {
+  it('12 – PUT:/posts/:id – return 204 & update post', async () => {
     const firstUpdatePost = {
       title: 'valid-title-update',
       shortDescription: 'valid-shortDescription-update',
@@ -301,6 +301,18 @@ describe('/posts', () => {
         shortDescription: firstUpdatePost.shortDescription,
         content: firstUpdatePost.content,
       })
+      .expect(HttpStatus.NO_CONTENT);
+  });
+
+  it('13 – DELETE:/posts/:id – return 404 with not existing postId', async () => {
+    await request(app.getHttpServer())
+      .delete('/posts/123')
+      .expect(HttpStatus.NOT_FOUND);
+  });
+  it('14 – DELETE:/posts/:id – return 204 & delete post', async () => {
+    const { firstPost } = expect.getState();
+    await request(app.getHttpServer())
+      .delete(`/posts/${firstPost.id}`)
       .expect(HttpStatus.NO_CONTENT);
   });
 
