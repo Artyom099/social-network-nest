@@ -17,7 +17,7 @@ describe('/blogs', () => {
     await request(app.getHttpServer()).delete('/testing/all-data');
   });
 
-  it('1 - return 200 and empty array', async () => {
+  it('1 – GET:/blogs – return 200 and empty array', async () => {
     await request(app.getHttpServer()).get('/blogs').expect(HttpStatus.OK, {
       pagesCount: 0,
       page: 1,

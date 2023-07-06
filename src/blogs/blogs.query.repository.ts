@@ -17,8 +17,8 @@ export class BlogsQueryRepository {
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<BlogViewModel[]>> {
     const totalCount = await this.blogModel.countDocuments();
-    const sortedBlogs = await this.blogModel
-      .find()
+    const items = await this.blogModel
+      .find({}, { _id: 0 })
       .sort({ [sortBy]: sortDirection })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -27,9 +27,9 @@ export class BlogsQueryRepository {
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
-      pageSize: pageSize, // количество пользователей на странице
+      pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
-      items: sortedBlogs,
+      items,
     };
   }
 }

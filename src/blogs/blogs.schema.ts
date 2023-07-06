@@ -5,7 +5,7 @@ import { randomUUID } from 'crypto';
 
 export type BlogDocument = HydratedDocument<Blog>;
 
-@Schema({ _id: false, versionKey: false })
+@Schema({ versionKey: false })
 export class Blog {
   id: string;
   @Prop({ required: true })
