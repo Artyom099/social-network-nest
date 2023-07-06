@@ -4,6 +4,8 @@ import { UserViewModel } from './users.models';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import Filter = module;
+import module from 'node:module';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -17,9 +19,19 @@ export class UsersQueryRepository {
     sortBy: string,
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<UserViewModel[]>> {
-    const totalCount = await this.userModel.countDocuments();
+    const filter: Filter<UserViewModel> = {
+      $or: [
+        {
+          'accountData.login': { $regex: searchLoginTerm ?? '', $options: 'i' },
+        },
+        {
+          'accountData.email': { $regex: searchEmailTerm ?? '', $options: 'i' },
+        },
+      ],
+    };
+    const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel
-      .find()
+      .find(filter)
       .sort({ [sortBy]: sortDirection })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
