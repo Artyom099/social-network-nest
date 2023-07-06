@@ -8,6 +8,10 @@ import { User } from './users.schema';
 export class UsersService {
   constructor(protected usersRepository: UsersRepository) {}
 
+  async getUser(userId: string): Promise<UserViewModel> {
+    return this.usersRepository.getUser(userId);
+  }
+
   async createUser(InputModel: CreateUserInputModel): Promise<UserViewModel> {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(

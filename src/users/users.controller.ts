@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -52,6 +53,11 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') userId: string) {
-    return this.usersService.deleteUser(userId);
+    const foundBlog = await this.usersService.getUser(userId);
+    if (!foundBlog) {
+      throw new NotFoundException('blog not found');
+    } else {
+      return this.usersService.deleteUser(userId);
+    }
   }
 }
