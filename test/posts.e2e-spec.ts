@@ -215,9 +215,9 @@ describe('/posts', () => {
       .post('/posts')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
-        title: 'valid-title',
-        shortDescription: 'valid-shortDescription',
-        content: 'valid-content',
+        title: firstPost.title,
+        shortDescription: firstPost.shortDescription,
+        content: firstPost.content,
         blogId: firstCreatedBlog.id,
       });
     expect(createPostResponse).toBeDefined();
@@ -282,7 +282,27 @@ describe('/posts', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it('11 – PUT:/posts/:id – return 404 with not existing postId', async () => {});
+  it('11 – PUT:/posts/:id – return 404 with not existing postId', async () => {
+    await request(app.getHttpServer())
+      .put('/posts/123')
+      .expect(HttpStatus.NOT_FOUND);
+  });
+  it('12 – PUT:/posts/:id – return 404 with not existing postId', async () => {
+    const firstUpdatePost = {
+      title: 'valid-title-update',
+      shortDescription: 'valid-shortDescription-update',
+      content: 'valid-content-update',
+    };
+    const { firstPost } = expect.getState();
+    await request(app.getHttpServer())
+      .put(`/posts/${firstPost.id}`)
+      .send({
+        title: firstUpdatePost.title,
+        shortDescription: firstUpdatePost.shortDescription,
+        content: firstUpdatePost.content,
+      })
+      .expect(HttpStatus.NO_CONTENT);
+  });
 
   // it('11 – PUT:/posts/:id/like-status – return 204 & set like', async () => {
   //   const { firstAccessToken, firstPost } = expect.getState();
