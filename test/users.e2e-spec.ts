@@ -66,7 +66,12 @@ describe('UsersController (e2e)', () => {
     expect.setState({ firstCreatedUser: firstCreatedUser });
   });
 
-  it('3 – DELETE:/users – return 204 & delete first user', async () => {
+  it('3 – DELETE:/users – return 404', async () => {
+    request(app.getHttpServer())
+      .delete('/users/1')
+      .expect(HttpStatus.NOT_FOUND);
+  });
+  it('4 – DELETE:/users – return 204 & delete first user', async () => {
     const { firstCreatedUser } = expect.getState();
     request(app.getHttpServer())
       .delete(`/users/${firstCreatedUser.id}`)

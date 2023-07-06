@@ -74,7 +74,14 @@ export class PostsRepository {
     };
   }
   async updatePost(id: string, InputModel: PostInputModel) {
-    return this.postModel.updateOne({ id }, { InputModel });
+    return this.postModel.updateOne(
+      { id },
+      {
+        title: InputModel.title,
+        shortDescription: InputModel.shortDescription,
+        content: InputModel.content,
+      },
+    );
   }
   async deletePost(id: string) {
     return this.postModel.deleteOne({ id });
