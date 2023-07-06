@@ -36,8 +36,8 @@ export class PostsController {
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
     return this.postsQueryRepository.getSortedPosts(
-      pageNumber,
-      pageSize,
+      Number(pageNumber),
+      Number(pageSize),
       sortBy,
       sortDirection,
     );
@@ -103,8 +103,8 @@ export class PostsController {
       const sortDirection = query.sortDirection ?? SortDirection.default;
       return this.commentsQueryRepository.getCommentsCurrentPost(
         postId,
-        pageNumber,
-        pageSize,
+        Number(pageNumber),
+        Number(pageSize),
         sortBy,
         sortDirection,
       );

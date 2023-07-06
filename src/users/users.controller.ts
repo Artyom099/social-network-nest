@@ -36,8 +36,8 @@ export class UsersController {
     return this.usersQueryRepository.getSortedUsers(
       searchEmailTerm,
       searchLoginTerm,
-      pageNumber,
-      pageSize,
+      Number(pageNumber),
+      Number(pageSize),
       sortBy,
       sortDirection,
     );

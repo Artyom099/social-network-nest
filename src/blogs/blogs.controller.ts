@@ -42,8 +42,8 @@ export class BlogsController {
     const sortDirection = query.sortDirection ?? SortDirection.default;
     return this.blogsQueryRepository.getSortedBlogs(
       searchNameTerm,
-      pageNumber,
-      pageSize,
+      Number(pageNumber),
+      Number(pageSize),
       sortBy,
       sortDirection,
     );
