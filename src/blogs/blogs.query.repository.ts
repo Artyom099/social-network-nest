@@ -16,9 +16,12 @@ export class BlogsQueryRepository {
     sortBy: string,
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<BlogViewModel[]>> {
-    const totalCount = await this.blogModel.countDocuments();
+    const filter = searchNameTerm
+      ? { name: { $regex: searchNameTerm, $options: 'i' } }
+      : {};
+    const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel
-      .find({}, { _id: 0 })
+      .find(filter, { _id: 0 })
       .sort({ [sortBy]: sortDirection })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
