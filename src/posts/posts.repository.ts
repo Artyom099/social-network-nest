@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   NewestLikesViewModel,
+  PostCreateDTO,
   PostDBModel,
   PostInputModel,
   PostViewModel,
@@ -54,8 +55,9 @@ export class PostsRepository {
     };
   }
   async createPost(post: PostDBModel): Promise<PostViewModel> {
-    await this.postModel.create(post);
+    const newPost = await this.postModel.create(post);
     return {
+      // id: newPost._id.toString(),
       id: post.id,
       title: post.title,
       shortDescription: post.shortDescription,

@@ -45,3 +45,4 @@ export type ExtendedLikesInfoDBModel = {
   addedAt: string;
   status: LikeStatus;
 };
+export type PostCreateDTO = Omit<PostDBModel, 'id'>;

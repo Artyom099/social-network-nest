@@ -3,6 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeStatus } from '../utils/constants';
 import { BlogViewModel } from '../blogs/blogs.models';
 import { PostInputModel } from './posts.models';
+import { randomUUID } from 'crypto';
 
 @Schema({ _id: false, versionKey: false })
 class ExtendedLikesInfo {
@@ -20,7 +21,7 @@ const ExtendedLikesInfoSchema =
 
 export type PostDocument = HydratedDocument<Post>;
 
-@Schema({ _id: false, versionKey: false })
+@Schema({ versionKey: false })
 export class Post {
   @Prop({ required: true })
   id: string;
@@ -41,6 +42,7 @@ export class Post {
 
   static create(bLog: BlogViewModel, InputModel: PostInputModel) {
     const post = new Post();
+    post.id = randomUUID();
     post.title = InputModel.title;
     post.shortDescription = InputModel.shortDescription;
     post.content = InputModel.content;

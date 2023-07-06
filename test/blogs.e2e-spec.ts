@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { LikeStatus } from '../src/utils/constants';
 
-// Stmts - 100%
 describe('/blogs', () => {
   let app: INestApplication;
   beforeAll(async () => {
@@ -27,17 +27,17 @@ describe('/blogs', () => {
     });
   });
 
-  it('2 - return 404 for not existing blog', async () => {
+  it('2 – GET:/blogs/:id – return 404 for not existing blog', async () => {
     await request(app.getHttpServer())
       .get('/blogs/1')
       .expect(HttpStatus.NOT_FOUND);
   });
-  it("3 - return 404 - can't get posts of not existing blog", async () => {
+  it("3 – GET:/blogs/:id/posts – return 404 & can't get posts of not existing blog", async () => {
     await request(app.getHttpServer())
       .get('/blogs/1/posts')
       .expect(HttpStatus.NOT_FOUND);
   });
-  it("4 - return 404 - can't create posts of not existing blog", async () => {
+  it("4 – POST:/blogs/:id/posts – return 404 & can't create posts of not existing blog", async () => {
     await request(app.getHttpServer())
       .post(`/blogs/1/posts`)
       .auth('admin', 'qwerty', { type: 'basic' })
@@ -260,44 +260,57 @@ describe('/blogs', () => {
         description: firstUpdateBlog.description,
         websiteUrl: firstUpdateBlog.websiteUrl,
       });
+
+    expect.setState({ firstUpdateBlog: firstUpdateBlog });
   });
 
-  it('14 - return 404 for delete non-exist blog', async () => {
+  it('14 – DELETE:/blogs/:id – return 404 for delete non-exist blog', async () => {
     await request(app.getHttpServer())
       .delete('/blogs/1')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it('15 - return 201 - create posts current blog', async () => {
-    const { createdBlog1 } = expect.getState();
+  it('15 – POST:/blogs/:id/posts – return 201 & create posts current blog', async () => {
+    const { firstCreatedBlog, firstUpdateBlog } = expect.getState();
+    const firstPost = {
+      title: 'valid-title',
+      shortDescription: 'valid-shortDescription',
+      content: 'valid-content',
+    };
     const createPostResponse = await request(app.getHttpServer())
-      .post(`/blogs/${createdBlog1.id}/posts`)
+      .post(`/blogs/${firstCreatedBlog.id}/posts`)
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
-        title: 'valid-title',
-        shortDescription: 'valid-shortDescription',
-        content: 'valid-content',
+        title: firstPost.title,
+        shortDescription: firstPost.shortDescription,
+        content: firstPost.content,
       });
 
     expect(createPostResponse).toBeDefined();
     expect(createPostResponse.status).toBe(HttpStatus.CREATED);
     expect(createPostResponse.body).toEqual({
       id: expect.any(String),
-      title: 'valid-title',
-      shortDescription: 'valid-shortDescription',
-      content: 'valid-content',
-      blogId: createdBlog1.id,
-      blogName: 'val_name update',
+      title: firstPost.title,
+      shortDescription: firstPost.shortDescription,
+      content: firstPost.content,
+      blogId: firstCreatedBlog.id,
+      blogName: firstUpdateBlog.name,
       createdAt: expect.any(String),
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: LikeStatus.None,
+        newestLikes: [],
+      },
     });
 
     expect.setState({ createdPost: createPostResponse.body });
   });
-  it('16 - return 200 - get posts current blog with pagination', async () => {
-    const { createdBlog1, createdPost } = expect.getState();
+  it('16 – GET:/blogs/:id/posts – return 200 & get posts current blog with pagination', async () => {
+    const { firstCreatedBlog, createdPost } = expect.getState();
     const getPostsRequest = await request(app.getHttpServer()).get(
-      `/blogs/${createdBlog1.id}/posts`,
+      `/blogs/${firstCreatedBlog.id}/posts`,
     );
 
     expect(getPostsRequest).toBeDefined();
@@ -311,15 +324,15 @@ describe('/blogs', () => {
     });
   });
 
-  it('17 - delete both blogs', async () => {
-    const { createdBlog1, createdBlog2 } = expect.getState();
+  it('17 – DELETE:/blogs/:id – delete both blogs', async () => {
+    const { firstCreatedBlog, secondCreatedBlog } = expect.getState();
     await request(app.getHttpServer())
-      .delete('/blogs/' + createdBlog1.id)
+      .delete('/blogs/' + firstCreatedBlog.id)
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())
-      .get('/blogs/' + createdBlog1.id)
+      .get('/blogs/' + firstCreatedBlog.id)
       .expect(HttpStatus.NOT_FOUND);
 
     await request(app.getHttpServer())
@@ -329,16 +342,16 @@ describe('/blogs', () => {
         page: 1,
         pageSize: 10,
         totalCount: 1,
-        items: [createdBlog2],
+        items: [secondCreatedBlog],
       });
 
     await request(app.getHttpServer())
-      .delete('/blogs/' + createdBlog2.id)
+      .delete('/blogs/' + secondCreatedBlog.id)
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())
-      .get('/blogs/' + createdBlog2.id)
+      .get('/blogs/' + secondCreatedBlog.id)
       .expect(HttpStatus.NOT_FOUND);
 
     await request(app.getHttpServer()).get('/blogs').expect(HttpStatus.OK, {

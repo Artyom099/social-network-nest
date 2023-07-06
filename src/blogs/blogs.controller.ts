@@ -58,11 +58,11 @@ export class BlogsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getBlog(@Param('id') blogId: string) {
-    const blog = await this.blogsService.getBlog(blogId);
-    if (!blog) {
+    const foundBlog = await this.blogsService.getBlog(blogId);
+    if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
-      return blog;
+      return foundBlog;
     }
   }
   @Put(':id')
@@ -71,13 +71,18 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
-    return this.blogsService.updateBlog(blogId, inputModel);
+    const foundBlog = await this.blogsService.getBlog(blogId);
+    if (!foundBlog) {
+      throw new NotFoundException('blog not found');
+    } else {
+      return this.blogsService.updateBlog(blogId, inputModel);
+    }
   }
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') blogId: string) {
-    const blog = await this.blogsService.getBlog(blogId);
-    if (!blog) {
+    const foundBlog = await this.blogsService.getBlog(blogId);
+    if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
       return this.blogsService.deleteBlog(blogId);
