@@ -3,6 +3,7 @@ export type BlogInputModel = {
   description: string;
   websiteUrl: string;
 };
+export type BlogCreateDTO = Omit<BlogViewModel, 'id'>;
 export type BlogViewModel = {
   id: string;
   name: string;

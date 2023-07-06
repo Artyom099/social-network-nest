@@ -61,6 +61,8 @@ export class BlogsController {
     const blog = await this.blogsService.getBlog(blogId);
     if (!blog) {
       throw new NotFoundException('blog not found');
+    } else {
+      return blog;
     }
   }
   @Put(':id')
@@ -74,7 +76,12 @@ export class BlogsController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') blogId: string) {
-    return this.blogsService.deleteBlog(blogId);
+    const blog = await this.blogsService.getBlog(blogId);
+    if (!blog) {
+      throw new NotFoundException('blog not found');
+    } else {
+      return this.blogsService.deleteBlog(blogId);
+    }
   }
 
   @Get(':id/posts')

@@ -24,6 +24,7 @@ export type CommentDocument = HydratedDocument<Comment>;
 
 @Schema({ versionKey: false })
 export class Comment {
+  @Prop({ required: true })
   id: string;
   @Prop({ required: true })
   postId: string;

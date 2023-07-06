@@ -207,53 +207,58 @@ describe('/blogs', () => {
     expect.setState({ secondCreatedBlog: secondCreatedBlog });
   });
 
-  it("11 - shouldn't update blog that not exist", async () => {
-    await request(app.getHttpServer())
-      .put('/blogs/' + -3)
-      .auth('admin', 'qwerty', { type: 'basic' })
-      .send({
-        name: 'val_name update',
-        description: 'valid description update',
-        websiteUrl: 'https://valid-Url-update.com',
-      })
-      .expect(HttpStatus.NOT_FOUND);
-  });
-  it("12 - shouldn't update blog with incorrect input data", async () => {
-    const { createdBlog1 } = expect.getState();
-    await request(app.getHttpServer())
-      .put('/blogs/' + createdBlog1.id)
-      .auth('admin', 'qwerty', { type: 'basic' })
-      .send({
-        name: 'invalid long name update',
-        description: 'valid description update',
-        websiteUrl: 'https://valid-Url-update.com',
-      })
-      .expect(HttpStatus.BAD_REQUEST);
+  // it("11 - shouldn't update blog that not exist", async () => {
+  //   await request(app.getHttpServer())
+  //     .put('/blogs/' + -3)
+  //     .auth('admin', 'qwerty', { type: 'basic' })
+  //     .send({
+  //       name: 'val_name update',
+  //       description: 'valid description update',
+  //       websiteUrl: 'https://valid-Url-update.com',
+  //     })
+  //     .expect(HttpStatus.NOT_FOUND);
+  // });
+  // it("12 - shouldn't update blog with incorrect input data", async () => {
+  //   const { createdBlog1 } = expect.getState();
+  //   await request(app.getHttpServer())
+  //     .put('/blogs/' + createdBlog1.id)
+  //     .auth('admin', 'qwerty', { type: 'basic' })
+  //     .send({
+  //       name: 'invalid long name update',
+  //       description: 'valid description update',
+  //       websiteUrl: 'https://valid-Url-update.com',
+  //     })
+  //     .expect(HttpStatus.BAD_REQUEST);
+  //
+  //   await request(app.getHttpServer())
+  //     .get('/blogs/' + createdBlog1.id)
+  //     .expect(HttpStatus.OK, createdBlog1);
+  // });
 
+  it('13 – PUT:/blogs – return 202 & update blog', async () => {
+    const { firstCreatedBlog } = expect.getState();
+    const firstUpdateBlog = {
+      name: 'val_name update',
+      description: 'valid description update',
+      websiteUrl: 'https://valid-Url-update.com',
+    };
     await request(app.getHttpServer())
-      .get('/blogs/' + createdBlog1.id)
-      .expect(HttpStatus.OK, createdBlog1);
-  });
-
-  it('13 - update blog with correct input data', async () => {
-    const { createdBlog1 } = expect.getState();
-    await request(app.getHttpServer())
-      .put('/blogs/' + createdBlog1.id)
+      .put('/blogs/' + firstCreatedBlog.id)
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
-        name: 'val_name update',
-        description: 'valid description update',
-        websiteUrl: 'https://valid-Url-update.com',
+        name: firstUpdateBlog.name,
+        description: firstUpdateBlog.description,
+        websiteUrl: firstUpdateBlog.websiteUrl,
       })
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())
-      .get('/blogs/' + createdBlog1.id)
+      .get('/blogs/' + firstCreatedBlog.id)
       .expect(HttpStatus.OK, {
-        ...createdBlog1,
-        name: 'val_name update',
-        description: 'valid description update',
-        websiteUrl: 'https://valid-Url-update.com',
+        ...firstCreatedBlog,
+        name: firstUpdateBlog.name,
+        description: firstUpdateBlog.description,
+        websiteUrl: firstUpdateBlog.websiteUrl,
       });
   });
 

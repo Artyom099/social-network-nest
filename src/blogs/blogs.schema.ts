@@ -7,6 +7,7 @@ export type BlogDocument = HydratedDocument<Blog>;
 
 @Schema({ versionKey: false })
 export class Blog {
+  @Prop({ required: true })
   id: string;
   @Prop({ required: true })
   name: string;

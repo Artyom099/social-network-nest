@@ -9,12 +9,13 @@ export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
   async getBlog(id: string): Promise<BlogViewModel | null> {
-    return this.blogModel.findOne({ id });
+    return this.blogModel.findOne({ id }, { _id: 0 });
   }
   async createBlog(blog: BlogViewModel): Promise<BlogViewModel> {
     const newBLog = await this.blogModel.create(blog);
     return {
-      id: newBLog._id.toString(),
+      id: blog.id,
+      // id: newBLog._id.toString(),
       name: blog.name,
       description: blog.description,
       websiteUrl: blog.websiteUrl,
@@ -23,7 +24,14 @@ export class BlogsRepository {
     };
   }
   async updateBlog(id: string, InputModel: BlogInputModel) {
-    await this.blogModel.updateOne({ id }, { InputModel });
+    await this.blogModel.updateOne(
+      { id },
+      {
+        name: InputModel.name,
+        description: InputModel.description,
+        websiteUrl: InputModel.websiteUrl,
+      },
+    );
   }
   async deleteBlog(id: string) {
     await this.blogModel.deleteOne({ id });
