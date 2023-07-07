@@ -1,11 +1,19 @@
 import { LikeStatus } from '../utils/constants';
+import { IsNotEmpty, Length } from 'class-validator';
 
-export type PostInputModel = {
+export class PostInputModel {
+  @IsNotEmpty()
+  @Length(3, 30)
   title: string;
+  @IsNotEmpty()
+  @Length(3, 100)
   shortDescription: string;
+  @IsNotEmpty()
+  @Length(3, 1000)
   content: string;
+  @IsNotEmpty()
   blogId: string;
-};
+}
 
 export type PostViewModel = {
   id: string;
