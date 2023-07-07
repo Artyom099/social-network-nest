@@ -1,4 +1,11 @@
 import { LikeStatus } from '../utils/constants';
+import { IsNotEmpty, Length } from 'class-validator';
+
+export class CommentInputModel {
+  @IsNotEmpty()
+  @Length(20, 300)
+  content: string;
+}
 
 export type CommentDBModel = {
   id: string;
