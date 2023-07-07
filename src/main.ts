@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,7 +17,10 @@ async function bootstrap() {
           const constraintsKeys = Object.keys(e.constraints as {});
           constraintsKeys.forEach((cKey) => {
             if (e.constraints) {
-              errorsForResponse.push(e.constraints[cKey]);
+              errorsForResponse.push({
+                message: e.constraints[cKey],
+                field: e.property,
+              });
             }
           });
         });
@@ -25,6 +29,7 @@ async function bootstrap() {
       },
     }),
   );
+  app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(3000);
 }
 bootstrap();
