@@ -8,7 +8,6 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthInputModel } from './auth.models';
 import { Public } from './decorators/public.decorator';
 
 @Controller('auth')
