@@ -26,11 +26,15 @@ import { Post, PostSchema } from './posts/posts.schema';
 import { Comment, CommentSchema } from './comments/comments.schema';
 import { config } from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 config();
 
 @Module({
   imports: [
+    AuthModule,
+    UsersModule,
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URL || ''),
     MongooseModule.forFeature([

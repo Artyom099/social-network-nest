@@ -18,7 +18,7 @@ import {
 } from './users.models';
 import { SortBy, SortDirection } from '../utils/constants';
 import { UsersQueryRepository } from './users.query.repository';
-import { AuthGuard } from '../auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('users')

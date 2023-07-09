@@ -10,6 +10,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       stopAtFirstError: true,
+      // forbidUnknownValues: false,
       exceptionFactory: (errors) => {
         const errorsForResponse: any = [];
 

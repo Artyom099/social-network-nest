@@ -1,5 +1,5 @@
 import { LikeStatus } from '../utils/constants';
-import { CommentViewModel } from './comments.models';
+import { CommentInputModel, CommentViewModel } from './comments.models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument } from './comments.schema';
@@ -37,5 +37,46 @@ export class CommentsRepository {
         myStatus,
       },
     };
+  }
+  async updateComment(id: string, content: CommentInputModel) {
+    await this.commentModel.updateOne({ id }, { content });
+  }
+  async deleteComment(id: string) {
+    await this.commentModel.deleteOne({ id });
+  }
+  async updateCommentLikes(
+    id: string,
+    newLikeStatus: LikeStatus,
+  ): Promise<boolean> {
+    const currentUserId = 'mock';
+
+    const comment = await this.commentModel.findOne({ id });
+    if (!comment) return false;
+    // если юзер есть в массиве, обновляем его статус
+    for (const s of comment.likesInfo) {
+      if (s.userId === currentUserId) {
+        if (s.status === newLikeStatus) return true;
+        const result = await this.commentModel.updateOne(
+          { id },
+          {
+            likesInfo: {
+              userId: currentUserId,
+              status: newLikeStatus,
+            },
+          },
+        );
+        return result.modifiedCount === 1;
+      }
+    }
+    // иначе добавляем юзера и его статус в массив
+    const result = await this.commentModel.updateOne(
+      { id },
+      {
+        $addToSet: {
+          likesInfo: { userId: currentUserId, status: newLikeStatus },
+        },
+      },
+    );
+    return result.modifiedCount === 1;
   }
 }
