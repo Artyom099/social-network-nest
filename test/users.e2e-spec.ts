@@ -19,7 +19,7 @@ describe('UsersController (e2e)', () => {
   it('1 – GET:/users – return 200 & empty array', async () => {
     await request(app.getHttpServer())
       .get('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 0,
         page: 1,
@@ -37,6 +37,7 @@ describe('UsersController (e2e)', () => {
     };
     const createResponse = await request(app.getHttpServer())
       .post('/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: firstUser.login,
         password: firstUser.password,
@@ -74,6 +75,7 @@ describe('UsersController (e2e)', () => {
     };
     const createResponse = await request(app.getHttpServer())
       .post('/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: secondUser.login,
         password: secondUser.password,
@@ -111,6 +113,7 @@ describe('UsersController (e2e)', () => {
     };
     const createResponse = await request(app.getHttpServer())
       .post('/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: thirdUser.login,
         password: thirdUser.password,
@@ -149,6 +152,7 @@ describe('UsersController (e2e)', () => {
     };
     const createResponse = await request(app.getHttpServer())
       .post('/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: fourthUser.login,
         password: fourthUser.password,
@@ -186,12 +190,14 @@ describe('UsersController (e2e)', () => {
   it('6 – DELETE:/users – return 404', async () => {
     request(app.getHttpServer())
       .delete('/users/1')
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NOT_FOUND);
   });
   it('7 – DELETE:/users – return 204 & delete first user', async () => {
     const { firstCreatedUser } = expect.getState();
     request(app.getHttpServer())
       .delete(`/users/${firstCreatedUser.id}`)
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
   });
 });

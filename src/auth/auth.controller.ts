@@ -6,22 +6,25 @@ import {
   HttpStatus,
   Post,
   Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
+import { AuthInputModel } from './auth.models';
 
 @Controller('auth')
 export class AuthController {
   constructor(protected authService: AuthService) {}
 
   @Public()
-  @HttpCode(HttpStatus.OK)
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   signIn(@Body() signInDto: Record<string, any>) {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
   @Get('profile')
+  @HttpCode(HttpStatus.OK)
   getProfile(@Request() req) {
     return req.user;
   }
@@ -29,15 +32,30 @@ export class AuthController {
   //
   //
 
-  // @Get('me')
-  // @HttpCode(HttpStatus.OK)
-  // async getMyInfo() {
-  // }
-  //
-  // @Post('login')
-  // @HttpCode(HttpStatus.OK)
-  // async login(@Body() InputModel: AuthInputModel) {}
-  //
+  @Get('me')
+  @HttpCode(HttpStatus.OK)
+  async getMyInfo(@Request() req) {
+    return {
+      email: req.user.email,
+      login: req.user.login,
+      userId: req.use!.id,
+    };
+  }
+
+  @Post('login2')
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() InputModel: AuthInputModel) {
+    const login = this.authService.checkCredentials(
+      InputModel.loginOrEmail,
+      InputModel.password,
+    );
+    if (!login) {
+      throw new UnauthorizedException();
+    } else {
+      return login;
+    }
+  }
+
   // @Post('logout')
   // @HttpCode(HttpStatus.NO_CONTENT)
   // async logout() {}

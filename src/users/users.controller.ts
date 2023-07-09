@@ -19,6 +19,7 @@ import {
 import { SortBy, SortDirection } from '../utils/constants';
 import { UsersQueryRepository } from './users.query.repository';
 import { AuthGuard } from '../auth/auth.guard';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -28,6 +29,7 @@ export class UsersController {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Get()
   @HttpCode(HttpStatus.OK)
   async getUsers(@Query() query: GetUsersWithPagingAndSearch) {
@@ -47,12 +49,14 @@ export class UsersController {
     );
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: CreateUserInputModel) {
     return this.usersService.createUser(inputModel);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') userId: string) {

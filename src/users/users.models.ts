@@ -18,6 +18,16 @@ export type UserViewModel = {
   email: string;
   createdAt: string;
 };
+export type UserDBModel = {
+  id: string;
+  accountData: {
+    login: string;
+    email: string;
+    passwordSalt: string;
+    passwordHash: string;
+    createdAt: Date;
+  };
+};
 export type GetUsersWithPagingAndSearch = {
   sortBy: SortBy;
   sortDirection: SortDirection;

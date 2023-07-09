@@ -7,6 +7,9 @@ import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
 import { BasicStrategy } from './strategies/basic.strategy';
+import { AuthRepository } from './auth.repository';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UserSchema } from '../users/users.schema';
 
 @Module({
   imports: [
@@ -16,11 +19,13 @@ import { BasicStrategy } from './strategies/basic.strategy';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s' },
     }),
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   providers: [
     AuthService,
     { provide: APP_GUARD, useClass: AuthGuard },
     BasicStrategy,
+    AuthRepository,
   ],
   controllers: [AuthController],
   exports: [AuthService],
