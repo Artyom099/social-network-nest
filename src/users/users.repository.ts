@@ -11,7 +11,6 @@ export class UsersRepository {
   async getUser(id: string): Promise<UserViewModel | null> {
     return this.userModel.findOne({ id });
   }
-
   async createUser(user: User): Promise<UserViewModel> {
     await this.userModel.create(user);
     return {

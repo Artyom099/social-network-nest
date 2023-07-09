@@ -15,7 +15,7 @@ async function bootstrap() {
         const errorsForResponse: any = [];
 
         errors.forEach((e) => {
-          const constraintsKeys = Object.keys(e.constraints as {});
+          const constraintsKeys = Object.keys(e.constraints as object);
           constraintsKeys.forEach((cKey) => {
             if (e.constraints) {
               errorsForResponse.push({

@@ -28,11 +28,11 @@ export class AuthController {
 
   //
   //
-  //
 
   // @Get('me')
   // @HttpCode(HttpStatus.OK)
-  // async getMyInfo() {}
+  // async getMyInfo() {
+  // }
   //
   // @Post('login')
   // @HttpCode(HttpStatus.OK)
