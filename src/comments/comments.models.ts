@@ -11,7 +11,7 @@ export type CommentDBModel = {
   id: string;
   postId: string;
   content: string;
-  commentatorIno: {
+  commentatorInfo: {
     userId: string;
     userLogin: string;
   };
@@ -24,7 +24,7 @@ export type CommentDBModel = {
 export type CommentViewModel = {
   id: string;
   content: string;
-  commentatorIno: {
+  commentatorInfo: {
     userId: string;
     userLogin: string;
   };

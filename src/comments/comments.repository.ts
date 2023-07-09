@@ -1,5 +1,9 @@
 import { LikeStatus } from '../utils/constants';
-import { CommentInputModel, CommentViewModel } from './comments.models';
+import {
+  CommentDBModel,
+  CommentInputModel,
+  CommentViewModel,
+} from './comments.models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument } from './comments.schema';
@@ -26,7 +30,7 @@ export class CommentsRepository {
     return {
       id: comment.id,
       content: comment.content,
-      commentatorIno: {
+      commentatorInfo: {
         userId: comment.commentatorIno.userId,
         userLogin: comment.commentatorIno.userLogin,
       },
@@ -35,6 +39,25 @@ export class CommentsRepository {
         likesCount,
         dislikesCount,
         myStatus,
+      },
+    };
+  }
+  async createComment(
+    createdComment: CommentDBModel,
+  ): Promise<CommentViewModel> {
+    await this.commentModel.insertMany(createdComment);
+    return {
+      id: createdComment.id,
+      content: createdComment.content,
+      commentatorInfo: {
+        userId: createdComment.commentatorInfo.userId,
+        userLogin: createdComment.commentatorInfo.userLogin,
+      },
+      createdAt: createdComment.createdAt,
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: LikeStatus.None,
       },
     };
   }

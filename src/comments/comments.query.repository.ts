@@ -41,7 +41,7 @@ export class CommentsQueryRepository {
       return {
         id: c.id,
         content: c.content,
-        commentatorIno: {
+        commentatorInfo: {
           userId: c.commentatorIno.userId,
           userLogin: c.commentatorIno.userLogin,
         },
