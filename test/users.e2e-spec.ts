@@ -202,4 +202,8 @@ describe('UsersController (e2e)', () => {
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
   });
+
+  afterAll(async () => {
+    await app.close();
+  });
 });

@@ -3,8 +3,9 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { LikeStatus } from '../src/utils/constants';
+import { appSettings } from '../src/settings';
 
-describe('/posts', () => {
+describe('PostsController (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -12,6 +13,7 @@ describe('/posts', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    appSettings(app);
     await app.init();
 
     await request(app.getHttpServer()).delete('/testing/all-data');
@@ -636,4 +638,8 @@ describe('/posts', () => {
   //     ],
   //   });
   // });
+
+  afterAll(async () => {
+    await app.close();
+  });
 });

@@ -18,7 +18,7 @@ import { PostInputModel } from './posts.models';
 import { BlogsService } from '../blogs/blogs.service';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
-import { SortBy, SortDirection } from '../utils/constants';
+import { LikeStatus, SortBy, SortDirection } from '../utils/constants';
 import { BearerAuthGuard } from '../auth/guards/bearer-auth.guard';
 import { CommentInputModel } from '../comments/comments.models';
 import { CommentsService } from '../comments/comments.service';
@@ -132,7 +132,7 @@ export class PostsController {
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
-      const userId = 'mock';
+      const userId = 'mock'; //todo - checkUserIdMiddleware
       const userLogin = 'mock';
       return this.commentsService.createComment(
         postId,
@@ -146,5 +146,16 @@ export class PostsController {
   @Put(':id/like-status')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateLikeStatus() {}
+  async updateLikeStatus(
+    @Param('id') postId: string,
+    @Body() likeStatus: LikeStatus,
+  ) {
+    const foundPost = await this.postsService.getPost(postId);
+    if (!foundPost) {
+      throw new NotFoundException('post not found');
+    } else {
+      const userId = 'mock'; //todo
+      return this.postsService.updatePostLikes(postId, userId, likeStatus);
+    }
+  }
 }

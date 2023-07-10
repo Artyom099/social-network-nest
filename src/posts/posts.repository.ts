@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
   NewestLikesViewModel,
-  PostCreateDTO,
   PostDBModel,
   PostInputModel,
   PostViewModel,
@@ -85,5 +84,47 @@ export class PostsRepository {
   }
   async deletePost(id: string) {
     return this.postModel.deleteOne({ id });
+  }
+
+  async updatePostLikes(
+    id: string,
+    userId: string,
+    newLikeStatus: LikeStatus,
+    addedAt: Date,
+    login: string,
+  ) {
+    const post = await this.postModel.findOne({ id });
+    if (!post) return false;
+    // если юзер есть в массиве, обновляем его статус
+    for (const s of post.extendedLikesInfo) {
+      if (s.userId === userId) {
+        if (s.status === newLikeStatus) return true;
+        return this.postModel.updateOne(
+          { id },
+          {
+            extendedLikesInfo: {
+              addedAt,
+              userId,
+              status: newLikeStatus,
+              login,
+            },
+          },
+        );
+      }
+    }
+    // иначе добавляем юзера, его лайк статус, дату и логин в массив
+    return this.postModel.updateOne(
+      { id },
+      {
+        $addToSet: {
+          extendedLikesInfo: {
+            addedAt,
+            userId,
+            status: newLikeStatus,
+            login,
+          },
+        },
+      },
+    );
   }
 }

@@ -38,6 +38,7 @@ export class User {
     accountData.passwordSalt = passwordSalt;
     accountData.passwordHash = passwordHash;
     accountData.createdAt = new Date();
+
     const user = new User();
     user.id = randomUUID();
     user.accountData = accountData;

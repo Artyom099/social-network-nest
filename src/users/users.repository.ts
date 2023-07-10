@@ -9,7 +9,14 @@ export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async getUser(id: string): Promise<UserViewModel | null> {
-    return this.userModel.findOne({ id });
+    const user = await this.userModel.findOne({ id });
+    // todo - почему Unresolved variable accountData?
+    return {
+      id: user.id,
+      login: user.accountData.login,
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt.toISOString(),
+    };
   }
   async createUser(user: User): Promise<UserViewModel> {
     await this.userModel.create(user);

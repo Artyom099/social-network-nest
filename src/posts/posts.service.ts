@@ -3,10 +3,15 @@ import { PostsRepository } from './posts.repository';
 import { PostInputModel, PostViewModel } from './posts.models';
 import { BlogViewModel } from '../blogs/blogs.models';
 import { Post } from './posts.schema';
+import { LikeStatus } from '../utils/constants';
+import { UsersRepository } from '../users/users.repository';
 
 @Injectable()
 export class PostsService {
-  constructor(protected postsRepository: PostsRepository) {}
+  constructor(
+    protected postsRepository: PostsRepository,
+    protected usersRepository: UsersRepository,
+  ) {}
   async getPost(postId: string): Promise<PostViewModel | null> {
     return this.postsRepository.getPost(postId);
   }
@@ -22,5 +27,21 @@ export class PostsService {
   }
   async deletePost(postId: string) {
     return this.postsRepository.deletePost(postId);
+  }
+  async updatePostLikes(
+    postId: string,
+    userId: string,
+    likeStatus: LikeStatus,
+  ) {
+    //todo - нормально, что PostsService лезет в usersRepository?
+    const user = await this.usersRepository.getUser(userId);
+    const addedAt = new Date();
+    return this.postsRepository.updatePostLikes(
+      postId,
+      userId,
+      likeStatus,
+      addedAt,
+      user!.login,
+    );
   }
 }
