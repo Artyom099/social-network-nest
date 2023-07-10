@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
-import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { jwtConstants } from './constants';
-import { BasicStrategy } from './strategies/basic.strategy';
 import { AuthRepository } from './auth.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/users.schema';
@@ -23,8 +20,8 @@ import { User, UserSchema } from '../users/users.schema';
   ],
   providers: [
     AuthService,
-    { provide: APP_GUARD, useClass: AuthGuard },
-    BasicStrategy,
+    // { provide: APP_GUARD, useClass: AuthGuard },
+    // BasicStrategy,
     AuthRepository,
   ],
   controllers: [AuthController],

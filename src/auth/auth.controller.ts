@@ -38,7 +38,7 @@ export class AuthController {
     return {
       email: req.user.email,
       login: req.user.login,
-      userId: req.use!.id,
+      userId: req.user.id,
     };
   }
 
