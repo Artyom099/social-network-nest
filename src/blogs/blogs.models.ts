@@ -1,5 +1,7 @@
 import { IsNotEmpty, IsUrl, Length } from 'class-validator';
 
+//todo - не работаетвалидация данных на пост и пут
+
 export class BlogInputModel {
   @IsNotEmpty()
   @Length(3, 15)

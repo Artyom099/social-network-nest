@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogInputModel } from './blogs.models';
 import { BlogsService } from './blogs.service';
@@ -22,6 +23,7 @@ import { PostInputModel } from '../posts/posts.models';
 import { BlogsQueryRepository } from './blogs.query.repository';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { SortBy, SortDirection } from '../utils/constants';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -49,6 +51,7 @@ export class BlogsController {
     );
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: BlogInputModel) {
@@ -65,6 +68,8 @@ export class BlogsController {
       return foundBlog;
     }
   }
+
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
@@ -78,6 +83,8 @@ export class BlogsController {
       return this.blogsService.updateBlog(blogId, inputModel);
     }
   }
+
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') blogId: string) {
@@ -112,6 +119,8 @@ export class BlogsController {
       );
     }
   }
+
+  @UseGuards(BasicAuthGuard)
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostCurrentBlog(

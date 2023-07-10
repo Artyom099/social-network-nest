@@ -9,9 +9,11 @@ import {
   NotFoundException,
   Param,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { CommentInputModel, CommentViewModel } from './comments.models';
 import { LikeStatus } from '../utils/constants';
+import { BearerAuthGuard } from '../auth/guards/bearer-auth.guard';
 
 @Controller('comments')
 export class CommentsController {
@@ -31,6 +33,7 @@ export class CommentsController {
   }
 
   @Put()
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateComment(
     @Param('id') commentId: string,
@@ -45,6 +48,7 @@ export class CommentsController {
   }
 
   @Delete()
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteComment(@Param('id') commentId: string) {
     const foundComment = await this.commentsService.getComment(commentId);
@@ -56,6 +60,7 @@ export class CommentsController {
   }
 
   @Put()
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
     @Param('id') commentId: string,

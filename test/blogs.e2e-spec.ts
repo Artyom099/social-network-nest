@@ -4,7 +4,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { LikeStatus } from '../src/utils/constants';
 
-describe('/blogs', () => {
+describe('BlogsController (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -49,26 +49,26 @@ describe('/blogs', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  // it("5 - shouldn't create blog with correct input - NO Auth", async () => {
-  //   await request(app.getHttpServer())
-  //     .post('/blogs')
-  //     .send({
-  //       name: 'valid name',
-  //       description: 'valid description',
-  //       websiteUrl: 'https://valid-Url.com',
-  //     })
-  //     .expect(HttpStatus.UNAUTHORIZED);
-  //
-  //   await request(app.getHttpServer()).get('/blogs').expect(HttpStatus.OK, {
-  //     pagesCount: 0,
-  //     page: 1,
-  //     pageSize: 10,
-  //     totalCount: 0,
-  //     items: [],
-  //   });
-  // });
+  it("5 – POST:/blogs – shouldn't create blog - NO Auth", async () => {
+    await request(app.getHttpServer())
+      .post('/blogs')
+      .send({
+        name: 'valid name',
+        description: 'valid description',
+        websiteUrl: 'https://valid-Url.com',
+      })
+      .expect(HttpStatus.UNAUTHORIZED);
 
-  // it("6 - shouldn't create blog with incorrect input data (name = null)", async () => {
+    await request(app.getHttpServer()).get('/blogs').expect(HttpStatus.OK, {
+      pagesCount: 0,
+      page: 1,
+      pageSize: 10,
+      totalCount: 0,
+      items: [],
+    });
+  });
+
+  // it("6 – POST:/blogs – shouldn't create blog with name = null", async () => {
   //   await request(app.getHttpServer())
   //     .post('/blogs')
   //     .auth('admin', 'qwerty', { type: 'basic' })
@@ -77,9 +77,10 @@ describe('/blogs', () => {
   //       description: 'valid description',
   //       websiteUrl: 'https://valid-Url.com',
   //     })
-  //     .expect(HttpStatus.BAD_REQUEST, {
-  //       errorsMessages: [{ message: 'Invalid value', field: 'name' }],
-  //     });
+  //     .expect(
+  //       HttpStatus.BAD_REQUEST,
+  //       // { errorsMessages: [{ message: 'Invalid value', field: 'name' }],}
+  //     );
   //   await request(app.getHttpServer()).get('/blogs').expect(HttpStatus.OK, {
   //     pagesCount: 0,
   //     page: 1,
@@ -88,7 +89,7 @@ describe('/blogs', () => {
   //     items: [],
   //   });
   // });
-  // it("7 - shouldn't create blog with incorrect input data - (short description)", async () => {
+  // it("7 – POST:/blogs – shouldn't create blog with short description", async () => {
   //   await request(app.getHttpServer())
   //     .post('/blogs')
   //     .auth('admin', 'qwerty', { type: 'basic' })
@@ -207,21 +208,21 @@ describe('/blogs', () => {
     expect.setState({ secondCreatedBlog: secondCreatedBlog });
   });
 
-  // it("11 - shouldn't update blog that not exist", async () => {
+  it("11 – PUT:/blogs/:id – shouldn't update blog that not exist", async () => {
+    await request(app.getHttpServer())
+      .put('/blogs/' + -3)
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({
+        name: 'val_name update',
+        description: 'valid description update',
+        websiteUrl: 'https://valid-Url-update.com',
+      })
+      .expect(HttpStatus.NOT_FOUND);
+  });
+  // it("12 – PUT:/blogs/:id – shouldn't update blog with long name", async () => {
+  //   const { firstCreatedBlog } = expect.getState();
   //   await request(app.getHttpServer())
-  //     .put('/blogs/' + -3)
-  //     .auth('admin', 'qwerty', { type: 'basic' })
-  //     .send({
-  //       name: 'val_name update',
-  //       description: 'valid description update',
-  //       websiteUrl: 'https://valid-Url-update.com',
-  //     })
-  //     .expect(HttpStatus.NOT_FOUND);
-  // });
-  // it("12 - shouldn't update blog with incorrect input data", async () => {
-  //   const { createdBlog1 } = expect.getState();
-  //   await request(app.getHttpServer())
-  //     .put('/blogs/' + createdBlog1.id)
+  //     .put('/blogs/' + firstCreatedBlog.id)
   //     .auth('admin', 'qwerty', { type: 'basic' })
   //     .send({
   //       name: 'invalid long name update',
@@ -231,11 +232,11 @@ describe('/blogs', () => {
   //     .expect(HttpStatus.BAD_REQUEST);
   //
   //   await request(app.getHttpServer())
-  //     .get('/blogs/' + createdBlog1.id)
-  //     .expect(HttpStatus.OK, createdBlog1);
+  //     .get('/blogs/' + firstCreatedBlog.id)
+  //     .expect(HttpStatus.OK, firstCreatedBlog);
   // });
 
-  it('13 – PUT:/blogs – return 202 & update blog', async () => {
+  it('13 – PUT:/blogs/:id – return 202 & update blog', async () => {
     const { firstCreatedBlog } = expect.getState();
     const firstUpdateBlog = {
       name: 'val_name update',

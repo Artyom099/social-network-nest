@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { appSettings } from '../src/settings';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -11,6 +12,7 @@ describe('UsersController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    appSettings(app);
     await app.init();
 
     await request(app.getHttpServer()).delete('/testing/all-data');
@@ -56,7 +58,7 @@ describe('UsersController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -94,7 +96,7 @@ describe('UsersController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -132,7 +134,7 @@ describe('UsersController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -171,7 +173,7 @@ describe('UsersController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
