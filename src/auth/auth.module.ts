@@ -7,6 +7,7 @@ import { jwtConstants } from './constants';
 import { AuthRepository } from './auth.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/users.schema';
+import { UsersRepository } from '../users/users.repository';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { User, UserSchema } from '../users/users.schema';
     // { provide: APP_GUARD, useClass: AuthGuard },
     // BasicStrategy,
     AuthRepository,
+    UsersRepository,
   ],
   controllers: [AuthController],
   exports: [AuthService],

@@ -154,7 +154,7 @@ export class PostsController {
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
-      const userId = 'mock'; //todo
+      const userId = 'mock'; //todo - checkUserIdMiddleware
       return this.postsService.updatePostLikes(postId, userId, likeStatus);
     }
   }

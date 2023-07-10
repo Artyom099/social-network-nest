@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserViewModel } from './users.models';
+import { UserDBModel, UserViewModel } from './users.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './users.schema';
@@ -10,7 +10,7 @@ export class UsersRepository {
 
   async getUser(id: string): Promise<UserViewModel | null> {
     const user = await this.userModel.findOne({ id });
-    // todo - почему Unresolved variable accountData?
+    // todo - почему Unresolved variable accountData? - без ! не работет
     return {
       id: user.id,
       login: user.accountData.login,
@@ -18,7 +18,7 @@ export class UsersRepository {
       createdAt: user.accountData.createdAt.toISOString(),
     };
   }
-  async createUser(user: User): Promise<UserViewModel> {
+  async createUser(user: UserDBModel): Promise<UserViewModel> {
     await this.userModel.create(user);
     return {
       id: user.id,

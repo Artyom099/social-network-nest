@@ -27,6 +27,12 @@ export type UserDBModel = {
     passwordHash: string;
     createdAt: Date;
   };
+  emailConfirmation: {
+    confirmationCode: string;
+    expirationDate: Date;
+    isConfirmed: boolean;
+  };
+  recoveryCode: string;
 };
 export type GetUsersWithPagingAndSearch = {
   sortBy: SortBy;
