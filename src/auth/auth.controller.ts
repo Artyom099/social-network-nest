@@ -18,13 +18,6 @@ import { BearerAuthGuard } from './guards/bearer-auth.guard';
 export class AuthController {
   constructor(protected authService: AuthService) {}
 
-  // @Public()
-  // @Post('login')
-  // @HttpCode(HttpStatus.OK)
-  // signIn(@Body() signInDto: Record<string, any>) {
-  //   return this.authService.signIn(signInDto.username, signInDto.password);
-  // }
-
   @Get('profile')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -32,10 +25,8 @@ export class AuthController {
     return req.user;
   }
 
-  //
-  //
-
   @Get('me')
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Request() req) {
     const user = await this.authService.getUser(req.userId);
@@ -90,9 +81,13 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() email: string, login: string, password: string) {
+    //todo - добавить имя поля в обоих Exception
     const existUserEmail = await this.authService.getUserByLoginOrEmail(email);
+    if (existUserEmail) {
+      throw new BadRequestException();
+    }
     const existUserLogin = await this.authService.getUserByLoginOrEmail(login);
-    if (existUserEmail || existUserLogin) {
+    if (existUserLogin) {
       throw new BadRequestException();
     } else {
       await this.authService.createUser(login, password, email);
@@ -110,7 +105,14 @@ export class AuthController {
     }
   }
 
-  // @Post('registration-email-resending')
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async resendConfirmationEmail() {}
+  @Post('registration-email-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resendConfirmationEmail(@Body() email: string) {
+    const existUser = await this.authService.getUserByLoginOrEmail(email);
+    if (!existUser || existUser.emailConfirmation.isConfirmed) {
+      throw new BadRequestException();
+    } else {
+      await this.authService.updateConfirmationCode(email);
+    }
+  }
 }

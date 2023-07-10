@@ -12,10 +12,10 @@ export class UsersRepository {
     const user = await this.userModel.findOne({ id });
     // todo - почему Unresolved variable accountData? - без ! не работет
     return {
-      id: user.id,
-      login: user.accountData.login,
-      email: user.accountData.email,
-      createdAt: user.accountData.createdAt.toISOString(),
+      id: user!.id,
+      login: user!.accountData.login,
+      email: user!.accountData.email,
+      createdAt: user!.accountData.createdAt.toISOString(),
     };
   }
   async createUser(user: UserDBModel): Promise<UserViewModel> {

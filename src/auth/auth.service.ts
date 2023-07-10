@@ -101,6 +101,17 @@ export class AuthService {
       return false;
     }
   }
+  async updateConfirmationCode(email: string): Promise<string | null> {
+    const newCode = randomUUID();
+    await this.authRepository.updateConfirmationCode(email, newCode);
+    try {
+      // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
+      // await emailManager.sendEmailConfirmationMessage(email, newConfirmationCode);
+    } catch (error) {
+      return null;
+    }
+    return newCode;
+  }
 
   async sendRecoveryCode(email: string) {
     const recoveryCode = randomUUID();

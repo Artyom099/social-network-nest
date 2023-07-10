@@ -24,10 +24,7 @@ export class UsersService {
     return this.usersRepository.deleteUser(userId);
   }
 
-  private static async _generateHash(
-    password: string,
-    salt: string,
-  ): Promise<string> {
+  static async _generateHash(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt);
   }
 }
