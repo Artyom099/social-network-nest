@@ -10,10 +10,26 @@ export class SecurityRepository {
     @InjectModel(Session.name) private sessionModel: Model<SessionDocument>,
   ) {}
 
-  async createSession(
-    activeSession: SessionDBModel,
-  ): Promise<SessionViewModel> {
-    const session = await this.sessionModel.create(activeSession);
+  async getSession(deviceId: string): Promise<SessionViewModel | null> {
+    const session = await this.sessionModel.findOne({ deviceId }).exec();
+    if (!session) return null;
+    else
+      return {
+        ip: session.ip,
+        title: session.title,
+        lastActiveDate: session.lastActiveDate.toISOString(),
+        deviceId: session.deviceId,
+      };
+  }
+  //todo - : Promise<SessionViewModel[]>
+  async getSessions(userId: string) {
+    return this.sessionModel
+      .find({ userId }, { projection: { _id: 0, userId: 0 } })
+      .exec();
+  }
+
+  async createSession(session: SessionDBModel): Promise<SessionViewModel> {
+    await this.sessionModel.create(session);
     return {
       ip: session.ip,
       title: session.title,
@@ -21,14 +37,14 @@ export class SecurityRepository {
       deviceId: session.deviceId,
     };
   }
-
   async updateLastActiveDate(deviceId: string, date: string) {
     return this.sessionModel.updateOne({ deviceId }, { lastActiveDate: date });
   }
 
-  async getActiveSession(deviceId: string) {}
-  async getAllActiveSessions(userId: string) {}
-
-  async deleteCurrentSession(deviceId: string) {}
-  async deleteOtherActiveSessions(deviceId: string) {}
+  async deleteOtherSessions(deviceId: string) {
+    return this.sessionModel.deleteMany({ $nor: [{ deviceId }] });
+  }
+  async deleteCurrentSession(deviceId: string) {
+    return this.sessionModel.deleteOne({ deviceId });
+  }
 }

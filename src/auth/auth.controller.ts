@@ -6,24 +6,23 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Request,
+  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthInputModel } from './auth.models';
 import { BearerAuthGuard } from './guards/bearer-auth.guard';
+import { SecurityService } from '../security/security.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(protected authService: AuthService) {}
-
-  @Get('profile')
-  @UseGuards(BearerAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  getProfile(@Request() req) {
-    return req.user;
-  }
+  constructor(
+    private authService: AuthService,
+    private securityService: SecurityService,
+  ) {}
 
   @Get('me')
   @UseGuards(BearerAuthGuard)
@@ -39,21 +38,46 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() InputModel: AuthInputModel) {
-    const login = this.authService.checkCredentials(
+  async login(
+    @Req() req,
+    @Res({ passthrough: true }) res,
+    @Body() InputModel: AuthInputModel,
+  ) {
+    const token = this.authService.checkCredentials(
       InputModel.loginOrEmail,
       InputModel.password,
     );
-    if (!login) {
+    if (!token) {
       throw new UnauthorizedException();
     } else {
-      return login;
+      const title = req.headers['user-agent'];
+      const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
+      const lastActiveDate = new Date(tokenPayload.iat * 1000);
+
+      await this.securityService.createSession(
+        req.ip,
+        title,
+        lastActiveDate,
+        tokenPayload.deviceId,
+        tokenPayload.userId,
+      );
+      res.cookie('refreshToken', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+      });
     }
   }
 
-  // @Post('logout')
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async logout() {}
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Req() req) {
+    const refreshTokenPayload = this.authService.getTokenPayload(
+      req.cookies.refreshToken,
+    );
+    await this.securityService.deleteCurrentSession(
+      refreshTokenPayload.deviceId,
+    );
+  }
 
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)

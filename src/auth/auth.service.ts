@@ -11,21 +11,11 @@ import add from 'date-fns/add';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
     private jwtService: JwtService,
+    private usersService: UsersService,
     private authRepository: AuthRepository,
     private usersRepository: UsersRepository,
   ) {}
-
-  // async signIn(username, pass) {
-  //   const user = await this.usersService.findOne(username);
-  //   if (user?.password !== pass) {
-  //     throw new UnauthorizedException();
-  //   } else {
-  //     const payload = { username: user!.username, sub: user!.userId };
-  //     return { access_token: await this.jwtService.signAsync(payload) };
-  //   }
-  // }
 
   async getUser(userId: string): Promise<UserViewModel | null> {
     return this.usersRepository.getUser(userId);
@@ -63,7 +53,7 @@ export class AuthService {
       //   newUser.emailConfirmation.confirmationCode,
       // );
     } catch (error) {
-      //todo - здевсь обращаться в сервис или в репозиторий?
+      //todo - здесь обращаться в сервис или в репозиторий?
       await this.usersService.deleteUser(newUser.id);
       return null;
     }
@@ -80,10 +70,19 @@ export class AuthService {
     if (user.accountData.passwordHash !== passwordHash) {
       return null;
     } else {
-      const payload = { userId: user.id };
-      return { access_token: await this.jwtService.signAsync(payload) };
-      //todo - добавить рефреш токен в куки
+      const payload = { userId: user.id, deviceId: randomUUID() };
+      return {
+        accessToken: await this.jwtService.signAsync(payload, {
+          expiresIn: '5m',
+        }),
+        refreshToken: await this.jwtService.signAsync(payload, {
+          expiresIn: '20s',
+        }),
+      };
     }
+  }
+  async getTokenPayload(token: string) {
+    return this.jwtService.decode(token);
   }
 
   async checkConfirmationCode(code: string): Promise<boolean> {

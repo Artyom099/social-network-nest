@@ -28,27 +28,13 @@ export class AuthRepository {
     //   };
     // }
   }
-
-  async updateEmailConfirmation(id: string) {
-    await this.userModel.updateOne(
-      { id },
-      { $set: { 'emailConfirmation.isConfirmed': true } },
-    );
+  async getUserByRecoveryCode(code: string): Promise<UserDBModel | null> {
+    return this.userModel.findOne({ 'accountData.recoveryCode': code });
   }
-
   async getUserByConfirmationCode(code: string): Promise<UserDBModel | null> {
     return this.userModel.findOne({
       'emailConfirmation.confirmationCode': code,
     });
-    // if (user) return user;
-    // else return null;
-  }
-
-  async updateConfirmationCode(email: string, code: string) {
-    await this.userModel.updateOne(
-      { 'accountData.email': email },
-      { $set: { 'emailConfirmation.confirmationCode': code } },
-    );
   }
 
   async setRecoveryCode(email: string, recoveryCode: string) {
@@ -58,10 +44,18 @@ export class AuthRepository {
     );
   }
 
-  async getUserByRecoveryCode(code: string) {
-    return this.userModel.findOne({ 'accountData.recoveryCode': code });
+  async updateEmailConfirmation(id: string) {
+    await this.userModel.updateOne(
+      { id },
+      { $set: { 'emailConfirmation.isConfirmed': true } },
+    );
   }
-
+  async updateConfirmationCode(email: string, code: string) {
+    await this.userModel.updateOne(
+      { 'accountData.email': email },
+      { $set: { 'emailConfirmation.confirmationCode': code } },
+    );
+  }
   async updateSaltAndHash(code: string, salt: string, hash: string) {
     await this.userModel.updateOne(
       { recoveryCode: code },
