@@ -11,22 +11,14 @@ export class AuthRepository {
   async getUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UserDBModel | null> {
-    return this.userModel.findOne({
+    const user = this.userModel.findOne({
       $or: [
         { 'accountData.email': loginOrEmail },
         { 'accountData.login': loginOrEmail },
       ],
     });
-    // if (!user) {
-    //   return null;
-    // } else {
-    //   return {
-    //     id: user.id,
-    //     login: user!.accountData.login,
-    //     email: user!.accountData.email,
-    //     createdAt: user!.accountData.createdAt.toISOString(),
-    //   };
-    // }
+
+    return user;
   }
   async getUserByRecoveryCode(code: string): Promise<UserDBModel | null> {
     return this.userModel.findOne({ 'accountData.recoveryCode': code });
@@ -43,6 +35,16 @@ export class AuthRepository {
       { $set: { recoveryCode: recoveryCode } },
     );
   }
+
+  async save(model: any) {
+    return model.save();
+  }
+  // async updateEmailConfirmation2(id: string) {
+  //   const user = await this.userModel.findOne({ id }).exec();
+  //   user!.emailConfirmation.isConfirmed = true;
+  //   await user!.save();
+  //   return true;
+  // }
 
   async updateEmailConfirmation(id: string) {
     await this.userModel.updateOne(

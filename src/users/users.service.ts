@@ -11,14 +11,17 @@ export class UsersService {
   async getUser(userId: string): Promise<UserViewModel | null> {
     return this.usersRepository.getUser(userId);
   }
-  async createUser(InputModel: CreateUserInputModel): Promise<UserViewModel> {
+
+  async createUser(InputModel: CreateUserInputModel): Promise<string> {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await UsersService._generateHash(
       InputModel.password,
       passwordSalt,
     );
-    const newUser = User.create(InputModel, passwordSalt, passwordHash);
-    return this.usersRepository.createUser(newUser);
+
+    const newUser = User.createUser(InputModel, passwordSalt, passwordHash);
+    await this.usersRepository.saveUser(newUser);
+    return newUser.id;
   }
   async deleteUser(userId: string) {
     return this.usersRepository.deleteUser(userId);

@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { SecurityService } from './security.service';
 import { AuthService } from '../auth/auth.service';
@@ -21,16 +22,22 @@ export class SecurityController {
 
   @Get('devices')
   @HttpCode(HttpStatus.OK)
-  async getActiveSessions() {
-    const userId = 'mock';
-    return this.securityService.getSessions(userId);
+  async getActiveSessions(@Req() req) {
+    const tokenPayload = await this.authService.getTokenPayload(
+      req.cookies.refreshToken,
+    );
+    return this.securityService.getSessions(tokenPayload.userId);
   }
 
   @Delete('devices')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOtherSessions() {
-    const userId = 'mock';
-    await this.securityService.deleteOtherSessions(userId);
+  async deleteOtherSessions(@Req() req) {
+    const tokenPayload = this.authService.getTokenPayload(
+      req.cookies.refreshToken,
+    );
+
+    if (tokenPayload)
+      await this.securityService.deleteOtherSessions(tokenPayload.deviceId);
   }
 
   @Delete('devices/:id')
@@ -40,9 +47,14 @@ export class SecurityController {
     if (!currentSession) {
       throw new NotFoundException();
     }
-    const tokenPayload = await this.authService.getTokenPayload(
+    const tokenPayload = this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
+    if (!tokenPayload) {
+      throw new UnauthorizedException();
+    }
+
     const activeSessions = await this.securityService.getSessions(
       tokenPayload.userId,
     );

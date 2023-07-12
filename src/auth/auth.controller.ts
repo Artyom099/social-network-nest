@@ -36,37 +36,37 @@ export class AuthController {
     };
   }
 
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  async login(
-    @Req() req,
-    @Res({ passthrough: true }) res,
-    @Body() InputModel: AuthInputModel,
-  ) {
-    const token = this.authService.checkCredentials(
-      InputModel.loginOrEmail,
-      InputModel.password,
-    );
-    if (!token) {
-      throw new UnauthorizedException();
-    } else {
-      const title = req.headers['user-agent'];
-      const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
-      const lastActiveDate = new Date(tokenPayload.iat * 1000);
-
-      await this.securityService.createSession(
-        req.ip,
-        title,
-        lastActiveDate,
-        tokenPayload.deviceId,
-        tokenPayload.userId,
-      );
-      res.cookie('refreshToken', token.refreshToken, {
-        httpOnly: true,
-        secure: true,
-      });
-    }
-  }
+  // @Post('login')
+  // @HttpCode(HttpStatus.OK)
+  // async login(
+  //   @Req() req,
+  //   @Res({ passthrough: true }) res,
+  //   @Body() InputModel: AuthInputModel,
+  // ) {
+  //   const token = await this.authService.checkCredentials(
+  //     InputModel.loginOrEmail,
+  //     InputModel.password,
+  //   );
+  //   if (!token) {
+  //     throw new UnauthorizedException();
+  //   } else {
+  //     const title = req.headers['user-agent'];
+  //     const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
+  //     const lastActiveDate = new Date(tokenPayload.iat * 1000);
+  //
+  //     await this.securityService.createSession(
+  //       req.ip,
+  //       title,
+  //       lastActiveDate,
+  //       tokenPayload.deviceId,
+  //       tokenPayload.userId,
+  //     );
+  //     res.cookie('refreshToken', token.refreshToken, {
+  //       httpOnly: true,
+  //       secure: true,
+  //     });
+  //   }
+  // }
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -121,8 +121,8 @@ export class AuthController {
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendConfirmationEmail(@Body() code: string) {
-    const verifyEmail = await this.authService.checkConfirmationCode(code);
-    if (!verifyEmail) {
+    const confirmEmail = await this.authService.confirmEmail(code);
+    if (!confirmEmail) {
       throw new BadRequestException();
     } else {
       return true;

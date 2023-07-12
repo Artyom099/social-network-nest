@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Model } from 'mongoose';
 import { randomUUID } from 'crypto';
 import { CreateUserInputModel } from './users.models';
 import add from 'date-fns/add';
@@ -28,21 +28,21 @@ class EmailConfirmation {
   @Prop({ required: true, type: Boolean })
   isConfirmed: boolean;
 }
+const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
 
 export type UserDocument = HydratedDocument<User>;
-
 @Schema({ versionKey: false })
 export class User {
   @Prop({ required: true, type: String, unique: true, index: true })
   id: string;
   @Prop({ type: AccountDataSchema, required: true })
   accountData: AccountData;
-  @Prop({ type: EmailConfirmation, required: true })
+  @Prop({ type: EmailConfirmationSchema, required: true })
   emailConfirmation: EmailConfirmation;
   @Prop({ type: String, required: true })
   recoveryCode: string;
 
-  static create(
+  static createUser(
     createUserInputModel: CreateUserInputModel,
     passwordSalt: string,
     passwordHash: string,
@@ -66,5 +66,70 @@ export class User {
     user.recoveryCode = '';
     return user;
   }
+
+  setRecoveryCode(code: string) {
+    this.recoveryCode = code;
+  }
+  updateConfirmationCode() {
+    return (this.emailConfirmation.confirmationCode = randomUUID());
+  }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.method('canBeConfirmed', function canBeConfirmed(code: string) {
+  return (
+    this &&
+    !this.emailConfirmation.isConfirmed &&
+    this.emailConfirmation.confirmationCode === code &&
+    this.emailConfirmation.expirationDate > new Date()
+  );
+});
+UserSchema.method('confirm', function confirm() {
+  if (this.emailConfirmation.isConfirmed) {
+    throw new Error('Already confirmed');
+  } else {
+    this.emailConfirmation.isConfirmed = true;
+  }
+});
+
+// const statics = {
+//   createUser(
+//     createUserInputModel: CreateUserInputModel,
+//     passwordSalt: string,
+//     passwordHash: string,
+//   ) {
+//     const accountData = new AccountData();
+//     accountData.login = createUserInputModel.login;
+//     accountData.email = createUserInputModel.email;
+//     accountData.passwordSalt = passwordSalt;
+//     accountData.passwordHash = passwordHash;
+//     accountData.createdAt = new Date();
+//
+//     const emailConfirmation = new EmailConfirmation();
+//     emailConfirmation.confirmationCode = randomUUID();
+//     emailConfirmation.expirationDate = add(new Date(), { minutes: 10 });
+//     emailConfirmation.isConfirmed = false;
+//
+//     const userDto = {
+//       id: randomUUID(),
+//       accountData: accountData,
+//       emailConfirmation: emailConfirmation,
+//       recoveryCode: '',
+//     };
+//     return new this(userDto);
+//   },
+// };
+// UserSchema.statics = statics;
+// export type UserModelType = Model<UserDocument> & typeof statics;
+
+export type UserMethodsType = {
+  canBeConfirmed: (code: string) => boolean;
+  confirm: () => void;
+};
+
+type UserModelType = Model<User, {}, UserMethodsType>;
+
+export const UserModel = mongoose.model<User, UserModelType>(
+  'Users',
+  UserSchema,
+);

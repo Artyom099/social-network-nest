@@ -53,14 +53,16 @@ export class AuthService {
       //   newUser.emailConfirmation.confirmationCode,
       // );
     } catch (error) {
-      //todo - здесь обращаться в сервис или в репозиторий?
-      await this.usersService.deleteUser(newUser.id);
+      await this.usersRepository.deleteUser(newUser.id);
       return null;
     }
     return user;
   }
 
-  async checkCredentials(loginOrEmail, password) {
+  async checkCredentials(
+    loginOrEmail,
+    password,
+  ): Promise<{ accessToken: string; refreshToken: string } | null> {
     const user = await this.authRepository.getUserByLoginOrEmail(loginOrEmail);
     if (!user) return null;
     const passwordHash = await this._generateHash(
@@ -81,13 +83,34 @@ export class AuthService {
       };
     }
   }
-  async getTokenPayload(token: string) {
-    return this.jwtService.decode(token);
+
+  getTokenPayload(
+    token: string,
+  ): { userId: string; deviceId: string; iat: number; exp: number } | null {
+    // { userId: '1682507411257', deviceId: '1682507411257', iat: 1682507422, exp: 1682511022 }
+    const payload = this.jwtService.decode(token);
+    if (typeof payload === 'string' || payload === null) {
+      return null;
+    } else {
+      return {
+        deviceId: payload.deviceId,
+        exp: payload.exp,
+        iat: payload.iat,
+        userId: payload.userId,
+      };
+    }
   }
 
-  async checkConfirmationCode(code: string): Promise<boolean> {
+  async confirmEmail(code: string): Promise<boolean> {
     // проверка кода на правильность, срок жизни и повторное использование
     const user = await this.authRepository.getUserByConfirmationCode(code);
+
+    if (user.canBeConfirmed(code)) {
+      user!.emailConfirmation.isConfirmed = true;
+      const result = await this.authRepository.save(user);
+      return result;
+    }
+
     if (
       user &&
       !user.emailConfirmation.isConfirmed &&
