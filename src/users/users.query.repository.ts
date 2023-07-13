@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PagingViewModel } from '../utils/common.models';
-import { UserViewModel } from './users.models';
+import { UserDBModel, UserViewModel } from './users.models';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,6 +8,33 @@ import { InjectModel } from '@nestjs/mongoose';
 @Injectable()
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+  async getUserById(id: string): Promise<UserViewModel | null> {
+    const user = this.userModel.findOne({ id }).exec();
+    if (!user) return null;
+    return {
+      id: user.id,
+      login: user.accountData.login,
+      email: user.accountData.email,
+      createdAt: user.accountData.createdAt.toISOString(),
+    };
+  }
+  async getUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
+    return this.userModel.findOne({
+      $or: [
+        { 'accountData.login': loginOrEmail },
+        { 'accountData.email': loginOrEmail },
+      ],
+    });
+  }
+  async getUserByRecoveryCode(code: string): Promise<UserDBModel | null> {
+    return this.userModel.findOne({ 'accountData.recoveryCode': code });
+  }
+  async getUserByConfirmationCode(code: string): Promise<UserDBModel | null> {
+    return this.userModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
+  }
 
   async getSortedUsers(
     searchEmailTerm: string | null,
@@ -30,14 +57,7 @@ export class UsersQueryRepository {
     const _sortBy = 'accountData.' + sortBy;
     const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel
-      .find(filter, {
-        // _id: 0,
-        // accountData: 0,
-        // id: 1,
-        // login: '$accountData.login',
-        // email: '$accountData.email',
-        // createdAt: '$accountData.createdAt',
-      })
+      .find(filter)
       .sort({ [_sortBy]: sortDirection })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)

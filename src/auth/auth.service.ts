@@ -7,6 +7,7 @@ import { randomUUID } from 'crypto';
 import { UsersRepository } from '../users/users.repository';
 import { UserDBModel, UserViewModel } from '../users/users.models';
 import add from 'date-fns/add';
+import { User } from '../users/users.schema';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
   ) {}
 
   async getUser(userId: string): Promise<UserViewModel | null> {
-    return this.usersRepository.getUser(userId);
+    return this.usersRepository.getUserById(userId);
   }
   async getUserByLoginOrEmail(
     loginOrEmail: string,
@@ -105,11 +106,11 @@ export class AuthService {
     // проверка кода на правильность, срок жизни и повторное использование
     const user = await this.authRepository.getUserByConfirmationCode(code);
 
-    if (user.canBeConfirmed(code)) {
-      user!.emailConfirmation.isConfirmed = true;
-      const result = await this.authRepository.save(user);
-      return result;
-    }
+    // if (user.canBeConfirmed(code)) {
+    //   user.confirm();
+    //   const result = await this.authRepository.save(user);
+    //   return result;
+    // }
 
     if (
       user &&
@@ -124,20 +125,36 @@ export class AuthService {
     }
   }
   async updateConfirmationCode(email: string): Promise<string | null> {
-    const newCode = randomUUID();
-    await this.authRepository.updateConfirmationCode(email, newCode);
+    //достали тупого юзер
+    const user = await this.usersRepository.getUserByLoginOrEmail(email);
+    if (!user) return null;
+    //сделали его умным
+    const smartUser = User.createUserClass(user);
+    //обновили у него ConfirmationCode
+    const newConfirmationCode = smartUser.updateConfirmationCode();
+    //записали это обновление в БД - todo - smartUser или user?
+    await this.usersRepository.updateUser(user.id, user);
+
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
       // await emailManager.sendEmailConfirmationMessage(email, newConfirmationCode);
     } catch (error) {
       return null;
     }
-    return newCode;
+    return newConfirmationCode;
   }
 
   async sendRecoveryCode(email: string) {
-    const recoveryCode = randomUUID();
-    await this.authRepository.setRecoveryCode(email, recoveryCode);
+    //достали тупого юзер
+    const user = await this.usersRepository.getUserByLoginOrEmail(email);
+    if (!user) return null;
+    //сделали его умным
+    const smartUser = User.createUserClass(user);
+    //обновили у него recoveryCode
+    const recoveryCode = smartUser.setRecoveryCode();
+    //записали это обновление в БД - todo - smartUser или user?
+    await this.usersRepository.updateUser(user.id, smartUser);
+
     try {
       // await emailManager.sendEmailRecoveryCode(email, recoveryCode);
     } catch (error) {

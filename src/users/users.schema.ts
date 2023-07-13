@@ -46,7 +46,7 @@ export class User {
     createUserInputModel: CreateUserInputModel,
     passwordSalt: string,
     passwordHash: string,
-  ) {
+  ): User {
     const accountData = new AccountData();
     accountData.login = createUserInputModel.login;
     accountData.email = createUserInputModel.email;
@@ -67,67 +67,122 @@ export class User {
     return user;
   }
 
-  setRecoveryCode(code: string) {
+  static createUserClass(userFromDb: any): User {
+    const accountData = new AccountData();
+    accountData.login = userFromDb.accountData.login;
+    accountData.email = userFromDb.accountData.email;
+    accountData.passwordSalt = userFromDb.accountData.passwordSalt;
+    accountData.passwordHash = userFromDb.accountData.passwordHash;
+    accountData.createdAt = userFromDb.accountData.createdAt;
+
+    const emailConfirmation = new EmailConfirmation();
+    emailConfirmation.confirmationCode =
+      userFromDb.emailConfirmation.confirmationCode;
+    emailConfirmation.expirationDate =
+      userFromDb.emailConfirmation.expirationDate;
+    emailConfirmation.isConfirmed = userFromDb.emailConfirmation.isConfirmed;
+
+    const user = new User();
+    user.id = userFromDb.id;
+    user.accountData = userFromDb.accountData;
+    user.emailConfirmation = userFromDb.emailConfirmation;
+    user.recoveryCode = userFromDb.recoveryCode;
+    return user;
+  }
+
+  getViewModel() {
+    return {
+      id: this.id,
+      login: this.accountData.login,
+      email: this.accountData.email,
+      createdAt: this.accountData.createdAt.toISOString(),
+    };
+  }
+
+  setRecoveryCode() {
+    const code = randomUUID();
     this.recoveryCode = code;
+    return code;
   }
   updateConfirmationCode() {
-    return (this.emailConfirmation.confirmationCode = randomUUID());
+    const newCode = randomUUID();
+    this.emailConfirmation.confirmationCode = newCode;
+    return newCode;
   }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.method('canBeConfirmed', function canBeConfirmed(code: string) {
-  return (
-    this &&
-    !this.emailConfirmation.isConfirmed &&
-    this.emailConfirmation.confirmationCode === code &&
-    this.emailConfirmation.expirationDate > new Date()
-  );
-});
-UserSchema.method('confirm', function confirm() {
-  if (this.emailConfirmation.isConfirmed) {
-    throw new Error('Already confirmed');
-  } else {
-    this.emailConfirmation.isConfirmed = true;
-  }
-});
+// UserSchema.method('canBeConfirmed', function canBeConfirmed(code: string) {
+//   return (
+//     this &&
+//     !this.emailConfirmation.isConfirmed &&
+//     this.emailConfirmation.confirmationCode === code &&
+//     this.emailConfirmation.expirationDate > new Date()
+//   );
+// });
+// UserSchema.method('confirm', function confirm() {
+//   if (this.emailConfirmation.isConfirmed) {
+//     throw new Error('Already confirmed');
+//   } else {
+//     this.emailConfirmation.isConfirmed = true;
+//   }
+// });
+//
+// UserSchema.pre('save', () => {});
+//
+// UserSchema.static(
+//   'createUser',
+//   function createUser(
+//     createUserInputModel: CreateUserInputModel,
+//     passwordSalt: string,
+//     passwordHash: string,
+//   ): User {},
+// );
+//
+// // const statics = {
+// //   createUser(
+// //     createUserInputModel: CreateUserInputModel,
+// //     passwordSalt: string,
+// //     passwordHash: string,
+// //   ) {
+// //     const accountData = new AccountData();
+// //     accountData.login = createUserInputModel.login;
+// //     accountData.email = createUserInputModel.email;
+// //     accountData.passwordSalt = passwordSalt;
+// //     accountData.passwordHash = passwordHash;
+// //     accountData.createdAt = new Date();
+// //
+// //     const emailConfirmation = new EmailConfirmation();
+// //     emailConfirmation.confirmationCode = randomUUID();
+// //     emailConfirmation.expirationDate = add(new Date(), { minutes: 10 });
+// //     emailConfirmation.isConfirmed = false;
+// //
+// //     const userDto = {
+// //       id: randomUUID(),
+// //       accountData: accountData,
+// //       emailConfirmation: emailConfirmation,
+// //       recoveryCode: '',
+// //     };
+// //     return new this(userDto);
+// //   },
+// // };
+// // UserSchema.statics = statics;
+// // export type UserModelType = Model<UserDocument> & typeof statics;
 
-// const statics = {
+export type UserMethodsType = {
+  // canBeConfirmed: (code: string) => boolean;
+  // confirm: () => void;
+  sayHi: () => void;
+};
+
+type UserModelType = Model<User, UserMethodsType>;
+// type UserModelStaticType = Model<User> & {
 //   createUser(
 //     createUserInputModel: CreateUserInputModel,
 //     passwordSalt: string,
 //     passwordHash: string,
-//   ) {
-//     const accountData = new AccountData();
-//     accountData.login = createUserInputModel.login;
-//     accountData.email = createUserInputModel.email;
-//     accountData.passwordSalt = passwordSalt;
-//     accountData.passwordHash = passwordHash;
-//     accountData.createdAt = new Date();
-//
-//     const emailConfirmation = new EmailConfirmation();
-//     emailConfirmation.confirmationCode = randomUUID();
-//     emailConfirmation.expirationDate = add(new Date(), { minutes: 10 });
-//     emailConfirmation.isConfirmed = false;
-//
-//     const userDto = {
-//       id: randomUUID(),
-//       accountData: accountData,
-//       emailConfirmation: emailConfirmation,
-//       recoveryCode: '',
-//     };
-//     return new this(userDto);
-//   },
+//   ): any;
 // };
-// UserSchema.statics = statics;
-// export type UserModelType = Model<UserDocument> & typeof statics;
-
-export type UserMethodsType = {
-  canBeConfirmed: (code: string) => boolean;
-  confirm: () => void;
-};
-
-type UserModelType = Model<User, {}, UserMethodsType>;
 
 export const UserModel = mongoose.model<User, UserModelType>(
   'Users',

@@ -39,12 +39,14 @@ export class AuthRepository {
   async save(model: any) {
     return model.save();
   }
-  // async updateEmailConfirmation2(id: string) {
-  //   const user = await this.userModel.findOne({ id }).exec();
-  //   user!.emailConfirmation.isConfirmed = true;
-  //   await user!.save();
-  //   return true;
-  // }
+
+  async updateEmailConfirmation2(id: string) {
+    const user = await this.userModel.findOne({ id }).exec();
+
+    user!.emailConfirmation.isConfirmed = true;
+    await user!.save();
+    return true;
+  }
 
   async updateEmailConfirmation(id: string) {
     await this.userModel.updateOne(
