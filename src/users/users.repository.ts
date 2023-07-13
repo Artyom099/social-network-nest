@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { UserViewModel } from './users.models';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModel } from './users.schema';
+import { User, UserDocument, UserModelType } from './users.schema';
 import { Model } from 'mongoose';
 
 @Injectable()
 export class UsersRepository {
   constructor(
     @InjectModel(User.name)
-    private userModel: Model<UserDocument>,
+    private userModel: UserModelType,
   ) {}
 
   async getUserById(id: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ id });
   }
-
-  async getUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
+  async getUserByLoginOrEmail(
+    loginOrEmail: string,
+  ): Promise<UserDocument | null> {
     return this.userModel.findOne({
       $or: [
         { 'accountData.login': loginOrEmail },
         { 'accountData.email': loginOrEmail },
       ],
+    });
+  }
+  async getUserByRecoveryCode(code: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ recoveryCode: code });
+  }
+  async getUserByConfirmationCode(code: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      'emailConfirmation.confirmationCode': code,
     });
   }
 
@@ -37,22 +45,19 @@ export class UsersRepository {
   //   // const user = await this.userModel.createUser();
   //   // repo.save(user)
   // }
-  async deleteUser(id: string) {
-    await this.userModel.deleteOne({ id });
-    const u = await this.userModel.findOne();
-    u.s;
-  }
 
-  async createUser(user: User) {
-    return this.userModel.create(user);
+  async createUser(userDTO: any) {
+    return User.createUserClass(userDTO, this.userModel);
+  }
+  async save(model: any) {
+    return model.save();
   }
 
   async updateUser(id: string, user: User) {
     return this.userModel.updateOne({ id }, { user });
   }
-}
 
-//service:
-//repo.getUser()
-//user.updateCode(UpdateUserCodeDto)
-//repo.save(user)
+  async deleteUser(id: string) {
+    await this.userModel.deleteOne({ id });
+  }
+}

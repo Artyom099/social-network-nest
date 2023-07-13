@@ -50,7 +50,8 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: CreateUserInputModel) {
-    return this.usersService.createUser(inputModel);
+    const userId = await this.usersService.createUser(inputModel);
+    return this.usersQueryRepository.getUserById(userId);
   }
 
   @Delete(':id')
@@ -58,7 +59,7 @@ export class UsersController {
   async deleteUser(@Param('id') userId: string) {
     const foundBlog = await this.usersService.getUser(userId);
     if (!foundBlog) {
-      throw new NotFoundException('blog not found');
+      throw new NotFoundException('Blog not found');
     } else {
       return this.usersService.deleteUser(userId);
     }

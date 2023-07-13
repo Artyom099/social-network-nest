@@ -28,6 +28,10 @@ import { config } from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { SecurityService } from './security/security.service';
+import { SecurityRepository } from './security/security.repository';
+import { SecurityController } from './security/security.controller';
+import { Session, SessionSchema } from './security/security.schema';
 
 config();
 
@@ -42,6 +46,7 @@ config();
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: Session.name, schema: SessionSchema },
     ]),
   ],
   controllers: [
@@ -51,6 +56,7 @@ config();
     BlogsController,
     PostsController,
     CommentsController,
+    SecurityController,
   ],
   providers: [
     AppService,
@@ -71,6 +77,9 @@ config();
     CommentsService,
     CommentsRepository,
     CommentsQueryRepository,
+
+    SecurityService,
+    SecurityRepository,
   ],
 })
 export class AppModule {}

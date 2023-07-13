@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PagingViewModel } from '../utils/common.models';
-import { UserDBModel, UserViewModel } from './users.models';
+import { UserViewModel } from './users.models';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,30 +10,19 @@ export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async getUserById(id: string): Promise<UserViewModel | null> {
-    const user = this.userModel.findOne({ id }).exec();
+    //достали тупого юзера
+    const user = await this.userModel.findOne({ id }).exec();
     if (!user) return null;
+    // вернули ViewModel умного юзера
+    return this.getViewModel(user);
+  }
+  getViewModel(user): UserViewModel {
     return {
       id: user.id,
       login: user.accountData.login,
       email: user.accountData.email,
       createdAt: user.accountData.createdAt.toISOString(),
     };
-  }
-  async getUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
-    return this.userModel.findOne({
-      $or: [
-        { 'accountData.login': loginOrEmail },
-        { 'accountData.email': loginOrEmail },
-      ],
-    });
-  }
-  async getUserByRecoveryCode(code: string): Promise<UserDBModel | null> {
-    return this.userModel.findOne({ 'accountData.recoveryCode': code });
-  }
-  async getUserByConfirmationCode(code: string): Promise<UserDBModel | null> {
-    return this.userModel.findOne({
-      'emailConfirmation.confirmationCode': code,
-    });
   }
 
   async getSortedUsers(

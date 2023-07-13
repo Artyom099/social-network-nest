@@ -8,6 +8,10 @@ import { AuthRepository } from './auth.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/users.schema';
 import { UsersRepository } from '../users/users.repository';
+import { SecurityService } from '../security/security.service';
+import { SecurityRepository } from '../security/security.repository';
+import { Session, SessionSchema } from '../security/security.schema';
+import { UsersQueryRepository } from '../users/users.query.repository';
 
 @Module({
   imports: [
@@ -17,14 +21,20 @@ import { UsersRepository } from '../users/users.repository';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s' },
     }),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Session.name, schema: SessionSchema },
+    ]),
   ],
   providers: [
     AuthService,
+    SecurityService,
     // { provide: APP_GUARD, useClass: AuthGuard },
     // BasicStrategy,
     AuthRepository,
     UsersRepository,
+    SecurityRepository,
+    UsersQueryRepository,
   ],
   controllers: [AuthController],
   exports: [AuthService],

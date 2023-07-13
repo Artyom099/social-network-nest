@@ -20,9 +20,7 @@ export class AuthRepository {
 
     return user;
   }
-  async getUserByRecoveryCode(code: string): Promise<UserDBModel | null> {
-    return this.userModel.findOne({ 'accountData.recoveryCode': code });
-  }
+
   async getUserByConfirmationCode(code: string): Promise<UserDBModel | null> {
     return this.userModel.findOne({
       'emailConfirmation.confirmationCode': code,
@@ -38,14 +36,6 @@ export class AuthRepository {
 
   async save(model: any) {
     return model.save();
-  }
-
-  async updateEmailConfirmation2(id: string) {
-    const user = await this.userModel.findOne({ id }).exec();
-
-    user!.emailConfirmation.isConfirmed = true;
-    await user!.save();
-    return true;
   }
 
   async updateEmailConfirmation(id: string) {

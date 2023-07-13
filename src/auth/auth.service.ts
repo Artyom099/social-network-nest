@@ -5,8 +5,11 @@ import { AuthRepository } from './auth.repository';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { UsersRepository } from '../users/users.repository';
-import { UserDBModel, UserViewModel } from '../users/users.models';
-import add from 'date-fns/add';
+import {
+  CreateUserInputModel,
+  UserDBModel,
+  UserViewModel,
+} from '../users/users.models';
 import { User } from '../users/users.schema';
 
 @Injectable()
@@ -18,35 +21,30 @@ export class AuthService {
     private usersRepository: UsersRepository,
   ) {}
 
-  async getUser(userId: string): Promise<UserViewModel | null> {
-    return this.usersRepository.getUserById(userId);
-  }
   async getUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UserDBModel | null> {
-    return this.authRepository.getUserByLoginOrEmail(loginOrEmail);
+    return this.usersRepository.getUserByLoginOrEmail(loginOrEmail);
   }
-  async createUser(login: string, password: string, email: string) {
+
+  async createUser(
+    InputModel: CreateUserInputModel,
+  ): Promise<UserViewModel | null> {
     const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this._generateHash(password, passwordSalt);
-    const newUser: UserDBModel = {
-      id: randomUUID(),
-      accountData: {
-        login,
-        email,
-        passwordHash,
-        passwordSalt,
-        createdAt: new Date(),
-      },
-      emailConfirmation: {
-        confirmationCode: randomUUID(),
-        expirationDate: add(new Date(), { minutes: 10 }),
-        isConfirmed: false,
-      },
-      recoveryCode: '',
-    };
-    // todo - нормально, что AuthService использеут метод usersRepository?
-    const user = this.usersRepository.createUser(newUser);
+    const passwordHash = await this._generateHash(
+      InputModel.password,
+      passwordSalt,
+    );
+
+    //создание умного юзера
+    const smartUser = User.createUserBySelf(
+      InputModel,
+      passwordSalt,
+      passwordHash,
+    );
+    // сохранение умного юзера через репозиторий
+    await this.usersRepository.createUser(smartUser);
+
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
       // await emailManager.sendEmailConfirmationMessage(
@@ -54,10 +52,11 @@ export class AuthService {
       //   newUser.emailConfirmation.confirmationCode,
       // );
     } catch (error) {
-      await this.usersRepository.deleteUser(newUser.id);
+      await this.usersRepository.deleteUser(smartUser.id);
       return null;
     }
-    return user;
+    // возврщение ViewModel умного юзера
+    return smartUser.getViewModel();
   }
 
   async checkCredentials(
@@ -104,26 +103,15 @@ export class AuthService {
 
   async confirmEmail(code: string): Promise<boolean> {
     // проверка кода на правильность, срок жизни и повторное использование
-    const user = await this.authRepository.getUserByConfirmationCode(code);
-
-    // if (user.canBeConfirmed(code)) {
-    //   user.confirm();
-    //   const result = await this.authRepository.save(user);
-    //   return result;
-    // }
-
-    if (
-      user &&
-      !user.emailConfirmation.isConfirmed &&
-      user.emailConfirmation.confirmationCode === code &&
-      user.emailConfirmation.expirationDate > new Date()
-    ) {
-      await this.authRepository.updateEmailConfirmation(user.id);
-      return true;
-    } else {
-      return false;
-    }
+    //достали тупого юзер
+    const user = await this.usersRepository.getUserByConfirmationCode(code);
+    if (!user) return false;
+    //сделали его умным
+    const smartUser = User.createUserClass(user);
+    //подтвердили его email и вернули результат подтверждения
+    return smartUser.confirmEmail(code);
   }
+
   async updateConfirmationCode(email: string): Promise<string | null> {
     //достали тупого юзер
     const user = await this.usersRepository.getUserByLoginOrEmail(email);
@@ -151,7 +139,7 @@ export class AuthService {
     //сделали его умным
     const smartUser = User.createUserClass(user);
     //обновили у него recoveryCode
-    const recoveryCode = smartUser.setRecoveryCode();
+    const recoveryCode = smartUser.updateRecoveryCode();
     //записали это обновление в БД - todo - smartUser или user?
     await this.usersRepository.updateUser(user.id, smartUser);
 
@@ -164,17 +152,21 @@ export class AuthService {
   }
 
   async checkRecoveryCode(code: string) {
-    return this.authRepository.getUserByRecoveryCode(code);
+    return this.usersRepository.getUserByRecoveryCode(code);
   }
 
   async updatePassword(code: string, password: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(password, passwordSalt);
-    await this.authRepository.updateSaltAndHash(
-      code,
-      passwordSalt,
-      passwordHash,
-    );
+    //достали тупого юзер
+    const user = await this.usersRepository.getUserByRecoveryCode(code);
+    if (!user) return null;
+    //сделали его умным
+    const smartUser = User.createUserClass(user);
+    //обновили у него passwordSalt и passwordHash
+    smartUser.updateSaltAndHash(passwordSalt, passwordHash);
+    //записали это обновление в БД - todo - smartUser или user?
+    await this.usersRepository.updateUser(user.id, smartUser);
   }
 
   async _generateHash(password: string, salt: string) {

@@ -41,7 +41,7 @@ export class PostsService {
       userId,
       likeStatus,
       addedAt,
-      user!.login,
+      user!.accountData.login,
     );
   }
 }

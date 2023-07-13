@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument, Model } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { CreateUserInputModel } from './users.models';
+import { CreateUserInputModel, UserViewModel } from './users.models';
 import add from 'date-fns/add';
 
 @Schema({ _id: false, versionKey: false })
@@ -42,7 +42,31 @@ export class User {
   @Prop({ type: String, required: true })
   recoveryCode: string;
 
-  static createUser(
+  static createUserByAdmin(
+    createUserInputModel: CreateUserInputModel,
+    passwordSalt: string,
+    passwordHash: string,
+  ): User {
+    const accountData = new AccountData();
+    accountData.login = createUserInputModel.login;
+    accountData.email = createUserInputModel.email;
+    accountData.passwordSalt = passwordSalt;
+    accountData.passwordHash = passwordHash;
+    accountData.createdAt = new Date();
+
+    const emailConfirmation = new EmailConfirmation();
+    emailConfirmation.confirmationCode = randomUUID();
+    emailConfirmation.expirationDate = add(new Date(), { minutes: 10 });
+    emailConfirmation.isConfirmed = true;
+
+    const user = new User();
+    user.id = randomUUID();
+    user.accountData = accountData;
+    user.emailConfirmation = emailConfirmation;
+    user.recoveryCode = '';
+    return user;
+  }
+  static createUserBySelf(
     createUserInputModel: CreateUserInputModel,
     passwordSalt: string,
     passwordHash: string,
@@ -67,30 +91,50 @@ export class User {
     return user;
   }
 
-  static createUserClass(userFromDb: any): User {
-    const accountData = new AccountData();
-    accountData.login = userFromDb.accountData.login;
-    accountData.email = userFromDb.accountData.email;
-    accountData.passwordSalt = userFromDb.accountData.passwordSalt;
-    accountData.passwordHash = userFromDb.accountData.passwordHash;
-    accountData.createdAt = userFromDb.accountData.createdAt;
+  static createUserClass(userDto: any, UserModel: UserModelType): UserDocument {
+    //todo - переделть
+    const data = {
+      accountData: {
+        login: userDto.login,
+        password: userDto.password,
+        email: userDto.email,
+        createdAt: new Date(),
+      },
+      emailConfirmation: {
+        confirmationCode: '',
+        expirationDate: new Date(),
+        isConfirmed: true,
+      },
+      refreshToken: '',
+      passwordRecovery: { recoveryCode: '', expirationDate: new Date(0) },
+      banInfo: {},
+    };
+    const newUser = new UserModel(data);
+    return newUser;
 
-    const emailConfirmation = new EmailConfirmation();
-    emailConfirmation.confirmationCode =
-      userFromDb.emailConfirmation.confirmationCode;
-    emailConfirmation.expirationDate =
-      userFromDb.emailConfirmation.expirationDate;
-    emailConfirmation.isConfirmed = userFromDb.emailConfirmation.isConfirmed;
-
-    const user = new User();
-    user.id = userFromDb.id;
-    user.accountData = userFromDb.accountData;
-    user.emailConfirmation = userFromDb.emailConfirmation;
-    user.recoveryCode = userFromDb.recoveryCode;
-    return user;
+    // const accountData = new AccountData();
+    // accountData.login = userFromDb.accountData.login;
+    // accountData.email = userFromDb.accountData.email;
+    // accountData.passwordSalt = userFromDb.accountData.passwordSalt;
+    // accountData.passwordHash = userFromDb.accountData.passwordHash;
+    // accountData.createdAt = userFromDb.accountData.createdAt;
+    //
+    // const emailConfirmation = new EmailConfirmation();
+    // emailConfirmation.confirmationCode =
+    //   userFromDb.emailConfirmation.confirmationCode;
+    // emailConfirmation.expirationDate =
+    //   userFromDb.emailConfirmation.expirationDate;
+    // emailConfirmation.isConfirmed = userFromDb.emailConfirmation.isConfirmed;
+    //
+    // const user = new UserModel();
+    // user.id = userFromDb.id;
+    // user.accountData = userFromDb.accountData;
+    // user.emailConfirmation = userFromDb.emailConfirmation;
+    // user.recoveryCode = userFromDb.recoveryCode;
+    // return user;
   }
 
-  getViewModel() {
+  getViewModel(): UserViewModel {
     return {
       id: this.id,
       login: this.accountData.login,
@@ -98,20 +142,50 @@ export class User {
       createdAt: this.accountData.createdAt.toISOString(),
     };
   }
-
-  setRecoveryCode() {
+  updateSaltAndHash(salt: string, hash: string) {
+    this.accountData.passwordSalt = salt;
+    this.accountData.passwordHash = hash;
+  }
+  updateRecoveryCode(): string {
     const code = randomUUID();
     this.recoveryCode = code;
     return code;
   }
-  updateConfirmationCode() {
+  updateConfirmationCode(): string {
     const newCode = randomUUID();
     this.emailConfirmation.confirmationCode = newCode;
     return newCode;
   }
+
+  confirmEmail(code: string): boolean {
+    if (
+      this &&
+      !this.emailConfirmation.isConfirmed &&
+      this.emailConfirmation.confirmationCode === code &&
+      this.emailConfirmation.expirationDate > new Date()
+    ) {
+      this.emailConfirmation.isConfirmed = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 
+UserSchema.methods = {
+  getViewModel: User.prototype.getViewModel,
+};
+
+export type UserModelStaticType = {
+  createUserClass: (userFromDb: any) => UserDocument;
+};
+const userStaticMethods: UserModelStaticType = {
+  createUserClass: User.createUserClass,
+};
+UserSchema.statics = userStaticMethods;
+export type UserModelType = Model<User> & UserModelStaticType;
+//
 // UserSchema.method('canBeConfirmed', function canBeConfirmed(code: string) {
 //   return (
 //     this &&
@@ -168,13 +242,10 @@ export const UserSchema = SchemaFactory.createForClass(User);
 // // };
 // // UserSchema.statics = statics;
 // // export type UserModelType = Model<UserDocument> & typeof statics;
-
 export type UserMethodsType = {
-  // canBeConfirmed: (code: string) => boolean;
-  // confirm: () => void;
-  sayHi: () => void;
+  canBeConfirmed: (code: string) => boolean;
+  confirm: () => void;
 };
-
 type UserModelType = Model<User, UserMethodsType>;
 // type UserModelStaticType = Model<User> & {
 //   createUser(
@@ -184,7 +255,26 @@ type UserModelType = Model<User, UserMethodsType>;
 //   ): any;
 // };
 
-export const UserModel = mongoose.model<User, UserModelType>(
-  'Users',
-  UserSchema,
-);
+// export const UserModel = mongoose.model<User, UserModelType>(
+//   'Users',
+//   UserSchema,
+// );
+
+const data = {
+  accountData: {
+    login: userDto.login,
+    password: userDto.password,
+    email: userDto.email,
+    createdAt: new Date(),
+  },
+  emailConfirmation: {
+    confirmationCode: '',
+    expirationDate: new Date(),
+    isConfirmed: true,
+  },
+  refreshToken: '',
+  passwordRecovery: { recoveryCode: '', expirationDate: new Date(0) },
+  banInfo: {},
+};
+const newUser = new UserModel(data);
+return newUser;

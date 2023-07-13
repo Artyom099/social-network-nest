@@ -26,7 +26,7 @@ export class SecurityController {
     const tokenPayload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    return this.securityService.getSessions(tokenPayload.userId);
+    // return this.securityService.getSessions(tokenPayload.userId);
   }
 
   @Delete('devices')

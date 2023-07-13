@@ -13,22 +13,24 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthInputModel } from './auth.models';
 import { BearerAuthGuard } from './guards/bearer-auth.guard';
 import { SecurityService } from '../security/security.service';
+import { UsersQueryRepository } from '../users/users.query.repository';
+import { CreateUserInputModel } from '../users/users.models';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private securityService: SecurityService,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
   @Get('me')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Request() req) {
-    const user = await this.authService.getUser(req.userId);
+    const user = await this.usersQueryRepository.getUserById(req.userId);
     return {
       email: user?.email,
       login: user?.login,
@@ -74,18 +76,16 @@ export class AuthController {
     const refreshTokenPayload = this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    await this.securityService.deleteCurrentSession(
-      refreshTokenPayload.deviceId,
-    );
+    // await this.securityService.deleteCurrentSession(
+    //   refreshTokenPayload.deviceId,
+    // );
   }
 
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(@Body() recoveryCode: string, newPassword: string) {
-    const verifyRecoveryCode = await this.authService.checkRecoveryCode(
-      recoveryCode,
-    );
-    if (!verifyRecoveryCode) {
+    const confirm = await this.authService.checkRecoveryCode(recoveryCode);
+    if (!confirm) {
       throw new BadRequestException();
     } else {
       await this.authService.updatePassword(recoveryCode, newPassword);
@@ -104,17 +104,21 @@ export class AuthController {
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async registration(@Body() email: string, login: string, password: string) {
+  async registration(@Body() inputModel: CreateUserInputModel) {
     //todo - добавить имя поля в обоих Exception
-    const existUserEmail = await this.authService.getUserByLoginOrEmail(email);
+    const existUserEmail = await this.authService.getUserByLoginOrEmail(
+      inputModel.email,
+    );
     if (existUserEmail) {
       throw new BadRequestException();
     }
-    const existUserLogin = await this.authService.getUserByLoginOrEmail(login);
+    const existUserLogin = await this.authService.getUserByLoginOrEmail(
+      inputModel.login,
+    );
     if (existUserLogin) {
       throw new BadRequestException();
     } else {
-      await this.authService.createUser(login, password, email);
+      await this.authService.createUser(inputModel);
     }
   }
 
