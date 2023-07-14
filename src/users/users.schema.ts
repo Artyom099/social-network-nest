@@ -136,7 +136,6 @@ UserSchema.methods = {
   updateRecoveryCode: User.prototype.updateRecoveryCode,
   updateConfirmationCode: User.prototype.updateConfirmationCode,
 };
-
 export type UserModelStaticType = {
   createUserClass: (
     InputModel: CreateUserInputModel,
@@ -145,8 +144,8 @@ export type UserModelStaticType = {
     UserModel: UserModelType,
   ) => UserDocument;
 };
+export type UserModelType = Model<User> & UserModelStaticType;
 const userStaticMethods: UserModelStaticType = {
   createUserClass: User.createUserClass,
 };
 UserSchema.statics = userStaticMethods;
-export type UserModelType = Model<User> & UserModelStaticType;

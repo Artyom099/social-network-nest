@@ -3,12 +3,14 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/settings';
+import { AuthModule } from '../src/auth/auth.module';
+import { getRefreshTokenByResponseWithTokenName } from '../src/utils/utils';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, AuthModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -19,10 +21,12 @@ describe('AuthController (e2e)', () => {
   });
 
   it('1 – GET:/me – return 401', async () => {
-    await request(app).get('/auth/me').expect(HttpStatus.UNAUTHORIZED);
+    await request(app.getHttpServer())
+      .get('/auth/me')
+      .expect(HttpStatus.UNAUTHORIZED);
   });
   it('2 – POST:/login – return 401', async () => {
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/login')
       .send({
         loginOrEmail: 'valid-unauthorized@mail.ru',
@@ -37,7 +41,7 @@ describe('AuthController (e2e)', () => {
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
-    const firstCreateResponse = await request(app)
+    const firstCreateResponse = await request(app.getHttpServer())
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -55,7 +59,7 @@ describe('AuthController (e2e)', () => {
       createdAt: expect.any(String),
     });
 
-    await request(app)
+    await request(app.getHttpServer())
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -77,7 +81,7 @@ describe('AuthController (e2e)', () => {
     if (!firstCreateResponse.headers.authorization) return new Error();
     const accessToken =
       getRefreshTokenByResponseWithTokenName(firstCreateResponse);
-    await request(app)
+    await request(app.getHttpServer())
       .get('/auth/me')
       .auth('accessToken', { type: 'bearer' })
       .expect(HttpStatus.OK, {
@@ -90,14 +94,14 @@ describe('AuthController (e2e)', () => {
   });
 
   it("5 – POST:/auth/registration-email-resending – return 400 if email doesn't exist", async () => {
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/registration-email-resending')
       .send({ email: 'unknown-email@mail.com' })
       .expect(HttpStatus.BAD_REQUEST);
   });
   it('6 – POST:/auth/registration-email-resending – return 400 if email already confirmed', async () => {
     const { firstUser } = expect.getState();
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/registration-email-resending')
       .send({ email: firstUser.email })
       .expect(HttpStatus.BAD_REQUEST);
@@ -105,7 +109,7 @@ describe('AuthController (e2e)', () => {
 
   it("7 – POST:/auth/registration – return 400 if user's email already exist", async () => {
     const { firstUser } = expect.getState();
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/registration')
       .send({
         login: 'otherLogin',
@@ -123,7 +127,7 @@ describe('AuthController (e2e)', () => {
   });
   it("8 – POST:/auth/registration – return 400 if user's login already exist", async () => {
     const { firstUser } = expect.getState();
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/registration')
       .send({
         login: firstUser.login,
@@ -142,7 +146,7 @@ describe('AuthController (e2e)', () => {
 
   it('9 – POST:/auth/registration – return 204, create user & send confirmation email with code', async () => {
     const { firstUser } = expect.getState();
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/registration')
       .send({
         login: 'valLog2',
@@ -152,7 +156,7 @@ describe('AuthController (e2e)', () => {
       .expect(HttpStatus.NO_CONTENT);
   });
   it('10 – POST:/auth/registration-email-resending – return 204 if user exist & send confirmation email with code', async () => {
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/registration-email-resending')
       .send({
         email: 'artgolubev@bk.ru',
@@ -161,7 +165,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it("11 – POST:/auth/registration-confirmation – return 400 if confirmation code doesn't exist", async () => {
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/registration-confirmation')
       .send({
         code: 'invalid code',
@@ -177,7 +181,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('12 – POST:/auth/refresh-token – return 401 with no any token', async () => {
-    await request(app)
+    await request(app.getHttpServer())
       .post('/auth/refresh-token')
       .send('noToken')
       .expect(HttpStatus.UNAUTHORIZED);
@@ -185,7 +189,7 @@ describe('AuthController (e2e)', () => {
 
   // it('13 – POST:/auth/login – return 200 and login', async () => {
   //   const { firstUser } = expect.getState();
-  //   const loginResponse = await request(app).post('/auth/login').send({
+  //   const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
   //     loginOrEmail: firstUser.login,
   //     password: firstUser.password,
   //   });
@@ -206,7 +210,7 @@ describe('AuthController (e2e)', () => {
   //   const { accessToken, firstRefreshToken } = expect.getState();
   //   await sleep(1.1);
   //
-  //   const goodRefreshTokenResponse = await request(app)
+  //   const goodRefreshTokenResponse = await request(app.getHttpServer())
   //     .post('/auth/refresh-token')
   //     .set('cookie', firstRefreshToken);
   //
@@ -233,7 +237,7 @@ describe('AuthController (e2e)', () => {
   // });
   //
   // it('15 – POST:/auth/refresh-token – return 401 with no any token', async () => {
-  //   const goodRefreshTokenResponse = await request(app).post(
+  //   const goodRefreshTokenResponse = await request(app.getHttpServer()).post(
   //     '/auth/refresh-token',
   //   );
   //
@@ -254,7 +258,7 @@ describe('AuthController (e2e)', () => {
   //
   // it('17 – POST:/auth/password-recovery – return 400 with no email in body', async () => {
   //   const { secondRefreshToken } = expect.getState();
-  //   const recoveryResponse = await request(app)
+  //   const recoveryResponse = await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('cookie', secondRefreshToken);
   //
@@ -263,7 +267,7 @@ describe('AuthController (e2e)', () => {
   // });
   // it('18 – POST:/auth/password-recovery – return 204 & send recovery code to email', async () => {
   //   const { firstUser, secondRefreshToken } = expect.getState();
-  //   const recoveryResponse = await request(app)
+  //   const recoveryResponse = await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('cookie', secondRefreshToken)
   //     .send({ email: firstUser.email });
@@ -274,7 +278,7 @@ describe('AuthController (e2e)', () => {
   //   // console.log({recoveryCode: recoveryResponse.body.recoveryCode})
   // });
   // it('19 – POST:/auth/new-password – return 400 with incorrect recoveryCode', async () => {
-  //   const newPasswordResponse = await request(app)
+  //   const newPasswordResponse = await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .send({
   //       recoveryCode: 'incorrect',
@@ -286,7 +290,7 @@ describe('AuthController (e2e)', () => {
   // });
   // it('20 – POST:/auth/new-password – return 204 & update password', async () => {
   //   const { recoveryCode } = expect.getState();
-  //   const newPasswordResponse = await request(app)
+  //   const newPasswordResponse = await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .send({
   //       recoveryCode: recoveryCode,
@@ -301,37 +305,37 @@ describe('AuthController (e2e)', () => {
   //   const { firstUser } = expect.getState();
   //   await sleep(10);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-2')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-3')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-4')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-5')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-6')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   const loginResponse = await request(app)
+  //   const loginResponse = await request(app.getHttpServer())
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-7')
   //     .send({ email: firstUser.email })
@@ -342,37 +346,37 @@ describe('AuthController (e2e)', () => {
   // it('22 – POST:/auth/new-password – return 429', async () => {
   //   const { firstUser } = expect.getState();
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-2')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-3')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-4')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-5')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app)
+  //   await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-6')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   const loginResponse = await request(app)
+  //   const loginResponse = await request(app.getHttpServer())
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-7')
   //     .send({ email: firstUser.email })
@@ -383,7 +387,7 @@ describe('AuthController (e2e)', () => {
 
   // it('23 – POST:/auth/logout – return 204 & logout', async () => {
   //     const {secondRefreshToken} = expect.getState()
-  //     const goodRefreshTokenResponse = await request(app)
+  //     const goodRefreshTokenResponse = await request(app.getHttpServer())
   //         .post('/auth/logout')
   //         .set('cookie', secondRefreshToken)
   //

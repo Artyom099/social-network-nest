@@ -17,6 +17,7 @@ import { BearerAuthGuard } from './guards/bearer-auth.guard';
 import { SecurityService } from '../security/security.service';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { CreateUserInputModel } from '../users/users.models';
+import { AuthInputModel } from './auth.models';
 
 @Controller('auth')
 export class AuthController {
@@ -38,37 +39,38 @@ export class AuthController {
     };
   }
 
-  // @Post('login')
-  // @HttpCode(HttpStatus.OK)
-  // async login(
-  //   @Req() req,
-  //   @Res({ passthrough: true }) res,
-  //   @Body() InputModel: AuthInputModel,
-  // ) {
-  //   const token = await this.authService.checkCredentials(
-  //     InputModel.loginOrEmail,
-  //     InputModel.password,
-  //   );
-  //   if (!token) {
-  //     throw new UnauthorizedException();
-  //   } else {
-  //     const title = req.headers['user-agent'];
-  //     const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
-  //     const lastActiveDate = new Date(tokenPayload.iat * 1000);
-  //
-  //     await this.securityService.createSession(
-  //       req.ip,
-  //       title,
-  //       lastActiveDate,
-  //       tokenPayload.deviceId,
-  //       tokenPayload.userId,
-  //     );
-  //     res.cookie('refreshToken', token.refreshToken, {
-  //       httpOnly: true,
-  //       secure: true,
-  //     });
-  //   }
-  // }
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  async login(
+    @Req() req,
+    @Res({ passthrough: true }) res,
+    @Body() InputModel: AuthInputModel,
+  ) {
+    const token = await this.authService.checkCredentials(
+      InputModel.loginOrEmail,
+      InputModel.password,
+    );
+    if (!token) {
+      throw new UnauthorizedException();
+    } else {
+      const title = req.headers['user-agent'];
+      const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
+      const lastActiveDate = new Date(tokenPayload!.iat * 1000);
+
+      await this.securityService.createSession(
+        req.ip,
+        title,
+        lastActiveDate,
+        tokenPayload!.deviceId,
+        tokenPayload!.userId,
+      );
+      res.cookie('refreshToken', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+      });
+      return { accessToken: token.accessToken };
+    }
+  }
 
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
