@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { AuthRepository } from './auth.repository';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { UsersRepository } from '../users/users.repository';
@@ -10,14 +9,12 @@ import {
   UserDBModel,
   UserViewModel,
 } from '../users/users.models';
-import { User } from '../users/users.schema';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-    // private authRepository: AuthRepository,
     private usersRepository: UsersRepository,
   ) {}
 
@@ -35,16 +32,14 @@ export class AuthService {
       InputModel.password,
       passwordSalt,
     );
-
     //создание умного юзера
-    const smartUser = User.createUserBySelf(
+    const user = await this.usersRepository.createUserBySelf(
       InputModel,
       passwordSalt,
       passwordHash,
     );
     // сохранение умного юзера через репозиторий
-    // await this.usersRepository.createUser(smartUser);
-
+    await this.usersRepository.save(user);
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
       // await emailManager.sendEmailConfirmationMessage(
@@ -52,11 +47,10 @@ export class AuthService {
       //   newUser.emailConfirmation.confirmationCode,
       // );
     } catch (error) {
-      await this.usersRepository.deleteUser(smartUser.id);
+      await this.usersRepository.deleteUser(user.id);
       return null;
     }
-    // возврщение ViewModel умного юзера
-    return smartUser.getViewModel();
+    return user.getViewModel();
   }
 
   async checkCredentials(
@@ -134,7 +128,6 @@ export class AuthService {
     if (!user) return null;
     const recoveryCode = user.updateRecoveryCode();
     await this.usersRepository.updateUser(user.id, user);
-
     try {
       // await emailManager.sendEmailRecoveryCode(email, recoveryCode);
     } catch (error) {

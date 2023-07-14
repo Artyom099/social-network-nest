@@ -18,11 +18,12 @@ export class UsersQueryRepository {
   }
 
   async getUserById(id: string): Promise<UserViewModel | null> {
-    //достали тупого юзера
     const user = await this.userModel.findOne({ id }).exec();
-    if (!user) return null;
-    // вернули ViewModel умного юзера
-    return this.getViewModel(user);
+    if (!user) {
+      return null;
+    } else {
+      return this.getViewModel(user);
+    }
   }
 
   async getSortedUsers(

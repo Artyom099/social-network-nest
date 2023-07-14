@@ -42,55 +42,6 @@ export class User {
   @Prop({ type: String, required: true })
   recoveryCode: string;
 
-  static createUserByAdmin(
-    createUserInputModel: CreateUserInputModel,
-    passwordSalt: string,
-    passwordHash: string,
-  ): User {
-    const accountData = new AccountData();
-    accountData.login = createUserInputModel.login;
-    accountData.email = createUserInputModel.email;
-    accountData.passwordSalt = passwordSalt;
-    accountData.passwordHash = passwordHash;
-    accountData.createdAt = new Date();
-
-    const emailConfirmation = new EmailConfirmation();
-    emailConfirmation.confirmationCode = randomUUID();
-    emailConfirmation.expirationDate = add(new Date(), { minutes: 10 });
-    emailConfirmation.isConfirmed = true;
-
-    const user = new User();
-    user.id = randomUUID();
-    user.accountData = accountData;
-    user.emailConfirmation = emailConfirmation;
-    user.recoveryCode = '';
-    return user;
-  }
-  static createUserBySelf(
-    createUserInputModel: CreateUserInputModel,
-    passwordSalt: string,
-    passwordHash: string,
-  ): User {
-    const accountData = new AccountData();
-    accountData.login = createUserInputModel.login;
-    accountData.email = createUserInputModel.email;
-    accountData.passwordSalt = passwordSalt;
-    accountData.passwordHash = passwordHash;
-    accountData.createdAt = new Date();
-
-    const emailConfirmation = new EmailConfirmation();
-    emailConfirmation.confirmationCode = randomUUID();
-    emailConfirmation.expirationDate = add(new Date(), { minutes: 10 });
-    emailConfirmation.isConfirmed = false;
-
-    const user = new User();
-    user.id = randomUUID();
-    user.accountData = accountData;
-    user.emailConfirmation = emailConfirmation;
-    user.recoveryCode = '';
-    return user;
-  }
-
   static createUserClass(
     InputModel: CreateUserInputModel,
     passwordSalt: string,
@@ -114,27 +65,30 @@ export class User {
       recoveryCode: '1',
     };
     return new UserModel(data);
-
-    // const accountData = new AccountData();
-    // accountData.login = userFromDb.accountData.login;
-    // accountData.email = userFromDb.accountData.email;
-    // accountData.passwordSalt = userFromDb.accountData.passwordSalt;
-    // accountData.passwordHash = userFromDb.accountData.passwordHash;
-    // accountData.createdAt = userFromDb.accountData.createdAt;
-    //
-    // const emailConfirmation = new EmailConfirmation();
-    // emailConfirmation.confirmationCode =
-    //   userFromDb.emailConfirmation.confirmationCode;
-    // emailConfirmation.expirationDate =
-    //   userFromDb.emailConfirmation.expirationDate;
-    // emailConfirmation.isConfirmed = userFromDb.emailConfirmation.isConfirmed;
-    //
-    // const user = new UserModel();
-    // user.id = userFromDb.id;
-    // user.accountData = userFromDb.accountData;
-    // user.emailConfirmation = userFromDb.emailConfirmation;
-    // user.recoveryCode = userFromDb.recoveryCode;
-    // return user;
+  }
+  static createUserBySelf(
+    InputModel: CreateUserInputModel,
+    passwordSalt: string,
+    passwordHash: string,
+    UserModel: UserModelType,
+  ): UserDocument {
+    const data = {
+      id: randomUUID(),
+      accountData: {
+        login: InputModel.login,
+        email: InputModel.email,
+        passwordSalt,
+        passwordHash,
+        createdAt: new Date(),
+      },
+      emailConfirmation: {
+        confirmationCode: randomUUID(),
+        expirationDate: add(new Date(), { minutes: 10 }),
+        isConfirmed: false,
+      },
+      recoveryCode: '1',
+    };
+    return new UserModel(data);
   }
 
   getViewModel(): UserViewModel {
@@ -196,28 +150,3 @@ const userStaticMethods: UserModelStaticType = {
 };
 UserSchema.statics = userStaticMethods;
 export type UserModelType = Model<User> & UserModelStaticType;
-
-// UserSchema.method('canBeConfirmed', function canBeConfirmed(code: string) {
-//   return (
-//     this &&
-//     !this.emailConfirmation.isConfirmed &&
-//     this.emailConfirmation.confirmationCode === code &&
-//     this.emailConfirmation.expirationDate > new Date()
-//   );
-// });
-// UserSchema.method('confirm', function confirm() {
-//   if (this.emailConfirmation.isConfirmed) {
-//     throw new Error('Already confirmed');
-//   } else {
-//     this.emailConfirmation.isConfirmed = true;
-//   }
-// });
-//
-// UserSchema.statics = statics;
-// export type UserModelType = Model<UserDocument> & typeof statics;
-
-// export type UserMethodsType = {
-//   canBeConfirmed: (code: string) => boolean;
-//   confirm: () => void;
-// };
-// type UserModelType = Model<User, UserMethodsType>;

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from './users.schema';
-import { Model } from 'mongoose';
 import { CreateUserInputModel } from './users.models';
 
 @Injectable()
@@ -45,14 +44,25 @@ export class UsersRepository {
       this.userModel,
     );
   }
+  async createUserBySelf(
+    InputModel: CreateUserInputModel,
+    passwordSalt: string,
+    passwordHash: string,
+  ) {
+    return User.createUserBySelf(
+      InputModel,
+      passwordSalt,
+      passwordHash,
+      this.userModel,
+    );
+  }
+
   async save(model: any) {
     return model.save();
   }
-
   async updateUser(id: string, user: User) {
     return this.userModel.updateOne({ id }, { user });
   }
-
   async deleteUser(id: string) {
     await this.userModel.deleteOne({ id });
   }
