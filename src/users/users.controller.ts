@@ -57,8 +57,8 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') userId: string) {
-    const foundBlog = await this.usersService.getUser(userId);
-    if (!foundBlog) {
+    const foundUser = await this.usersService.getUser(userId);
+    if (!foundUser) {
       throw new NotFoundException('Blog not found');
     } else {
       return this.usersService.deleteUser(userId);

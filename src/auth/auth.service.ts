@@ -17,7 +17,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-    private authRepository: AuthRepository,
+    // private authRepository: AuthRepository,
     private usersRepository: UsersRepository,
   ) {}
 
@@ -43,7 +43,7 @@ export class AuthService {
       passwordHash,
     );
     // сохранение умного юзера через репозиторий
-    await this.usersRepository.createUser(smartUser);
+    // await this.usersRepository.createUser(smartUser);
 
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
@@ -63,7 +63,7 @@ export class AuthService {
     loginOrEmail,
     password,
   ): Promise<{ accessToken: string; refreshToken: string } | null> {
-    const user = await this.authRepository.getUserByLoginOrEmail(loginOrEmail);
+    const user = await this.usersRepository.getUserByLoginOrEmail(loginOrEmail);
     if (!user) return null;
     const passwordHash = await this._generateHash(
       password,
@@ -102,25 +102,22 @@ export class AuthService {
   }
 
   async confirmEmail(code: string): Promise<boolean> {
-    // проверка кода на правильность, срок жизни и повторное использование
-    //достали тупого юзер
     const user = await this.usersRepository.getUserByConfirmationCode(code);
-    if (!user) return false;
-    //сделали его умным
-    const smartUser = User.createUserClass(user);
-    //подтвердили его email и вернули результат подтверждения
-    return smartUser.confirmEmail(code);
+    if (!user) {
+      return false;
+    } else {
+      user.confirmEmail(code);
+      await this.usersRepository.updateUser(user.id, user);
+      return true;
+    }
   }
 
   async updateConfirmationCode(email: string): Promise<string | null> {
-    //достали тупого юзер
     const user = await this.usersRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
-    //сделали его умным
-    const smartUser = User.createUserClass(user);
     //обновили у него ConfirmationCode
-    const newConfirmationCode = smartUser.updateConfirmationCode();
-    //записали это обновление в БД - todo - smartUser или user?
+    const newConfirmationCode = user.updateConfirmationCode();
+    //записали это обновление в БД
     await this.usersRepository.updateUser(user.id, user);
 
     try {
@@ -133,15 +130,10 @@ export class AuthService {
   }
 
   async sendRecoveryCode(email: string) {
-    //достали тупого юзер
     const user = await this.usersRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
-    //сделали его умным
-    const smartUser = User.createUserClass(user);
-    //обновили у него recoveryCode
-    const recoveryCode = smartUser.updateRecoveryCode();
-    //записали это обновление в БД - todo - smartUser или user?
-    await this.usersRepository.updateUser(user.id, smartUser);
+    const recoveryCode = user.updateRecoveryCode();
+    await this.usersRepository.updateUser(user.id, user);
 
     try {
       // await emailManager.sendEmailRecoveryCode(email, recoveryCode);
@@ -158,15 +150,12 @@ export class AuthService {
   async updatePassword(code: string, password: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(password, passwordSalt);
-    //достали тупого юзер
+
     const user = await this.usersRepository.getUserByRecoveryCode(code);
     if (!user) return null;
-    //сделали его умным
-    const smartUser = User.createUserClass(user);
-    //обновили у него passwordSalt и passwordHash
-    smartUser.updateSaltAndHash(passwordSalt, passwordHash);
-    //записали это обновление в БД - todo - smartUser или user?
-    await this.usersRepository.updateUser(user.id, smartUser);
+
+    user.updateSaltAndHash(passwordSalt, passwordHash);
+    await this.usersRepository.updateUser(user.id, user);
   }
 
   async _generateHash(password: string, salt: string) {

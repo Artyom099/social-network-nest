@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from './users.schema';
 import { Model } from 'mongoose';
+import { CreateUserInputModel } from './users.models';
 
 @Injectable()
 export class UsersRepository {
@@ -32,22 +33,17 @@ export class UsersRepository {
     });
   }
 
-  // async createUser(userDTO: User): Promise<UserDocument | null> {
-  //   //создаем умный объект из DTO
-  //   const smartUserModel = new UserModel(userDTO);
-  //   await smartUserModel.save();
-  //   return smartUserModel;
-  //
-  //   // service
-  //   // const user = new this.userModel();
-  //   // create logic
-  //   // await user.save();
-  //   // const user = await this.userModel.createUser();
-  //   // repo.save(user)
-  // }
-
-  async createUser(userDTO: any) {
-    return User.createUserClass(userDTO, this.userModel);
+  async createUser(
+    InputModel: CreateUserInputModel,
+    passwordSalt: string,
+    passwordHash: string,
+  ) {
+    return User.createUserClass(
+      InputModel,
+      passwordSalt,
+      passwordHash,
+      this.userModel,
+    );
   }
   async save(model: any) {
     return model.save();

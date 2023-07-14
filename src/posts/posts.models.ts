@@ -3,23 +3,23 @@ import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class PostInputModel {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   @Length(3, 30)
   @Transform(({ value }) => value?.trim())
   title: string;
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   @Length(3, 100)
   @Transform(({ value }) => value?.trim())
   shortDescription: string;
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   @Length(3, 1000)
   @Transform(({ value }) => value?.trim())
   content: string;
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   @Transform(({ value }) => value?.trim())
   //todo - добавить кастом декоратор
   blogId: string;

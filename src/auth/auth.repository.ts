@@ -11,14 +11,12 @@ export class AuthRepository {
   async getUserByLoginOrEmail(
     loginOrEmail: string,
   ): Promise<UserDBModel | null> {
-    const user = this.userModel.findOne({
+    return this.userModel.findOne({
       $or: [
         { 'accountData.email': loginOrEmail },
         { 'accountData.login': loginOrEmail },
       ],
     });
-
-    return user;
   }
 
   async getUserByConfirmationCode(code: string): Promise<UserDBModel | null> {

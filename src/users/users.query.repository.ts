@@ -8,14 +8,6 @@ import { InjectModel } from '@nestjs/mongoose';
 @Injectable()
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-
-  async getUserById(id: string): Promise<UserViewModel | null> {
-    //достали тупого юзера
-    const user = await this.userModel.findOne({ id }).exec();
-    if (!user) return null;
-    // вернули ViewModel умного юзера
-    return this.getViewModel(user);
-  }
   getViewModel(user): UserViewModel {
     return {
       id: user.id,
@@ -23,6 +15,14 @@ export class UsersQueryRepository {
       email: user.accountData.email,
       createdAt: user.accountData.createdAt.toISOString(),
     };
+  }
+
+  async getUserById(id: string): Promise<UserViewModel | null> {
+    //достали тупого юзера
+    const user = await this.userModel.findOne({ id }).exec();
+    if (!user) return null;
+    // вернули ViewModel умного юзера
+    return this.getViewModel(user);
   }
 
   async getSortedUsers(

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model } from 'mongoose';
 import { randomUUID } from 'crypto';
 import { CreateUserInputModel, UserViewModel } from './users.models';
 import add from 'date-fns/add';
@@ -91,26 +91,29 @@ export class User {
     return user;
   }
 
-  static createUserClass(userDto: any, UserModel: UserModelType): UserDocument {
-    //todo - переделть
+  static createUserClass(
+    InputModel: CreateUserInputModel,
+    passwordSalt: string,
+    passwordHash: string,
+    UserModel: UserModelType,
+  ): UserDocument {
     const data = {
+      id: randomUUID(),
       accountData: {
-        login: userDto.login,
-        password: userDto.password,
-        email: userDto.email,
+        login: InputModel.login,
+        email: InputModel.email,
+        passwordSalt,
+        passwordHash,
         createdAt: new Date(),
       },
       emailConfirmation: {
-        confirmationCode: '',
-        expirationDate: new Date(),
+        confirmationCode: randomUUID(),
+        expirationDate: add(new Date(), { minutes: 10 }),
         isConfirmed: true,
       },
-      refreshToken: '',
-      passwordRecovery: { recoveryCode: '', expirationDate: new Date(0) },
-      banInfo: {},
+      recoveryCode: '1',
     };
-    const newUser = new UserModel(data);
-    return newUser;
+    return new UserModel(data);
 
     // const accountData = new AccountData();
     // accountData.login = userFromDb.accountData.login;
@@ -142,6 +145,19 @@ export class User {
       createdAt: this.accountData.createdAt.toISOString(),
     };
   }
+  confirmEmail(code: string): boolean {
+    if (
+      this &&
+      !this.emailConfirmation.isConfirmed &&
+      this.emailConfirmation.confirmationCode === code &&
+      this.emailConfirmation.expirationDate > new Date()
+    ) {
+      this.emailConfirmation.isConfirmed = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
   updateSaltAndHash(salt: string, hash: string) {
     this.accountData.passwordSalt = salt;
     this.accountData.passwordHash = hash;
@@ -156,36 +172,31 @@ export class User {
     this.emailConfirmation.confirmationCode = newCode;
     return newCode;
   }
-
-  confirmEmail(code: string): boolean {
-    if (
-      this &&
-      !this.emailConfirmation.isConfirmed &&
-      this.emailConfirmation.confirmationCode === code &&
-      this.emailConfirmation.expirationDate > new Date()
-    ) {
-      this.emailConfirmation.isConfirmed = true;
-      return true;
-    } else {
-      return false;
-    }
-  }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods = {
   getViewModel: User.prototype.getViewModel,
+  confirmEmail: User.prototype.confirmEmail,
+  updateSaltAndHash: User.prototype.updateSaltAndHash,
+  updateRecoveryCode: User.prototype.updateRecoveryCode,
+  updateConfirmationCode: User.prototype.updateConfirmationCode,
 };
 
 export type UserModelStaticType = {
-  createUserClass: (userFromDb: any) => UserDocument;
+  createUserClass: (
+    InputModel: CreateUserInputModel,
+    passwordSalt: string,
+    passwordHash: string,
+    UserModel: UserModelType,
+  ) => UserDocument;
 };
 const userStaticMethods: UserModelStaticType = {
   createUserClass: User.createUserClass,
 };
 UserSchema.statics = userStaticMethods;
 export type UserModelType = Model<User> & UserModelStaticType;
-//
+
 // UserSchema.method('canBeConfirmed', function canBeConfirmed(code: string) {
 //   return (
 //     this &&
@@ -202,79 +213,11 @@ export type UserModelType = Model<User> & UserModelStaticType;
 //   }
 // });
 //
-// UserSchema.pre('save', () => {});
-//
-// UserSchema.static(
-//   'createUser',
-//   function createUser(
-//     createUserInputModel: CreateUserInputModel,
-//     passwordSalt: string,
-//     passwordHash: string,
-//   ): User {},
-// );
-//
-// // const statics = {
-// //   createUser(
-// //     createUserInputModel: CreateUserInputModel,
-// //     passwordSalt: string,
-// //     passwordHash: string,
-// //   ) {
-// //     const accountData = new AccountData();
-// //     accountData.login = createUserInputModel.login;
-// //     accountData.email = createUserInputModel.email;
-// //     accountData.passwordSalt = passwordSalt;
-// //     accountData.passwordHash = passwordHash;
-// //     accountData.createdAt = new Date();
-// //
-// //     const emailConfirmation = new EmailConfirmation();
-// //     emailConfirmation.confirmationCode = randomUUID();
-// //     emailConfirmation.expirationDate = add(new Date(), { minutes: 10 });
-// //     emailConfirmation.isConfirmed = false;
-// //
-// //     const userDto = {
-// //       id: randomUUID(),
-// //       accountData: accountData,
-// //       emailConfirmation: emailConfirmation,
-// //       recoveryCode: '',
-// //     };
-// //     return new this(userDto);
-// //   },
-// // };
-// // UserSchema.statics = statics;
-// // export type UserModelType = Model<UserDocument> & typeof statics;
-export type UserMethodsType = {
-  canBeConfirmed: (code: string) => boolean;
-  confirm: () => void;
-};
-type UserModelType = Model<User, UserMethodsType>;
-// type UserModelStaticType = Model<User> & {
-//   createUser(
-//     createUserInputModel: CreateUserInputModel,
-//     passwordSalt: string,
-//     passwordHash: string,
-//   ): any;
+// UserSchema.statics = statics;
+// export type UserModelType = Model<UserDocument> & typeof statics;
+
+// export type UserMethodsType = {
+//   canBeConfirmed: (code: string) => boolean;
+//   confirm: () => void;
 // };
-
-// export const UserModel = mongoose.model<User, UserModelType>(
-//   'Users',
-//   UserSchema,
-// );
-
-const data = {
-  accountData: {
-    login: userDto.login,
-    password: userDto.password,
-    email: userDto.email,
-    createdAt: new Date(),
-  },
-  emailConfirmation: {
-    confirmationCode: '',
-    expirationDate: new Date(),
-    isConfirmed: true,
-  },
-  refreshToken: '',
-  passwordRecovery: { recoveryCode: '', expirationDate: new Date(0) },
-  banInfo: {},
-};
-const newUser = new UserModel(data);
-return newUser;
+// type UserModelType = Model<User, UserMethodsType>;

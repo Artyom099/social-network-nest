@@ -1,19 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
-import { CreateUserInputModel, UserViewModel } from './users.models';
+import { CreateUserInputModel } from './users.models';
 import * as bcrypt from 'bcrypt';
 import { User } from './users.schema';
 import { UsersQueryRepository } from './users.query.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    protected usersRepository: UsersRepository,
-    protected usersQueryRepository: UsersQueryRepository,
-  ) {}
+  constructor(protected usersRepository: UsersRepository) {}
 
   async getUser(userId: string): Promise<User | null> {
-    //достали тупого юзер
     return this.usersRepository.getUserById(userId);
   }
   async createUser(InputModel: CreateUserInputModel): Promise<string> {
@@ -22,16 +18,13 @@ export class UsersService {
       InputModel.password,
       passwordSalt,
     );
-    //создание умного юзера
-    // const smartUser = User.createUserByAdmin(
-    //   InputModel,
-    //   passwordSalt,
-    //   passwordHash,
-    // );
-    const userDTO = { ...InputModel, passwordSalt, passwordHash };
+    // создание умного юзера через репозиторий
+    const user = await this.usersRepository.createUser(
+      InputModel,
+      passwordSalt,
+      passwordHash,
+    );
     // сохранение умного юзера через репозиторий
-    const user = await this.usersRepository.createUser(userDTO);
-
     await this.usersRepository.save(user);
     return user.id;
   }
