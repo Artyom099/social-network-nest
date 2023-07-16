@@ -22,25 +22,25 @@ describe('AuthController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
-  it('should be ok', async () => {
-    const inputModel: CreateUserInputModel = {
-      login: '1234567',
-      email: '1@gmail.com',
-      password: '213455',
-    };
-    const res = await request(server)
-      .post('/auth/registration')
-      .send(inputModel);
+  // it('should be ok', async () => {
+  //   const inputModel: CreateUserInputModel = {
+  //     login: '1234567',
+  //     email: '1@gmail.com',
+  //     password: '213455',
+  //   };
+  //   const res = await request(server)
+  //     .post('/auth/registration')
+  //     .send(inputModel);
+  //
+  //   console.log(res.body, res.status);
+  //   expect(res.status).toBe(400);
+  // });
 
-    console.log(res.body, res.status);
-    expect(res.status).toBe(400);
-  });
-
-  it('1 – GET:/me – return 401', async () => {
+  it('1 – GET:/auth/me – return 401', async () => {
     await request(server).get('/auth/me').expect(HttpStatus.UNAUTHORIZED);
   });
-  it('2 – POST:/login – return 401', async () => {
-    await request(app.getHttpServer())
+  it('2 – POST:/auth/login – return 401', async () => {
+    await request(server)
       .post('/auth/login')
       .send({
         loginOrEmail: 'valid-unauthorized@mail.ru',
@@ -49,13 +49,13 @@ describe('AuthController (e2e)', () => {
       .expect(HttpStatus.UNAUTHORIZED);
   });
 
-  it('3 – POST:/users – create user by admin', async () => {
+  it('3 – POST:/users – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-111111',
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
-    const firstCreateResponse = await request(app.getHttpServer())
+    const firstCreateResponse = await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -73,7 +73,7 @@ describe('AuthController (e2e)', () => {
       createdAt: expect.any(String),
     });
 
-    await request(app.getHttpServer())
+    await request(server)
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -89,13 +89,13 @@ describe('AuthController (e2e)', () => {
       firstCreateResponse: firstCreateResponse,
     });
   });
-  it('4 – GET:/me – return created user', async () => {
+  it('4 – GET:/auth/me – return created user', async () => {
     const { firstUser, firstCreateResponse } = expect.getState();
     //чтобы .split не ругался на возможный undefined
     if (!firstCreateResponse.headers.authorization) return new Error();
     const accessToken =
       getRefreshTokenByResponseWithTokenName(firstCreateResponse);
-    await request(app.getHttpServer())
+    await request(server)
       .get('/auth/me')
       .auth('accessToken', { type: 'bearer' })
       .expect(HttpStatus.OK, {
@@ -108,131 +108,144 @@ describe('AuthController (e2e)', () => {
   });
 
   it("5 – POST:/auth/registration-email-resending – return 400 if email doesn't exist", async () => {
-    await request(app.getHttpServer())
+    await request(server)
       .post('/auth/registration-email-resending')
       .send({ email: 'unknown-email@mail.com' })
       .expect(HttpStatus.BAD_REQUEST, {
         errorsMessages: [
           {
-            message: expect.any(String),
+            message: 'email not exist or confirm',
             field: 'email',
           },
         ],
       });
   });
-  // it('6 – POST:/auth/registration-email-resending – return 400 if email already confirmed', async () => {
-  //   const { firstUser } = expect.getState();
-  //   await request(app.getHttpServer())
-  //     .post('/auth/registration-email-resending')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.BAD_REQUEST);
-  // });
-  //
-  // it("7 – POST:/auth/registration – return 400 if user's email already exist", async () => {
-  //   const { firstUser } = expect.getState();
-  //   await request(app.getHttpServer())
-  //     .post('/auth/registration')
-  //     .send({
-  //       login: 'otherLogin',
-  //       password: firstUser.password,
-  //       email: firstUser.email,
-  //     })
-  //     .expect(HttpStatus.BAD_REQUEST, {
-  //       errorsMessages: [
-  //         {
-  //           message: expect.any(String),
-  //           field: 'email',
-  //         },
-  //       ],
-  //     });
-  // });
-  // it("8 – POST:/auth/registration – return 400 if user's login already exist", async () => {
+  it('6 – POST:/auth/registration-email-resending – return 400 if email already confirm', async () => {
+    const { firstUser } = expect.getState();
+    await request(server)
+      .post('/auth/registration-email-resending')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.BAD_REQUEST, {
+        errorsMessages: [
+          {
+            message: 'email not exist or confirm',
+            field: 'email',
+          },
+        ],
+      });
+  });
 
-  //   const { firstUser } = expect.getState();
-  //   await request(app.getHttpServer())
-  //     .post('/auth/registration')
-  //     .send({
-  //       login: firstUser.login,
-  //       password: firstUser.password,
-  //       email: 'other-email@mail.com',
-  //     })
-  //     .expect(HttpStatus.BAD_REQUEST, {
-  //       errorsMessages: [
-  //         {
-  //           message: 'user with the given login already exists',
-  //           field: 'login',
-  //         },
-  //       ],
-  //     });
-  // });
+  it("7 – POST:/auth/registration – return 400 if user's email already exist", async () => {
+    const { firstUser } = expect.getState();
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login: 'otherLogin',
+        password: firstUser.password,
+        email: firstUser.email,
+      })
+      .expect(HttpStatus.BAD_REQUEST, {
+        errorsMessages: [
+          {
+            message: 'email exist',
+            field: 'email',
+          },
+        ],
+      });
+  });
+  it("8 – POST:/auth/registration – return 400 if user's login already exist", async () => {
+    const { firstUser } = expect.getState();
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login: firstUser.login,
+        password: firstUser.password,
+        email: 'other-email@mail.com',
+      })
+      .expect(HttpStatus.BAD_REQUEST, {
+        errorsMessages: [
+          {
+            message: 'login exist',
+            field: 'login',
+          },
+        ],
+      });
+  });
 
-  // it('9 – POST:/auth/registration – return 204, create user & send confirmation email with code', async () => {
-  //   const { firstUser } = expect.getState();
-  //   await request(app.getHttpServer())
-  //     .post('/auth/registration')
-  //     .send({
-  //       login: 'valLog2',
-  //       password: firstUser.password,
-  //       email: 'artgolubev@bk.ru',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  // });
-  // it('10 – POST:/auth/registration-email-resending – return 204 if user exist & send confirmation email with code', async () => {
-  //   await request(app.getHttpServer())
-  //     .post('/auth/registration-email-resending')
-  //     .send({
-  //       email: 'artgolubev@bk.ru',
-  //     })
-  //     .expect(HttpStatus.NO_CONTENT);
-  // });
-  //
-  // it("11 – POST:/auth/registration-confirmation – return 400 if confirmation code doesn't exist", async () => {
-  //   await request(app.getHttpServer())
-  //     .post('/auth/registration-confirmation')
-  //     .send({
-  //       code: 'invalid code',
-  //     })
-  //     .expect(HttpStatus.BAD_REQUEST, {
-  //       errorsMessages: [
-  //         {
-  //           message: 'code is incorrect, expired or already been applied',
-  //           field: 'code',
-  //         },
-  //       ],
-  //     });
-  // });
-  //
+  it('9 – POST:/auth/registration – return 204, create 2nd user & send confirmation code', async () => {
+    const secondUser = {
+      login: 'lg-2222',
+      password: 'qwerty2',
+      email: 'artgolubev@bk.ru',
+    };
+    await request(server)
+      .post('/auth/registration')
+      .send({
+        login: secondUser.login,
+        password: secondUser.password,
+        email: secondUser.email,
+      })
+      .expect(HttpStatus.NO_CONTENT);
+
+    expect.setState({ secondUser: secondUser });
+  });
+  it('10 – POST:/auth/registration-email-resending – return 204 if user exist & send confirmation code', async () => {
+    const { secondUser } = expect.getState();
+    await request(server)
+      .post('/auth/registration-email-resending')
+      .send({
+        email: secondUser.email,
+      })
+      .expect(HttpStatus.NO_CONTENT);
+  });
+
+  it("11 – POST:/auth/registration-confirmation – return 400 if confirmation code doesn't exist", async () => {
+    await request(server)
+      .post('/auth/registration-confirmation')
+      .send({
+        code: 'invalid code',
+      })
+      .expect(HttpStatus.BAD_REQUEST, {
+        errorsMessages: [
+          {
+            message: 'code is incorrect, expired or already been applied',
+            field: 'code',
+          },
+        ],
+      });
+  });
+
   // it('12 – POST:/auth/refresh-token – return 401 with no any token', async () => {
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/refresh-token')
   //     .send('noToken')
   //     .expect(HttpStatus.UNAUTHORIZED);
   // });
 
-  // it('13 – POST:/auth/login – return 200 and login', async () => {
-  //   const { firstUser } = expect.getState();
-  //   const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
-  //     loginOrEmail: firstUser.login,
-  //     password: firstUser.password,
-  //   });
-  //
-  //   expect(loginResponse).toBeDefined();
-  //   expect(loginResponse.status).toBe(HttpStatus.OK);
-  //   expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
-  //   const { accessToken } = loginResponse.body;
-  //
-  //   const refreshToken = getRefreshTokenByResponseWithTokenName(loginResponse);
-  //   expect(refreshToken).toBeDefined();
-  //   expect(refreshToken).toEqual(expect.any(String));
-  //
-  //   expect.setState({ accessToken, firstRefreshToken: refreshToken });
-  // });
-  //
+  it('13 – POST:/auth/login – return 200 and login', async () => {
+    const { firstUser } = expect.getState();
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: firstUser.login,
+      password: firstUser.password,
+    });
+
+    expect(loginResponse).toBeDefined();
+    expect(loginResponse.status).toBe(HttpStatus.OK);
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
+
+    const refreshToken = getRefreshTokenByResponseWithTokenName(loginResponse);
+    expect(refreshToken).toBeDefined();
+    expect(refreshToken).toEqual(expect.any(String));
+
+    expect.setState({ accessToken, firstRefreshToken: refreshToken });
+  });
+
   // it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
   //   const { accessToken, firstRefreshToken } = expect.getState();
   //   await sleep(1.1);
   //
-  //   const goodRefreshTokenResponse = await request(app.getHttpServer())
+  //   const goodRefreshTokenResponse = await request(server)
   //     .post('/auth/refresh-token')
   //     .set('cookie', firstRefreshToken);
   //
@@ -257,7 +270,7 @@ describe('AuthController (e2e)', () => {
   //     secondRefreshToken: newRefreshToken,
   //   });
   // });
-  //
+
   // it('15 – POST:/auth/refresh-token – return 401 with no any token', async () => {
   //   const goodRefreshTokenResponse = await request(app.getHttpServer()).post(
   //     '/auth/refresh-token',
@@ -277,7 +290,7 @@ describe('AuthController (e2e)', () => {
   //   expect(goodRefreshTokenResponse).toBeDefined();
   //   expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
   // });
-  //
+
   // it('17 – POST:/auth/password-recovery – return 400 with no email in body', async () => {
   //   const { secondRefreshToken } = expect.getState();
   //   const recoveryResponse = await request(app.getHttpServer())

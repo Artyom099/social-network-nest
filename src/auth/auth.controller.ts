@@ -18,10 +18,14 @@ import { SecurityService } from '../security/security.service';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { CreateUserInputModel } from '../users/users.models';
 import { AuthInputModel } from './auth.models';
+import { CookieGuard } from './guards/cookie.guard';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
 
 @Controller('auth')
 export class AuthController {
   constructor(
+    private jwtService: JwtService,
     private authService: AuthService,
     private securityService: SecurityService,
     private usersQueryRepository: UsersQueryRepository,
@@ -56,7 +60,6 @@ export class AuthController {
       const title = req.headers['user-agent'];
       const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
       const lastActiveDate = new Date(tokenPayload!.iat * 1000);
-
       await this.securityService.createSession(
         req.ip,
         title,
@@ -73,14 +76,15 @@ export class AuthController {
   }
 
   @Post('logout')
+  @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req) {
     const refreshTokenPayload = this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    // await this.securityService.deleteCurrentSession(
-    //   refreshTokenPayload.deviceId,
-    // );
+    await this.securityService.deleteCurrentSession(
+      refreshTokenPayload!.deviceId,
+    );
   }
 
   @Post('new-password')
@@ -105,26 +109,40 @@ export class AuthController {
     return { recoveryCode: this.authService.sendRecoveryCode(body.email) };
   }
 
-  // @Post('refresh-token')
-  // @HttpCode(HttpStatus.OK)
-  // async refreshToken() {}
+  @Post('refresh-token')
+  @UseGuards(CookieGuard)
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(@Req() req) {
+    const refreshTokenPayload = this.authService.getTokenPayload(
+      req.cookies.refreshToken,
+    );
+    const tokenIssuedAt = new Date(
+      refreshTokenPayload!.iat * 1000,
+    ).toISOString();
+    const lastActiveSession = await this.securityService.getSession(
+      refreshTokenPayload!.deviceId,
+    );
+
+    if (tokenIssuedAt !== lastActiveSession!.lastActiveDate) {
+      throw new UnauthorizedException();
+    } else {
+    }
+  }
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
-    throw new BadRequestException('custom text=>field');
-    //todo - добавить имя поля в обоих Exception
     const existUserEmail = await this.authService.getUserByLoginOrEmail(
       inputModel.email,
     );
     if (existUserEmail) {
-      throw new BadRequestException({}, { description: 'email already exist' });
+      throw new BadRequestException('email exist=>email');
     }
     const existUserLogin = await this.authService.getUserByLoginOrEmail(
       inputModel.login,
     );
     if (existUserLogin) {
-      throw new BadRequestException();
+      throw new BadRequestException('login exist=>login');
     } else {
       await this.authService.createUser(inputModel);
     }
@@ -135,7 +153,9 @@ export class AuthController {
   async sendConfirmationEmail(@Body() body: { code: string }) {
     const confirmEmail = await this.authService.confirmEmail(body.code);
     if (!confirmEmail) {
-      throw new BadRequestException('custom text=>email');
+      throw new BadRequestException(
+        'code is incorrect, expired or already been applied=>code',
+      );
     } else {
       return true;
     }
@@ -146,7 +166,7 @@ export class AuthController {
   async resendConfirmationEmail(@Body() body: { email: string }) {
     const existUser = await this.authService.getUserByLoginOrEmail(body.email);
     if (!existUser || existUser.emailConfirmation.isConfirmed) {
-      throw new BadRequestException('custom text=>email');
+      throw new BadRequestException('email not exist or confirm=>email');
     } else {
       return this.authService.updateConfirmationCode(body.email);
     }

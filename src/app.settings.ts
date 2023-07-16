@@ -6,16 +6,16 @@ import {
 import cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
-import { ErrorExceptionFilter, HttpExceptionFilter } from './exception.filter';
+import { HttpExceptionFilter } from './exception.filter';
 
 export const appSettings = (app: INestApplication): INestApplication => {
   app.use(cookieParser());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
       transform: true,
       stopAtFirstError: true,
-      whitelist: true,
       // forbidUnknownValues: false,
       exceptionFactory: (errors) => {
         console.log('im in appSet');

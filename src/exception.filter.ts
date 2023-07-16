@@ -15,19 +15,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
-    // console.log({ exception: exception });
     if (status === HttpStatus.BAD_REQUEST) {
       const errorsMessages: any = [];
       const responseBody: any = exception.getResponse();
-      //todo можно ли оставить never?
 
       console.log({ responseBody_1: responseBody });
-      // console.log({ responseBody_1: responseBody.message });
       if (typeof responseBody.message === 'string') {
         const [message, field] = responseBody.message.split('=>');
         errorsMessages.push({ message, field });
-        // return response.status(status).send({ message, field });
       } else {
+        //todo можно ли оставить never?
         responseBody.message.forEach((m: never) => errorsMessages.push(m));
       }
 
