@@ -6,26 +6,30 @@ import {
 import cookieParser from 'cookie-parser';
 import { useContainer } from 'class-validator';
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './exception.filter';
+import { ErrorExceptionFilter, HttpExceptionFilter } from './exception.filter';
 
-export const appSettings = (app: INestApplication) => {
+export const appSettings = (app: INestApplication): INestApplication => {
   app.use(cookieParser());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       stopAtFirstError: true,
+      whitelist: true,
       // forbidUnknownValues: false,
       exceptionFactory: (errors) => {
-        const errorsForResponse: any = [];
+        console.log('im in appSet');
+        console.log({ errors: errors });
 
-        errors.forEach((e) => {
-          const constraintsKeys = Object.keys(e.constraints as object);
-          constraintsKeys.forEach((cKey) => {
-            if (e.constraints) {
+        const errorsForResponse: any = [];
+        errors.forEach((err) => {
+          console.log({ err: err });
+          const keys = Object.keys(err.constraints || {});
+          keys.forEach((key) => {
+            if (err.constraints) {
               errorsForResponse.push({
-                message: e.constraints[cKey],
-                field: e.property,
+                message: err.constraints[key],
+                field: err.property,
               });
             }
           });
@@ -37,4 +41,6 @@ export const appSettings = (app: INestApplication) => {
   );
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
+  return app;
 };
+// , new ErrorExceptionFilter()

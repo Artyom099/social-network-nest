@@ -18,8 +18,8 @@ export class UsersRepository {
   ): Promise<UserDocument | null> {
     return this.userModel.findOne({
       $or: [
-        { 'accountData.login': loginOrEmail },
         { 'accountData.email': loginOrEmail },
+        { 'accountData.login': loginOrEmail },
       ],
     });
   }

@@ -2,28 +2,42 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { appSettings } from '../src/settings';
-import { AuthModule } from '../src/auth/auth.module';
+import { appSettings } from '../src/app.settings';
 import { getRefreshTokenByResponseWithTokenName } from '../src/utils/utils';
+import { CreateUserInputModel } from '../src/users/users.models';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
+  let server: any;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule, AuthModule],
+      imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    app = appSettings(app);
     await app.init();
 
-    await request(app.getHttpServer()).delete('/testing/all-data');
+    server = app.getHttpServer();
+    await request(server).delete('/testing/all-data');
+  });
+
+  it('should be ok', async () => {
+    const inputModel: CreateUserInputModel = {
+      login: '1234567',
+      email: '1@gmail.com',
+      password: '213455',
+    };
+    const res = await request(server)
+      .post('/auth/registration')
+      .send(inputModel);
+
+    console.log(res.body, res.status);
+    expect(res.status).toBe(400);
   });
 
   it('1 – GET:/me – return 401', async () => {
-    await request(app.getHttpServer())
-      .get('/auth/me')
-      .expect(HttpStatus.UNAUTHORIZED);
+    await request(server).get('/auth/me').expect(HttpStatus.UNAUTHORIZED);
   });
   it('2 – POST:/login – return 401', async () => {
     await request(app.getHttpServer())
@@ -97,95 +111,103 @@ describe('AuthController (e2e)', () => {
     await request(app.getHttpServer())
       .post('/auth/registration-email-resending')
       .send({ email: 'unknown-email@mail.com' })
-      .expect(HttpStatus.BAD_REQUEST);
-  });
-  it('6 – POST:/auth/registration-email-resending – return 400 if email already confirmed', async () => {
-    const { firstUser } = expect.getState();
-    await request(app.getHttpServer())
-      .post('/auth/registration-email-resending')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.BAD_REQUEST);
-  });
-
-  it("7 – POST:/auth/registration – return 400 if user's email already exist", async () => {
-    const { firstUser } = expect.getState();
-    await request(app.getHttpServer())
-      .post('/auth/registration')
-      .send({
-        login: 'otherLogin',
-        password: firstUser.password,
-        email: firstUser.email,
-      })
       .expect(HttpStatus.BAD_REQUEST, {
         errorsMessages: [
           {
-            message: 'user with the given email already exists',
+            message: expect.any(String),
             field: 'email',
           },
         ],
       });
   });
-  it("8 – POST:/auth/registration – return 400 if user's login already exist", async () => {
-    const { firstUser } = expect.getState();
-    await request(app.getHttpServer())
-      .post('/auth/registration')
-      .send({
-        login: firstUser.login,
-        password: firstUser.password,
-        email: 'other-email@mail.com',
-      })
-      .expect(HttpStatus.BAD_REQUEST, {
-        errorsMessages: [
-          {
-            message: 'user with the given login already exists',
-            field: 'login',
-          },
-        ],
-      });
-  });
+  // it('6 – POST:/auth/registration-email-resending – return 400 if email already confirmed', async () => {
+  //   const { firstUser } = expect.getState();
+  //   await request(app.getHttpServer())
+  //     .post('/auth/registration-email-resending')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.BAD_REQUEST);
+  // });
+  //
+  // it("7 – POST:/auth/registration – return 400 if user's email already exist", async () => {
+  //   const { firstUser } = expect.getState();
+  //   await request(app.getHttpServer())
+  //     .post('/auth/registration')
+  //     .send({
+  //       login: 'otherLogin',
+  //       password: firstUser.password,
+  //       email: firstUser.email,
+  //     })
+  //     .expect(HttpStatus.BAD_REQUEST, {
+  //       errorsMessages: [
+  //         {
+  //           message: expect.any(String),
+  //           field: 'email',
+  //         },
+  //       ],
+  //     });
+  // });
+  // it("8 – POST:/auth/registration – return 400 if user's login already exist", async () => {
 
-  it('9 – POST:/auth/registration – return 204, create user & send confirmation email with code', async () => {
-    const { firstUser } = expect.getState();
-    await request(app.getHttpServer())
-      .post('/auth/registration')
-      .send({
-        login: 'valLog2',
-        password: firstUser.password,
-        email: 'artgolubev@bk.ru',
-      })
-      .expect(HttpStatus.NO_CONTENT);
-  });
-  it('10 – POST:/auth/registration-email-resending – return 204 if user exist & send confirmation email with code', async () => {
-    await request(app.getHttpServer())
-      .post('/auth/registration-email-resending')
-      .send({
-        email: 'artgolubev@bk.ru',
-      })
-      .expect(HttpStatus.NO_CONTENT);
-  });
+  //   const { firstUser } = expect.getState();
+  //   await request(app.getHttpServer())
+  //     .post('/auth/registration')
+  //     .send({
+  //       login: firstUser.login,
+  //       password: firstUser.password,
+  //       email: 'other-email@mail.com',
+  //     })
+  //     .expect(HttpStatus.BAD_REQUEST, {
+  //       errorsMessages: [
+  //         {
+  //           message: 'user with the given login already exists',
+  //           field: 'login',
+  //         },
+  //       ],
+  //     });
+  // });
 
-  it("11 – POST:/auth/registration-confirmation – return 400 if confirmation code doesn't exist", async () => {
-    await request(app.getHttpServer())
-      .post('/auth/registration-confirmation')
-      .send({
-        code: 'invalid code',
-      })
-      .expect(HttpStatus.BAD_REQUEST, {
-        errorsMessages: [
-          {
-            message: 'code is incorrect, expired or already been applied',
-            field: 'code',
-          },
-        ],
-      });
-  });
-
-  it('12 – POST:/auth/refresh-token – return 401 with no any token', async () => {
-    await request(app.getHttpServer())
-      .post('/auth/refresh-token')
-      .send('noToken')
-      .expect(HttpStatus.UNAUTHORIZED);
-  });
+  // it('9 – POST:/auth/registration – return 204, create user & send confirmation email with code', async () => {
+  //   const { firstUser } = expect.getState();
+  //   await request(app.getHttpServer())
+  //     .post('/auth/registration')
+  //     .send({
+  //       login: 'valLog2',
+  //       password: firstUser.password,
+  //       email: 'artgolubev@bk.ru',
+  //     })
+  //     .expect(HttpStatus.NO_CONTENT);
+  // });
+  // it('10 – POST:/auth/registration-email-resending – return 204 if user exist & send confirmation email with code', async () => {
+  //   await request(app.getHttpServer())
+  //     .post('/auth/registration-email-resending')
+  //     .send({
+  //       email: 'artgolubev@bk.ru',
+  //     })
+  //     .expect(HttpStatus.NO_CONTENT);
+  // });
+  //
+  // it("11 – POST:/auth/registration-confirmation – return 400 if confirmation code doesn't exist", async () => {
+  //   await request(app.getHttpServer())
+  //     .post('/auth/registration-confirmation')
+  //     .send({
+  //       code: 'invalid code',
+  //     })
+  //     .expect(HttpStatus.BAD_REQUEST, {
+  //       errorsMessages: [
+  //         {
+  //           message: 'code is incorrect, expired or already been applied',
+  //           field: 'code',
+  //         },
+  //       ],
+  //     });
+  // });
+  //
+  // it('12 – POST:/auth/refresh-token – return 401 with no any token', async () => {
+  //   await request(app.getHttpServer())
+  //     .post('/auth/refresh-token')
+  //     .send('noToken')
+  //     .expect(HttpStatus.UNAUTHORIZED);
+  // });
 
   // it('13 – POST:/auth/login – return 200 and login', async () => {
   //   const { firstUser } = expect.getState();

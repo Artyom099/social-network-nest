@@ -18,24 +18,17 @@ export class AuthRepository {
       ],
     });
   }
-
   async getUserByConfirmationCode(code: string): Promise<UserDBModel | null> {
     return this.userModel.findOne({
       'emailConfirmation.confirmationCode': code,
     });
   }
-
   async setRecoveryCode(email: string, recoveryCode: string) {
     await this.userModel.updateOne(
       { 'accountData.email': email },
       { $set: { recoveryCode: recoveryCode } },
     );
   }
-
-  async save(model: any) {
-    return model.save();
-  }
-
   async updateEmailConfirmation(id: string) {
     await this.userModel.updateOne(
       { id },

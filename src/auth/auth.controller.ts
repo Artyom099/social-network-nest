@@ -85,19 +85,24 @@ export class AuthController {
 
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async setNewPassword(@Body() recoveryCode: string, newPassword: string) {
-    const confirm = await this.authService.checkRecoveryCode(recoveryCode);
+  async setNewPassword(
+    @Body() body: { recoveryCode: string; newPassword: string },
+  ) {
+    const confirm = await this.authService.checkRecoveryCode(body.recoveryCode);
     if (!confirm) {
       throw new BadRequestException();
     } else {
-      await this.authService.updatePassword(recoveryCode, newPassword);
+      await this.authService.updatePassword(
+        body.recoveryCode,
+        body.newPassword,
+      );
     }
   }
 
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async passwordRecovery(@Body() email: string) {
-    return { recoveryCode: this.authService.sendRecoveryCode(email) };
+  async passwordRecovery(@Body() body: { email: string }) {
+    return { recoveryCode: this.authService.sendRecoveryCode(body.email) };
   }
 
   // @Post('refresh-token')
@@ -107,12 +112,13 @@ export class AuthController {
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
+    throw new BadRequestException('custom text=>field');
     //todo - добавить имя поля в обоих Exception
     const existUserEmail = await this.authService.getUserByLoginOrEmail(
       inputModel.email,
     );
     if (existUserEmail) {
-      throw new BadRequestException();
+      throw new BadRequestException({}, { description: 'email already exist' });
     }
     const existUserLogin = await this.authService.getUserByLoginOrEmail(
       inputModel.login,
@@ -126,10 +132,10 @@ export class AuthController {
 
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async sendConfirmationEmail(@Body() code: string) {
-    const confirmEmail = await this.authService.confirmEmail(code);
+  async sendConfirmationEmail(@Body() body: { code: string }) {
+    const confirmEmail = await this.authService.confirmEmail(body.code);
     if (!confirmEmail) {
-      throw new BadRequestException();
+      throw new BadRequestException('custom text=>email');
     } else {
       return true;
     }
@@ -137,12 +143,12 @@ export class AuthController {
 
   @Post('registration-email-resending')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async resendConfirmationEmail(@Body() email: string) {
-    const existUser = await this.authService.getUserByLoginOrEmail(email);
+  async resendConfirmationEmail(@Body() body: { email: string }) {
+    const existUser = await this.authService.getUserByLoginOrEmail(body.email);
     if (!existUser || existUser.emailConfirmation.isConfirmed) {
-      throw new BadRequestException();
+      throw new BadRequestException('custom text=>email');
     } else {
-      await this.authService.updateConfirmationCode(email);
+      return this.authService.updateConfirmationCode(body.email);
     }
   }
 }

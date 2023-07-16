@@ -3,7 +3,6 @@ import { UsersRepository } from './users.repository';
 import { CreateUserInputModel } from './users.models';
 import * as bcrypt from 'bcrypt';
 import { User } from './users.schema';
-import { UsersQueryRepository } from './users.query.repository';
 
 @Injectable()
 export class UsersService {

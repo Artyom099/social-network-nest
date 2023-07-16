@@ -4,11 +4,9 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { UsersRepository } from '../users/users.repository';
-import {
-  CreateUserInputModel,
-  UserDBModel,
-  UserViewModel,
-} from '../users/users.models';
+import { CreateUserInputModel, UserViewModel } from '../users/users.models';
+import { emailManager } from '../email/email.manager';
+import { User } from '../users/users.schema';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +16,7 @@ export class AuthService {
     private usersRepository: UsersRepository,
   ) {}
 
-  async getUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UserDBModel | null> {
+  async getUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
     return this.usersRepository.getUserByLoginOrEmail(loginOrEmail);
   }
 
@@ -42,10 +38,10 @@ export class AuthService {
     await this.usersRepository.save(user);
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
-      // await emailManager.sendEmailConfirmationMessage(
-      //   email,
-      //   newUser.emailConfirmation.confirmationCode,
-      // );
+      await emailManager.sendEmailConfirmationMessage(
+        user.accountData.email,
+        user.emailConfirmation.confirmationCode,
+      );
     } catch (error) {
       await this.usersRepository.deleteUser(user.id);
       return null;
@@ -116,7 +112,10 @@ export class AuthService {
 
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
-      // await emailManager.sendEmailConfirmationMessage(email, newConfirmationCode);
+      await emailManager.sendEmailConfirmationMessage(
+        email,
+        newConfirmationCode,
+      );
     } catch (error) {
       return null;
     }
@@ -129,7 +128,7 @@ export class AuthService {
     const recoveryCode = user.updateRecoveryCode();
     await this.usersRepository.updateUser(user.id, user);
     try {
-      // await emailManager.sendEmailRecoveryCode(email, recoveryCode);
+      await emailManager.sendEmailRecoveryCode(email, recoveryCode);
     } catch (error) {
       return null;
     }
