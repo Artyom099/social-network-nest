@@ -2,7 +2,7 @@ import { LikeStatus } from '../utils/constants';
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class PostInputModel {
+export class PostInputModelWithBlogId {
   @IsString()
   @IsNotEmpty()
   @Length(3, 30)
@@ -23,6 +23,23 @@ export class PostInputModel {
   @Transform(({ value }) => value?.trim())
   //todo - добавить кастом декоратор
   blogId: string;
+}
+export class PostInputModel {
+  @IsString()
+  @IsNotEmpty()
+  @Length(3, 30)
+  @Transform(({ value }) => value?.trim())
+  title: string;
+  @IsString()
+  @IsNotEmpty()
+  @Length(3, 100)
+  @Transform(({ value }) => value?.trim())
+  shortDescription: string;
+  @IsString()
+  @IsNotEmpty()
+  @Length(3, 1000)
+  @Transform(({ value }) => value?.trim())
+  content: string;
 }
 
 export type PostViewModel = {

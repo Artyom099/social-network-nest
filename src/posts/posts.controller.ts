@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { GetItemsWithPaging } from '../utils/common.models';
-import { PostInputModel } from './posts.models';
+import { PostInputModel, PostInputModelWithBlogId } from './posts.models';
 import { BlogsService } from '../blogs/blogs.service';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
@@ -50,7 +50,7 @@ export class PostsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createPost(@Body() inputModel: PostInputModel) {
+  async createPost(@Body() inputModel: PostInputModelWithBlogId) {
     const foundBLog = await this.blogService.getBlog(inputModel.blogId);
     if (!foundBLog) {
       throw new NotFoundException('blog not found');

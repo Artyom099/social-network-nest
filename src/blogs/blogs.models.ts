@@ -20,6 +20,13 @@ export class BlogInputModel {
   @Transform(({ value }) => value?.trim())
   websiteUrl: string;
 }
+export class BlogIdInputModel {
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
+  blogId: string;
+}
+
 export type BlogCreateDTO = Omit<BlogViewModel, 'id'>;
 export type BlogViewModel = {
   id: string;

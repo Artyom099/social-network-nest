@@ -19,7 +19,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const errorsMessages: any = [];
       const responseBody: any = exception.getResponse();
 
-      // console.log({ responseBody_1: responseBody });
+      console.log({ responseBody_1: responseBody });
       if (typeof responseBody.message === 'string') {
         const [message, field] = responseBody.message.split('=>');
         errorsMessages.push({ message, field });

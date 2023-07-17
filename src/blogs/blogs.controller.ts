@@ -15,7 +15,6 @@ import {
 import { BlogInputModel } from './blogs.models';
 import { BlogsService } from './blogs.service';
 import {
-  BlogIdInputModel,
   GetItemsWithPaging,
   GetItemsWithPagingAndSearch,
 } from '../utils/common.models';
@@ -103,10 +102,10 @@ export class BlogsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getPostsCurrentBlog(
-    @Param('id') InputModel: BlogIdInputModel,
+    @Param('id') blogId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    const foundBlog = await this.blogsService.getBlog(InputModel.blogId);
+    const foundBlog = await this.blogsService.getBlog(blogId);
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
@@ -115,7 +114,7 @@ export class BlogsController {
       const sortBy = query.sortBy ?? SortBy.default;
       const sortDirection = query.sortDirection ?? SortDirection.default;
       return this.postsQueryRepository.getSortedPostsCurrentBlog(
-        InputModel.blogId,
+        blogId,
         Number(pageNumber),
         Number(pageSize),
         sortBy,
@@ -131,7 +130,9 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModel,
   ) {
+    console.log('444444444');
     const foundBlog = await this.blogsService.getBlog(blogId);
+    console.log({ foundBlog: foundBlog });
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
