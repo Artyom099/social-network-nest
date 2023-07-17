@@ -105,13 +105,16 @@ export class AuthService {
 
   async confirmEmail(code: string): Promise<boolean> {
     const user = await this.usersRepository.getUserByConfirmationCode(code);
+    console.log({ user_before: user });
     if (!user) {
       return false;
     }
     if (!user.confirmEmail(code)) {
       return false;
     } else {
-      await this.usersRepository.updateUser(user.id, user);
+      await this.usersRepository.save(user);
+      const user2 = await this.usersRepository.getUserByConfirmationCode(code);
+      console.log({ user_after: user2 });
       return true;
     }
   }

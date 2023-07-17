@@ -173,6 +173,7 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendConfirmationEmail(@Body() body: { code: string }) {
     const confirmEmail = await this.authService.confirmEmail(body.code);
+    console.log({ confirmEmail: confirmEmail });
     if (!confirmEmail) {
       throw new BadRequestException(
         'code is incorrect, expired or already applied=>code',

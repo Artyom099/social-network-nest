@@ -56,7 +56,7 @@ describe('AuthController (e2e)', () => {
 
   it('3 – POST:/users – create 1st user by admin', async () => {
     const firstUser = {
-      login: 'lg-111111',
+      login: 'lg-1111',
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };

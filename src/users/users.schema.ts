@@ -107,6 +107,7 @@ export class User {
       this.emailConfirmation.expirationDate > new Date()
     ) {
       this.emailConfirmation.isConfirmed = true;
+      console.log({ stat: this.emailConfirmation.isConfirmed });
       return true;
     } else {
       return false;
