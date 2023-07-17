@@ -14,8 +14,8 @@ export class CookieGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const refreshToken = this.extractTokenFromHeader(request);
     if (!refreshToken) throw new UnauthorizedException();
-    console.log(refreshToken);
-
+    console.log({ refreshToken: refreshToken });
+    console.log(jwtConstants.secret);
     //todo - Cannot read properties of undefined (reading 'verifyAsync')
     const payload = await this.jwtService.verifyAsync(refreshToken, {
       secret: jwtConstants.secret,

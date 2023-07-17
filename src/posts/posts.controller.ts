@@ -132,7 +132,7 @@ export class PostsController {
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
-      const userId = 'mock'; //todo - checkUserIdMiddleware
+      const userId = 'mock'; //todo - CheckUserIdGuard
       const userLogin = 'mock';
       return this.commentsService.createComment(
         postId,
@@ -148,14 +148,14 @@ export class PostsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
     @Param('id') postId: string,
-    @Body() likeStatus: LikeStatus,
+    @Body() body: { likeStatus: LikeStatus },
   ) {
     const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
-      const userId = 'mock'; //todo - checkUserIdMiddleware
-      return this.postsService.updatePostLikes(postId, userId, likeStatus);
+      const userId = 'mock'; //todo - CheckUserIdGuard
+      return this.postsService.updatePostLikes(postId, userId, body.likeStatus);
     }
   }
 }

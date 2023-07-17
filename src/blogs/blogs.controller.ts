@@ -24,6 +24,8 @@ import { BlogsQueryRepository } from './blogs.query.repository';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { SortBy, SortDirection } from '../utils/constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { CookieGuard } from '../auth/guards/cookie.guard';
+import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -51,8 +53,8 @@ export class BlogsController {
     );
   }
 
-  @UseGuards(BasicAuthGuard)
   @Post()
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: BlogInputModel) {
     return this.blogsService.createBlog(inputModel);
@@ -69,8 +71,8 @@ export class BlogsController {
     }
   }
 
-  @UseGuards(BasicAuthGuard)
   @Put(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
     @Param('id') blogId: string,
@@ -84,8 +86,8 @@ export class BlogsController {
     }
   }
 
-  @UseGuards(BasicAuthGuard)
   @Delete(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') blogId: string) {
     const foundBlog = await this.blogsService.getBlog(blogId);
@@ -97,6 +99,7 @@ export class BlogsController {
   }
 
   @Get(':id/posts')
+  @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getPostsCurrentBlog(
     @Param('id') blogId: string,
@@ -120,8 +123,8 @@ export class BlogsController {
     }
   }
 
-  @UseGuards(BasicAuthGuard)
   @Post(':id/posts')
+  @UseGuards(BasicAuthGuard, CookieGuard)
   @HttpCode(HttpStatus.CREATED)
   async createPostCurrentBlog(
     @Param('id') blogId: string,

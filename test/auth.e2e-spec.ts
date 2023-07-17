@@ -213,7 +213,7 @@ describe('AuthController (e2e)', () => {
       .expect(HttpStatus.BAD_REQUEST, {
         errorsMessages: [
           {
-            message: 'code is incorrect, expired or already been applied',
+            message: 'code is incorrect, expired or already applied',
             field: 'code',
           },
         ],
@@ -249,7 +249,7 @@ describe('AuthController (e2e)', () => {
   it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
     const { accessToken, firstRefreshToken } = expect.getState();
     await sleep(1.1);
-
+    console.log('14-----------14');
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/refresh-token')
       .set('authorization', `Bearer ${firstRefreshToken}`);
