@@ -20,7 +20,7 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app = appSettings(app);
+    appSettings(app);
     await app.init();
 
     server = app.getHttpServer();
@@ -249,10 +249,9 @@ describe('AuthController (e2e)', () => {
   it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
     const { accessToken, firstRefreshToken } = expect.getState();
     await sleep(1.1);
-    console.log('14-----------14');
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/refresh-token')
-      .set('authorization', `Bearer ${firstRefreshToken}`);
+      .set('cookie', `refreshToken=${firstRefreshToken}`);
 
     expect(goodRefreshTokenResponse).toBeDefined();
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.OK);
@@ -276,106 +275,106 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  // it('15 – POST:/auth/refresh-token – return 401 with no any token', async () => {
-  //   const goodRefreshTokenResponse = await request(app.getHttpServer()).post(
-  //     '/auth/refresh-token',
-  //   );
-  //
-  //   expect(goodRefreshTokenResponse).toBeDefined();
-  //   expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
-  // });
-  // it('16 – POST:/auth/refresh-token – return 401 with old token', async () => {
-  //   const { firstRefreshToken } = expect.getState();
-  //   await sleep(1.1);
-  //
-  //   const goodRefreshTokenResponse = await request(app)
-  //     .post('/auth/refresh-token')
-  //     .set('cookie', firstRefreshToken);
-  //
-  //   expect(goodRefreshTokenResponse).toBeDefined();
-  //   expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
-  // });
+  it('15 – POST:/auth/refresh-token – return 401 with no any token', async () => {
+    const goodRefreshTokenResponse = await request(server).post(
+      '/auth/refresh-token',
+    );
 
-  // it('17 – POST:/auth/password-recovery – return 400 with no email in body', async () => {
-  //   const { secondRefreshToken } = expect.getState();
-  //   const recoveryResponse = await request(app.getHttpServer())
-  //     .post('/auth/password-recovery')
-  //     .set('cookie', secondRefreshToken);
-  //
-  //   expect(recoveryResponse).toBeDefined();
-  //   expect(recoveryResponse.status).toBe(HttpStatus.BAD_REQUEST);
-  // });
-  // it('18 – POST:/auth/password-recovery – return 204 & send recovery code to email', async () => {
-  //   const { firstUser, secondRefreshToken } = expect.getState();
-  //   const recoveryResponse = await request(app.getHttpServer())
-  //     .post('/auth/password-recovery')
-  //     .set('cookie', secondRefreshToken)
-  //     .send({ email: firstUser.email });
-  //
-  //   expect(recoveryResponse).toBeDefined();
-  //   expect(recoveryResponse.status).toBe(HttpStatus.OK);
-  //   expect.setState({ recoveryCode: recoveryResponse.body.recoveryCode });
-  //   // console.log({recoveryCode: recoveryResponse.body.recoveryCode})
-  // });
-  // it('19 – POST:/auth/new-password – return 400 with incorrect recoveryCode', async () => {
-  //   const newPasswordResponse = await request(app.getHttpServer())
-  //     .post('/auth/new-password')
-  //     .send({
-  //       recoveryCode: 'incorrect',
-  //       newPassword: 'newPassword',
-  //     });
-  //
-  //   expect(newPasswordResponse).toBeDefined();
-  //   expect(newPasswordResponse.status).toBe(HttpStatus.BAD_REQUEST);
-  // });
-  // it('20 – POST:/auth/new-password – return 204 & update password', async () => {
-  //   const { recoveryCode } = expect.getState();
-  //   const newPasswordResponse = await request(app.getHttpServer())
-  //     .post('/auth/new-password')
-  //     .send({
-  //       recoveryCode: recoveryCode,
-  //       newPassword: 'newPassword',
-  //     });
-  //
-  //   expect(newPasswordResponse).toBeDefined();
-  //   expect(newPasswordResponse.status).toBe(HttpStatus.NO_CONTENT);
-  // });
+    expect(goodRefreshTokenResponse).toBeDefined();
+    expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
+  it('16 – POST:/auth/refresh-token – return 401 with old token', async () => {
+    const { firstRefreshToken } = expect.getState();
+    await sleep(1.1);
+
+    const goodRefreshTokenResponse = await request(server)
+      .post('/auth/refresh-token')
+      .set('cookie', firstRefreshToken);
+
+    expect(goodRefreshTokenResponse).toBeDefined();
+    expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
+
+  it('17 – POST:/auth/password-recovery – return 400 with no email in body', async () => {
+    const { secondRefreshToken } = expect.getState();
+    const recoveryResponse = await request(server)
+      .post('/auth/password-recovery')
+      .set('cookie', `refreshToken=${secondRefreshToken}`);
+
+    expect(recoveryResponse).toBeDefined();
+    expect(recoveryResponse.status).toBe(HttpStatus.BAD_REQUEST);
+  });
+  it('18 – POST:/auth/password-recovery – return 204 & send recovery code to email', async () => {
+    const { firstUser, secondRefreshToken } = expect.getState();
+    const recoveryResponse = await request(server)
+      .post('/auth/password-recovery')
+      .set('cookie', secondRefreshToken)
+      .send({ email: firstUser.email });
+
+    expect(recoveryResponse).toBeDefined();
+    expect(recoveryResponse.status).toBe(HttpStatus.OK);
+    expect.setState({ recoveryCode: recoveryResponse.body.recoveryCode });
+    // console.log({recoveryCode: recoveryResponse.body.recoveryCode})
+  });
+  it('19 – POST:/auth/new-password – return 400 with incorrect recoveryCode', async () => {
+    const newPasswordResponse = await request(server)
+      .post('/auth/new-password')
+      .send({
+        recoveryCode: 'incorrect',
+        newPassword: 'newPassword',
+      });
+
+    expect(newPasswordResponse).toBeDefined();
+    expect(newPasswordResponse.status).toBe(HttpStatus.BAD_REQUEST);
+  });
+  it('20 – POST:/auth/new-password – return 204 & update password', async () => {
+    const { recoveryCode } = expect.getState();
+    const newPasswordResponse = await request(server)
+      .post('/auth/new-password')
+      .send({
+        recoveryCode: recoveryCode,
+        newPassword: 'newPassword',
+      });
+
+    expect(newPasswordResponse).toBeDefined();
+    expect(newPasswordResponse.status).toBe(HttpStatus.NO_CONTENT);
+  });
 
   // it('21 – POST:/auth/password-recovery – return 429', async () => {
   //   const { firstUser } = expect.getState();
   //   await sleep(10);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-2')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-3')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-4')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-5')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-6')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.OK);
   //
-  //   const loginResponse = await request(app.getHttpServer())
+  //   const loginResponse = await request(server)
   //     .post('/auth/password-recovery')
   //     .set('user-agent', 'device-7')
   //     .send({ email: firstUser.email })
@@ -386,37 +385,37 @@ describe('AuthController (e2e)', () => {
   // it('22 – POST:/auth/new-password – return 429', async () => {
   //   const { firstUser } = expect.getState();
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-2')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-3')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-4')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-5')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   await request(app.getHttpServer())
+  //   await request(server)
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-6')
   //     .send({ email: firstUser.email })
   //     .expect(HttpStatus.BAD_REQUEST);
   //
-  //   const loginResponse = await request(app.getHttpServer())
+  //   const loginResponse = await request(server)
   //     .post('/auth/new-password')
   //     .set('user-agent', 'device-7')
   //     .send({ email: firstUser.email })
@@ -425,15 +424,15 @@ describe('AuthController (e2e)', () => {
   //   expect(loginResponse).toBeDefined();
   // });
 
-  // it('23 – POST:/auth/logout – return 204 & logout', async () => {
-  //     const {secondRefreshToken} = expect.getState()
-  //     const goodRefreshTokenResponse = await request(app.getHttpServer())
-  //         .post('/auth/logout')
-  //         .set('cookie', secondRefreshToken)
-  //
-  //     expect(goodRefreshTokenResponse).toBeDefined()
-  //     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.NO_CONTENT)
-  // })
+  it('23 – POST:/auth/logout – return 204 & logout', async () => {
+    const { secondRefreshToken } = expect.getState();
+    const goodRefreshTokenResponse = await request(server)
+      .post('/auth/logout')
+      .set('cookie', secondRefreshToken);
+
+    expect(goodRefreshTokenResponse).toBeDefined();
+    expect(goodRefreshTokenResponse.status).toBe(HttpStatus.NO_CONTENT);
+  });
 
   afterAll(async () => {
     await app.close();

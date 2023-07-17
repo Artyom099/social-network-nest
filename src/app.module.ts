@@ -32,6 +32,8 @@ import { SecurityService } from './security/security.service';
 import { SecurityRepository } from './security/security.repository';
 import { SecurityController } from './security/security.controller';
 import { Session, SessionSchema } from './security/security.schema';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './auth/constants';
 
 config();
 
@@ -48,6 +50,11 @@ config();
       { name: Comment.name, schema: CommentSchema },
       { name: Session.name, schema: SessionSchema },
     ]),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '60s' },
+    }),
   ],
   controllers: [
     AppController,

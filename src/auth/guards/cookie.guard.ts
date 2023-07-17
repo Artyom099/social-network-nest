@@ -1,26 +1,25 @@
 import {
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { jwtConstants } from '../constants';
 
+@Injectable()
 export class CookieGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const refreshToken = this.extractTokenFromHeader(request);
+    const refreshToken = this.extractTokenFromCookie(request);
     if (!refreshToken) throw new UnauthorizedException();
-    console.log({ refreshToken: refreshToken });
-    console.log(jwtConstants.secret);
-    //todo - Cannot read properties of undefined (reading 'verifyAsync')
+
     const payload = await this.jwtService.verifyAsync(refreshToken, {
       secret: jwtConstants.secret,
     });
-    console.log({ payload: payload });
     const userId = payload.userId;
 
     if (!userId) {
@@ -31,9 +30,11 @@ export class CookieGuard implements CanActivate {
     }
   }
 
-  private extractTokenFromHeader(request: Request): string | null {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    // console.log({ type: type }, { token: token });
-    return type === 'Bearer' ? token : null;
+  private extractTokenFromCookie(request: Request): string | null {
+    console.log({ cookie: request.cookies });
+    if (request.cookies && request.cookies.refreshToken) {
+      return request.cookies.refreshToken;
+    }
+    return null;
   }
 }

@@ -1,12 +1,14 @@
 import {
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { jwtConstants } from '../constants';
 import { JwtService } from '@nestjs/jwt';
 
+@Injectable()
 export class BearerAuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
