@@ -175,7 +175,7 @@ export class AuthController {
     const confirmEmail = await this.authService.confirmEmail(body.code);
     if (!confirmEmail) {
       throw new BadRequestException(
-        'code is incorrect, expired or already been applied=>code',
+        'code is incorrect, expired or already applied=>code',
       );
     } else {
       return true;

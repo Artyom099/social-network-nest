@@ -107,8 +107,10 @@ export class AuthService {
     const user = await this.usersRepository.getUserByConfirmationCode(code);
     if (!user) {
       return false;
+    }
+    if (!user.confirmEmail(code)) {
+      return false;
     } else {
-      user.confirmEmail(code);
       await this.usersRepository.updateUser(user.id, user);
       return true;
     }
