@@ -17,7 +17,7 @@ import { BearerAuthGuard } from './guards/bearer-auth.guard';
 import { SecurityService } from '../security/security.service';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { CreateUserInputModel } from '../users/users.models';
-import { AuthInputModel } from './auth.models';
+import { AuthInputModel, EmailInputModel } from './auth.models';
 import { CookieGuard } from './guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 
@@ -146,8 +146,14 @@ export class AuthController {
 
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async passwordRecovery(@Body() body: { email: string }) {
-    return { recoveryCode: this.authService.sendRecoveryCode(body.email) };
+  //для моих тестов дожно быть OK
+  async passwordRecovery(@Body() InputModel: EmailInputModel) {
+    console.log({
+      recoveryCode_1: await this.authService.sendRecoveryCode(InputModel.email),
+    });
+    return {
+      recoveryCode: await this.authService.sendRecoveryCode(InputModel.email),
+    };
   }
 
   @Post('registration')
@@ -173,7 +179,6 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendConfirmationEmail(@Body() body: { code: string }) {
     const confirmEmail = await this.authService.confirmEmail(body.code);
-    console.log({ confirmEmail: confirmEmail });
     if (!confirmEmail) {
       throw new BadRequestException(
         'code is incorrect, expired or already applied=>code',

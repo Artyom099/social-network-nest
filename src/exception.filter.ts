@@ -47,7 +47,7 @@ export class ErrorExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
-    console.log({ responseBody_2: exception.getResponse() });
+    // console.log({ responseBody_2: exception.getResponse() });
 
     if (process.env.environment !== 'production') {
       response

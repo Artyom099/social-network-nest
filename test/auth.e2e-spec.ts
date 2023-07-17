@@ -27,20 +27,6 @@ describe('AuthController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
-  // it('should be ok', async () => {
-  //   const inputModel: CreateUserInputModel = {
-  //     login: '1234567',
-  //     email: '1@gmail.com',
-  //     password: '213455',
-  //   };
-  //   const res = await request(server)
-  //     .post('/auth/registration')
-  //     .send(inputModel);
-  //
-  //   console.log(res.body, res.status);
-  //   expect(res.status).toBe(400);
-  // });
-
   it('1 – GET:/auth/me – return 401', async () => {
     await request(server).get('/auth/me').expect(HttpStatus.UNAUTHORIZED);
   });
@@ -306,15 +292,17 @@ describe('AuthController (e2e)', () => {
   });
   it('18 – POST:/auth/password-recovery – return 204 & send recovery code to email', async () => {
     const { firstUser, secondRefreshToken } = expect.getState();
+    console.log('18-----18');
     const recoveryResponse = await request(server)
       .post('/auth/password-recovery')
       .set('cookie', secondRefreshToken)
       .send({ email: firstUser.email });
 
     expect(recoveryResponse).toBeDefined();
+    //для тестов здесть OK, поставить такой же статус в контроллере
     expect(recoveryResponse.status).toBe(HttpStatus.OK);
     expect.setState({ recoveryCode: recoveryResponse.body.recoveryCode });
-    // console.log({recoveryCode: recoveryResponse.body.recoveryCode})
+    console.log({ recoveryCode_body: recoveryResponse.body });
   });
   it('19 – POST:/auth/new-password – return 400 with incorrect recoveryCode', async () => {
     const newPasswordResponse = await request(server)
@@ -329,6 +317,8 @@ describe('AuthController (e2e)', () => {
   });
   it('20 – POST:/auth/new-password – return 204 & update password', async () => {
     const { recoveryCode } = expect.getState();
+    console.log('20-----20');
+    console.log(recoveryCode);
     const newPasswordResponse = await request(server)
       .post('/auth/new-password')
       .send({

@@ -105,7 +105,6 @@ export class AuthService {
 
   async confirmEmail(code: string): Promise<boolean> {
     const user = await this.usersRepository.getUserByConfirmationCode(code);
-    console.log({ user_before: user });
     if (!user) {
       return false;
     }
@@ -139,7 +138,7 @@ export class AuthService {
     return newConfirmationCode;
   }
 
-  async sendRecoveryCode(email: string) {
+  async sendRecoveryCode(email: string): Promise<string | null> {
     const user = await this.usersRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
     const recoveryCode = user.updateRecoveryCode();

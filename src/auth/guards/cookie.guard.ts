@@ -31,7 +31,6 @@ export class CookieGuard implements CanActivate {
   }
 
   private extractTokenFromCookie(request: Request): string | null {
-    console.log({ cookie: request.cookies });
     if (request.cookies && request.cookies.refreshToken) {
       return request.cookies.refreshToken;
     }
