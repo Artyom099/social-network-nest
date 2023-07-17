@@ -20,18 +20,18 @@ export class BearerAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      console.log('111'); //todo - дальше этого лога не идет, если тестить через постман
+      // console.log('111'); //todo - дальше этого лога не идет, если тестить через постман
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
-      console.log('222');
+      // console.log('222');
       console.log({ payload: payload });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['userId'] = payload.userId;
     } catch (e) {
       throw new UnauthorizedException();
-      console.log('333', e);
+      // console.log('333', e);
     }
     return true;
   }

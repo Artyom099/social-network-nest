@@ -3,10 +3,11 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { LikeStatus } from '../src/utils/constants';
-import { appSettings } from '../src/settings';
+import { appSettings } from '../src/app.settings';
 
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
+  let server: any;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -15,8 +16,8 @@ describe('PostsController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     appSettings(app);
     await app.init();
-
-    await request(app.getHttpServer()).delete('/testing/all-data');
+    server = app.getHttpServer();
+    await request(server).delete('/testing/all-data');
   });
 
   it('1 – POST:/users – create 1st user by admin', async () => {
@@ -25,9 +26,9 @@ describe('PostsController (e2e)', () => {
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
-    const firstCreateResponse = await request(app.getHttpServer())
+    const firstCreateResponse = await request(server)
       .post('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: firstUser.login,
         password: firstUser.password,
@@ -45,7 +46,7 @@ describe('PostsController (e2e)', () => {
 
     await request(app.getHttpServer())
       .get('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -63,9 +64,9 @@ describe('PostsController (e2e)', () => {
       password: 'qwerty2',
       email: 'artyomgolubev2@gmail.com',
     };
-    const secondCreateResponse = await request(app.getHttpServer())
+    const secondCreateResponse = await request(server)
       .post('/users')
-      // .auth('admin', 'qwerty', { type: 'basic' })
+      .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: secondUser.login,
         password: secondUser.password,
@@ -81,7 +82,7 @@ describe('PostsController (e2e)', () => {
       createdAt: expect.any(String),
     });
 
-    await request(app.getHttpServer())
+    await request(server)
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -103,7 +104,7 @@ describe('PostsController (e2e)', () => {
       password: 'qwerty3',
       email: 'artyomgolubev3@gmail.com',
     };
-    await request(app.getHttpServer())
+    await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -121,7 +122,7 @@ describe('PostsController (e2e)', () => {
       password: 'qwerty4',
       email: 'artyomgolubev4@gmail.com',
     };
-    await request(app.getHttpServer())
+    await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -139,7 +140,7 @@ describe('PostsController (e2e)', () => {
       password: 'qwerty5',
       email: 'artyomgolubev5@gmail.com',
     };
-    await request(app.getHttpServer())
+    await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -152,32 +153,30 @@ describe('PostsController (e2e)', () => {
     expect.setState({ fifthUser: fifthUser });
   });
 
-  // it('6 – POST: /auth/login – return 200, 1st user login and refreshToken', async () => {
-  //   const { firstUser } = expect.getState();
-  //   const loginResponse = await request(app.getHttpServer())
-  //     .post('/auth/login')
-  //     .send({
-  //       loginOrEmail: firstUser.login,
-  //       password: firstUser.password,
-  //     });
-  //
-  //   expect(loginResponse).toBeDefined();
-  //   expect(loginResponse.status).toBe(HttpStatus.OK);
-  //   expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
-  //   const { accessToken } = loginResponse.body;
-  //
-  //   const refreshToken = getRefreshTokenByResponse(loginResponse);
-  //   const refreshTokenWithName =
-  //     getRefreshTokenByResponseWithTokenName(loginResponse);
-  //   expect(refreshToken).toBeDefined();
-  //   expect(refreshToken).toEqual(expect.any(String));
-  //
-  //   expect.setState({
-  //     firstAccessToken: accessToken,
-  //     firstRefreshToken: refreshToken,
-  //     firstRefreshTokenWithName: refreshTokenWithName,
-  //   });
-  // });
+  it('6 – POST: /auth/login – return 200, 1st user login and refreshToken', async () => {
+    const { firstUser } = expect.getState();
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: firstUser.login,
+      password: firstUser.password,
+    });
+
+    expect(loginResponse).toBeDefined();
+    expect(loginResponse.status).toBe(HttpStatus.OK);
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
+
+    const refreshToken = getRefreshTokenByResponse(loginResponse);
+    const refreshTokenWithName =
+      getRefreshTokenByResponseWithTokenName(loginResponse);
+    expect(refreshToken).toBeDefined();
+    expect(refreshToken).toEqual(expect.any(String));
+
+    expect.setState({
+      firstAccessToken: accessToken,
+      firstRefreshToken: refreshToken,
+      firstRefreshTokenWithName: refreshTokenWithName,
+    });
+  });
 
   it('7 – POST:/blogs – return 201 & create blog by 1st user', async () => {
     const firstBlog = {
@@ -185,7 +184,7 @@ describe('PostsController (e2e)', () => {
       description: 'valid-description',
       websiteUrl: 'valid-websiteUrl.com',
     };
-    const createBlogResponse = await request(app.getHttpServer())
+    const createBlogResponse = await request(server)
       .post('/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -213,7 +212,7 @@ describe('PostsController (e2e)', () => {
       shortDescription: 'valid-shortDescription',
       content: 'valid-content',
     };
-    const createPostResponse = await request(app.getHttpServer())
+    const createPostResponse = await request(server)
       .post('/posts')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -246,7 +245,7 @@ describe('PostsController (e2e)', () => {
   it('9 – GET:/posts – return 200 and empty array', async () => {
     const { firstRefreshToken, firstPost, firstCreatedBlog } =
       expect.getState();
-    const getPosts = await request(app.getHttpServer())
+    const getPosts = await request(server)
       .get('/posts')
       .auth(firstRefreshToken, { type: 'bearer' });
 
@@ -278,16 +277,14 @@ describe('PostsController (e2e)', () => {
   });
   it('10 – GET:/posts/:id – return 404 with not existing postId', async () => {
     const { firstAccessToken } = expect.getState();
-    await request(app.getHttpServer())
+    await request(server)
       .get('/posts/123')
       .auth(firstAccessToken, { type: 'bearer' })
       .expect(HttpStatus.NOT_FOUND);
   });
 
   it('11 – PUT:/posts/:id – return 404 with not existing postId', async () => {
-    await request(app.getHttpServer())
-      .put('/posts/123')
-      .expect(HttpStatus.NOT_FOUND);
+    await request(server).put('/posts/123').expect(HttpStatus.NOT_FOUND);
   });
   it('12 – PUT:/posts/:id – return 204 & update post', async () => {
     const firstUpdatePost = {
@@ -296,7 +293,7 @@ describe('PostsController (e2e)', () => {
       content: 'valid-content-update',
     };
     const { firstPost } = expect.getState();
-    await request(app.getHttpServer())
+    await request(server)
       .put(`/posts/${firstPost.id}`)
       .send({
         title: firstUpdatePost.title,
@@ -307,13 +304,11 @@ describe('PostsController (e2e)', () => {
   });
 
   it('13 – DELETE:/posts/:id – return 404 with not existing postId', async () => {
-    await request(app.getHttpServer())
-      .delete('/posts/123')
-      .expect(HttpStatus.NOT_FOUND);
+    await request(server).delete('/posts/123').expect(HttpStatus.NOT_FOUND);
   });
   it('14 – DELETE:/posts/:id – return 204 & delete post', async () => {
     const { firstPost } = expect.getState();
-    await request(app.getHttpServer())
+    await request(server)
       .delete(`/posts/${firstPost.id}`)
       .expect(HttpStatus.NO_CONTENT);
   });

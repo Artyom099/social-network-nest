@@ -124,15 +124,13 @@ export class BlogsController {
   }
 
   @Post(':id/posts')
-  @UseGuards(BasicAuthGuard, CookieGuard)
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createPostCurrentBlog(
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    console.log('444444444');
     const foundBlog = await this.blogsService.getBlog(blogId);
-    console.log({ foundBlog: foundBlog });
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
