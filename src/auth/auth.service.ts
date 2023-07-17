@@ -74,6 +74,18 @@ export class AuthService {
     }
   }
 
+  async updateJWT(userId: string, deviceId: string) {
+    const payload = { userId, deviceId };
+    return {
+      accessToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '5m',
+      }),
+      refreshToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '20s',
+      }),
+    };
+  }
+
   getTokenPayload(
     token: string,
   ): { userId: string; deviceId: string; iat: number; exp: number } | null {

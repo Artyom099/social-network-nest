@@ -14,10 +14,13 @@ export class CookieGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const refreshToken = this.extractTokenFromHeader(request);
     if (!refreshToken) throw new UnauthorizedException();
+    console.log(refreshToken);
 
+    //todo - Cannot read properties of undefined (reading 'verifyAsync')
     const payload = await this.jwtService.verifyAsync(refreshToken, {
       secret: jwtConstants.secret,
     });
+    console.log({ payload: payload });
     const userId = payload.userId;
 
     if (!userId) {
@@ -30,6 +33,7 @@ export class CookieGuard implements CanActivate {
 
   private extractTokenFromHeader(request: Request): string | null {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    // console.log({ type: type }, { token: token });
     return type === 'Bearer' ? token : null;
   }
 }

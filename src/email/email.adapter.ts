@@ -10,12 +10,12 @@ export const emailAdapter = {
         // port: 587,
         secure: true,
         auth: {
-          user: settings.MAIL_LOGIN,
-          pass: settings.MAIL_PASSWORD,
+          user: settings.GMAIL_LOGIN,
+          pass: settings.GMAIL_PASSWORD,
         },
       });
       return await transporter.sendMail({
-        from: `"Blog Platform" <${settings.MAIL_LOGIN}>`,
+        from: `"Blog Platform" <${settings.GMAIL_LOGIN}>`,
         to: to,
         subject: subject,
         html: message,

@@ -3,8 +3,13 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/app.settings';
-import { getRefreshTokenByResponseWithTokenName } from '../src/utils/utils';
-import { CreateUserInputModel } from '../src/users/users.models';
+import {
+  getRefreshTokenByResponse,
+  getRefreshTokenByResponseWithTokenName,
+} from '../src/utils/utils';
+
+const sleep = (seconds: number) =>
+  new Promise((r) => setTimeout(r, seconds * 1000));
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -215,12 +220,12 @@ describe('AuthController (e2e)', () => {
       });
   });
 
-  // it('12 – POST:/auth/refresh-token – return 401 with no any token', async () => {
-  //   await request(server)
-  //     .post('/auth/refresh-token')
-  //     .send('noToken')
-  //     .expect(HttpStatus.UNAUTHORIZED);
-  // });
+  it('12 – POST:/auth/refresh-token – return 401 with no any token', async () => {
+    await request(server)
+      .post('/auth/refresh-token')
+      .send('noToken')
+      .expect(HttpStatus.UNAUTHORIZED);
+  });
 
   it('13 – POST:/auth/login – return 200 and login', async () => {
     const { firstUser } = expect.getState();
@@ -234,42 +239,42 @@ describe('AuthController (e2e)', () => {
     expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
     const { accessToken } = loginResponse.body;
 
-    const refreshToken = getRefreshTokenByResponseWithTokenName(loginResponse);
+    const refreshToken = getRefreshTokenByResponse(loginResponse);
     expect(refreshToken).toBeDefined();
     expect(refreshToken).toEqual(expect.any(String));
 
     expect.setState({ accessToken, firstRefreshToken: refreshToken });
   });
 
-  // it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
-  //   const { accessToken, firstRefreshToken } = expect.getState();
-  //   await sleep(1.1);
-  //
-  //   const goodRefreshTokenResponse = await request(server)
-  //     .post('/auth/refresh-token')
-  //     .set('cookie', firstRefreshToken);
-  //
-  //   expect(goodRefreshTokenResponse).toBeDefined();
-  //   expect(goodRefreshTokenResponse.status).toBe(HttpStatus.OK);
-  //   expect(goodRefreshTokenResponse.body).toEqual({
-  //     accessToken: expect.any(String),
-  //   });
-  //
-  //   const newAccessToken = goodRefreshTokenResponse.body.accessToken;
-  //   expect(newAccessToken).not.toBe(accessToken);
-  //
-  //   const newRefreshToken = getRefreshTokenByResponseWithTokenName(
-  //     goodRefreshTokenResponse,
-  //   );
-  //   expect(newRefreshToken).toBeDefined();
-  //   expect(newRefreshToken).toEqual(expect.any(String));
-  //   expect(newRefreshToken).not.toBe(firstRefreshToken);
-  //
-  //   expect.setState({
-  //     secondAccessToken: newAccessToken,
-  //     secondRefreshToken: newRefreshToken,
-  //   });
-  // });
+  it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
+    const { accessToken, firstRefreshToken } = expect.getState();
+    await sleep(1.1);
+
+    const goodRefreshTokenResponse = await request(server)
+      .post('/auth/refresh-token')
+      .set('authorization', `Bearer ${firstRefreshToken}`);
+
+    expect(goodRefreshTokenResponse).toBeDefined();
+    expect(goodRefreshTokenResponse.status).toBe(HttpStatus.OK);
+    expect(goodRefreshTokenResponse.body).toEqual({
+      accessToken: expect.any(String),
+    });
+
+    const newAccessToken = goodRefreshTokenResponse.body.accessToken;
+    expect(newAccessToken).not.toBe(accessToken);
+
+    const newRefreshToken = getRefreshTokenByResponseWithTokenName(
+      goodRefreshTokenResponse,
+    );
+    expect(newRefreshToken).toBeDefined();
+    expect(newRefreshToken).toEqual(expect.any(String));
+    expect(newRefreshToken).not.toBe(firstRefreshToken);
+
+    expect.setState({
+      secondAccessToken: newAccessToken,
+      secondRefreshToken: newRefreshToken,
+    });
+  });
 
   // it('15 – POST:/auth/refresh-token – return 401 with no any token', async () => {
   //   const goodRefreshTokenResponse = await request(app.getHttpServer()).post(

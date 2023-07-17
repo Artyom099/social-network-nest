@@ -20,7 +20,6 @@ import { CreateUserInputModel } from '../users/users.models';
 import { AuthInputModel } from './auth.models';
 import { CookieGuard } from './guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
 
 @Controller('auth')
 export class AuthController {
@@ -35,6 +34,7 @@ export class AuthController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Request() req) {
+    console.log(req.userId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
     return {
       email: user?.email,
@@ -57,7 +57,8 @@ export class AuthController {
     if (!token) {
       throw new UnauthorizedException();
     } else {
-      const title = req.headers['user-agent'];
+      //'user-agent'  || 'device-1'
+      const title = req.headers['host'];
       const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
       const lastActiveDate = new Date(tokenPayload!.iat * 1000);
       await this.securityService.createSession(
@@ -67,6 +68,46 @@ export class AuthController {
         tokenPayload!.deviceId,
         tokenPayload!.userId,
       );
+      res.cookie('refreshToken', token.refreshToken, {
+        httpOnly: true,
+        secure: true,
+      });
+      return { accessToken: token.accessToken };
+    }
+  }
+
+  @Post('refresh-token')
+  @UseGuards(CookieGuard)
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
+    const refreshTokenPayload = this.authService.getTokenPayload(
+      req.cookies.refreshToken,
+    );
+    const tokenIssuedAt = new Date(
+      refreshTokenPayload!.iat * 1000,
+    ).toISOString();
+    const lastActiveSession = await this.securityService.getSession(
+      refreshTokenPayload!.deviceId,
+    );
+
+    if (tokenIssuedAt !== lastActiveSession!.lastActiveDate) {
+      throw new UnauthorizedException();
+    } else {
+      const token = await this.authService.updateJWT(
+        refreshTokenPayload!.userId,
+        refreshTokenPayload!.deviceId,
+      );
+      const newTokenPayload = this.authService.getTokenPayload(
+        token.refreshToken,
+      );
+      const lastActiveDate = new Date(
+        newTokenPayload!.iat * 1000,
+      ).toISOString();
+      await this.securityService.updateLastActiveDate(
+        refreshTokenPayload!.deviceId,
+        lastActiveDate,
+      );
+
       res.cookie('refreshToken', token.refreshToken, {
         httpOnly: true,
         secure: true,
@@ -107,26 +148,6 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async passwordRecovery(@Body() body: { email: string }) {
     return { recoveryCode: this.authService.sendRecoveryCode(body.email) };
-  }
-
-  @Post('refresh-token')
-  @UseGuards(CookieGuard)
-  @HttpCode(HttpStatus.OK)
-  async refreshToken(@Req() req) {
-    const refreshTokenPayload = this.authService.getTokenPayload(
-      req.cookies.refreshToken,
-    );
-    const tokenIssuedAt = new Date(
-      refreshTokenPayload!.iat * 1000,
-    ).toISOString();
-    const lastActiveSession = await this.securityService.getSession(
-      refreshTokenPayload!.deviceId,
-    );
-
-    if (tokenIssuedAt !== lastActiveSession!.lastActiveDate) {
-      throw new UnauthorizedException();
-    } else {
-    }
   }
 
   @Post('registration')
