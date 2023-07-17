@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { settings } from '../utils/settings';
 
-export const emailAdapter = {
+export const emailAdapter1 = {
   async sendEmail(to: string, subject: string, message: string) {
     try {
       const transporter = nodemailer.createTransport({
@@ -27,19 +27,19 @@ export const emailAdapter = {
   },
 };
 
-export const emailAdapter2 = {
+export const emailAdapter = {
   async sendEmail(email: string, subject: string, message: string) {
     const transporter = await nodemailer.createTransport({
       host: 'smtp.mail.ru',
       port: 465,
       secure: true,
       auth: {
-        user: 'artyom.dev@mail.ru',
-        pass: '3VLABWWkQsUXVJW7vJ8j',
+        user: settings.MAIL_LOGIN,
+        pass: settings.MAIL_PASSWORD,
       },
     });
     return await transporter.sendMail({
-      from: '"Fred Foo 👻" <artyom.dev@mail.ru>', // sender address
+      from: `"Fred Foo 👻" <${settings.MAIL_LOGIN}>`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: message, // html body
