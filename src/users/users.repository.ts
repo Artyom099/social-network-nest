@@ -60,6 +60,7 @@ export class UsersRepository {
   async save(model: any) {
     return model.save();
   }
+  //todo - этот метод вроде не работает
   async updateUser(id: string, user: User) {
     return this.userModel.updateOne({ id }, { user });
   }

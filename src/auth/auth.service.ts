@@ -125,7 +125,7 @@ export class AuthService {
     //обновили у него ConfirmationCode
     const newConfirmationCode = user.updateConfirmationCode();
     //записали это обновление в БД
-    await this.usersRepository.updateUser(user.id, user);
+    await this.usersRepository.save(user);
 
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
@@ -143,7 +143,7 @@ export class AuthService {
     const user = await this.usersRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
     const recoveryCode = user.updateRecoveryCode();
-    await this.usersRepository.updateUser(user.id, user);
+    await this.usersRepository.save(user);
     try {
       await emailManager.sendEmailRecoveryCode(email, recoveryCode);
     } catch (error) {
@@ -164,7 +164,7 @@ export class AuthService {
     if (!user) return null;
 
     user.updateSaltAndHash(passwordSalt, passwordHash);
-    await this.usersRepository.updateUser(user.id, user);
+    await this.usersRepository.save(user);
   }
 
   async _generateHash(password: string, salt: string) {
