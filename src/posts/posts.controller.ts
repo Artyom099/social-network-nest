@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -22,6 +23,7 @@ import { LikeStatus, SortBy, SortDirection } from '../utils/constants';
 import { BearerAuthGuard } from '../auth/guards/bearer-auth.guard';
 import { CommentInputModel } from '../comments/comments.models';
 import { CommentsService } from '../comments/comments.service';
+import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -34,6 +36,7 @@ export class PostsController {
   ) {}
 
   @Get()
+  @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getPosts(@Query() query: GetItemsWithPaging) {
     const pageNumber = query.pageNumber ?? 1;
@@ -60,9 +63,14 @@ export class PostsController {
   }
 
   @Get(':id')
+  @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
-  async getPost(@Param('id') postId: string) {
-    const foundPost = await this.postsService.getPost(postId);
+  async getPost(@Req() req, @Param('id') postId: string) {
+    console.log(req.userId);
+    const foundPost = await this.postsQueryRepository.getPost(
+      postId,
+      req.userId,
+    );
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
@@ -77,6 +85,7 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: PostInputModel,
   ) {
+    //todo - как здесь сначла проверять наличие поста по postId, а потом валидировать данные?
     const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
@@ -98,6 +107,7 @@ export class PostsController {
   }
 
   @Get(':id/comments')
+  @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getCommentsCurrentPost(
     @Param('id') postId: string,
@@ -125,6 +135,7 @@ export class PostsController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createComment(
+    @Req() req,
     @Param('id') postId: string,
     @Body() inputModel: CommentInputModel,
   ) {
@@ -132,7 +143,7 @@ export class PostsController {
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
-      const userId = 'mock'; //todo - CheckUserIdGuard
+      const userId = req.userId;
       const userLogin = 'mock';
       return this.commentsService.createComment(
         postId,
@@ -147,14 +158,16 @@ export class PostsController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
+    @Req() req,
     @Param('id') postId: string,
     @Body() body: { likeStatus: LikeStatus },
   ) {
     const foundPost = await this.postsService.getPost(postId);
+    console.log({ foundPost: foundPost });
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
-      const userId = 'mock'; //todo - CheckUserIdGuard
+      const userId = req.userId;
       return this.postsService.updatePostLikes(postId, userId, body.likeStatus);
     }
   }

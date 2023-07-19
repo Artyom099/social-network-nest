@@ -10,22 +10,28 @@ export class CheckUserIdGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const refreshToken = this.extractTokenFromCookie(request);
-
+    console.log({ refreshToken: refreshToken });
     if (!refreshToken) {
-      request.body.userId = null;
+      request['userId'] = null;
     } else {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: jwtConstants.secret,
       });
-      request.body.userId = payload.userId;
+      request['userId'] = payload.userId;
     }
     return true;
   }
 
   private extractTokenFromCookie(request: Request): string | null {
-    if (request.cookies && request.cookies.refreshToken) {
-      return request.cookies.refreshToken;
-    }
-    return null;
+    // if (request.cookies && request.cookies.refreshToken) {
+    //   return request.cookies.refreshToken;
+    // }
+    // if (request.headers.authorization) {
+    //   return request.headers.authorization;
+    // } else {
+    //   return null;
+    // }
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : null;
   }
 }

@@ -21,7 +21,6 @@ export class PostsRepository {
     let dislikesCount = 0;
     const myStatus = LikeStatus.None;
     const newestLikes: NewestLikesViewModel[] = [];
-    // todo - как узнать currentUserId без мидлвейр?
     post.extendedLikesInfo.forEach((s) => {
       // if (s.userId === currentUserId) myStatus = s.status;
       if (s.status === LikeStatus.Dislike) dislikesCount++;

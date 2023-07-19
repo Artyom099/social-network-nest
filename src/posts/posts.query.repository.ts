@@ -14,6 +14,48 @@ import { Model } from 'mongoose';
 export class PostsQueryRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
+  async getPost(
+    id: string,
+    currentUserId?: string | null,
+  ): Promise<PostViewModel | null> {
+    const post = await this.postModel.findOne({ id }).exec();
+    if (!post) return null;
+    let myStatus = LikeStatus.None;
+    let likesCount = 0;
+    let dislikesCount = 0;
+    const newestLikes: NewestLikesViewModel[] = [];
+    post.extendedLikesInfo.forEach((p) => {
+      if (p.userId === currentUserId) myStatus = p.status;
+      if (p.status === LikeStatus.Dislike) dislikesCount++;
+      if (p.status === LikeStatus.Like) {
+        likesCount++;
+        newestLikes.push({
+          addedAt: p.addedAt,
+          userId: p.userId,
+          login: p.login,
+        });
+      }
+    });
+    return {
+      id: post.id,
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt,
+      extendedLikesInfo: {
+        likesCount,
+        dislikesCount,
+        myStatus,
+        newestLikes: newestLikes
+          .sort((a, b) => parseInt(a.addedAt) - parseInt(b.addedAt))
+          .slice(-3)
+          .reverse(),
+      },
+    };
+  }
+
   async getSortedPosts(
     pageNumber: number,
     pageSize: number,
