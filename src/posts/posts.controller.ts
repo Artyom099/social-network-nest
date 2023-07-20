@@ -66,7 +66,6 @@ export class PostsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getPost(@Req() req, @Param('id') postId: string) {
-    console.log(req.userId);
     const foundPost = await this.postsQueryRepository.getPost(
       postId,
       req.userId,
@@ -144,7 +143,7 @@ export class PostsController {
       throw new NotFoundException('post not found');
     } else {
       const userId = req.userId;
-      const userLogin = 'mock';
+      const userLogin = 'mock'; //todo-как и где искать userLogin
       return this.commentsService.createComment(
         postId,
         inputModel,
@@ -163,7 +162,6 @@ export class PostsController {
     @Body() body: { likeStatus: LikeStatus },
   ) {
     const foundPost = await this.postsService.getPost(postId);
-    console.log({ foundPost: foundPost });
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
