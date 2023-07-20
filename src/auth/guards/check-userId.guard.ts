@@ -10,7 +10,7 @@ export class CheckUserIdGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const refreshToken = this.extractTokenFromHeaders(request);
-    console.log({ refreshToken: refreshToken });
+    // console.log({ refreshToken: refreshToken });
     if (!refreshToken) {
       request['userId'] = null;
     } else {

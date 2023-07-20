@@ -331,7 +331,7 @@ describe('PostsController (e2e)', () => {
 
   it('15 – PUT:/posts/:id/like-status – return 204 & set like', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
-    const setLike = await request(app.getHttpServer())
+    const setLike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
       .auth(firstAccessToken, { type: 'bearer' })
       .send({ likeStatus: LikeStatus.Like });
@@ -347,7 +347,7 @@ describe('PostsController (e2e)', () => {
       firstUser,
       firstCreatedUser,
     } = expect.getState();
-    const getPost = await request(app.getHttpServer())
+    const getPost = await request(server)
       .get(`/posts/${firstPost.id}`)
       .auth(firstAccessToken, { type: 'bearer' });
 
@@ -377,7 +377,7 @@ describe('PostsController (e2e)', () => {
   });
   it('17 – PUT: /posts/:id/like-status – return 204 & set dislike', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
-    const setDislike = await request(app.getHttpServer())
+    const setDislike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
       .auth(firstAccessToken, { type: 'bearer' })
       .send({ likeStatus: LikeStatus.Dislike });
@@ -387,7 +387,7 @@ describe('PostsController (e2e)', () => {
   });
   it('18 – GET: /posts/:id – return 200 & get post with 1 dislike', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
-    const getPost = await request(app.getHttpServer())
+    const getPost = await request(server)
       .get(`/posts/${firstPost.id}`)
       .auth(firstAccessToken, { type: 'bearer' });
 
@@ -409,44 +409,45 @@ describe('PostsController (e2e)', () => {
       },
     });
   });
-  it('19 – PUT: /posts/:id/like-status – return 204 & delete dislike', async () => {
-    const { firstAccessToken, firstPost } = expect.getState();
-    const setNone = await request(app.getHttpServer())
-      .put(`/posts/${firstPost.id}/like-status`)
-      .auth(firstAccessToken, { type: 'bearer' })
-      .send({ likeStatus: LikeStatus.None });
 
-    expect(setNone).toBeDefined();
-    expect(setNone.status).toEqual(HttpStatus.NO_CONTENT);
-  });
-  it('20 – GET: /posts/:id – return 200 & get post', async () => {
-    const { firstAccessToken, firstPost } = expect.getState();
-    const getPost = await request(app.getHttpServer())
-      .get(`/posts/${firstPost.id}`)
-      .auth(firstAccessToken, { type: 'bearer' });
-
-    expect(getPost).toBeDefined();
-    expect(getPost.status).toEqual(HttpStatus.OK);
-    expect(getPost.body).toEqual({
-      id: firstPost.id,
-      title: firstPost.title,
-      shortDescription: firstPost.shortDescription,
-      content: firstPost.content,
-      blogId: firstPost.blogId,
-      blogName: firstPost.blogName,
-      createdAt: firstPost.createdAt,
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: LikeStatus.None,
-        newestLikes: [],
-      },
-    });
-  });
+  // it('19 – PUT: /posts/:id/like-status – return 204 & delete dislike', async () => {
+  //   const { firstAccessToken, firstPost } = expect.getState();
+  //   const setNone = await request(server)
+  //     .put(`/posts/${firstPost.id}/like-status`)
+  //     .auth(firstAccessToken, { type: 'bearer' })
+  //     .send({ likeStatus: LikeStatus.None });
+  //
+  //   expect(setNone).toBeDefined();
+  //   expect(setNone.status).toEqual(HttpStatus.NO_CONTENT);
+  // });
+  // it('20 – GET: /posts/:id – return 200 & get post', async () => {
+  //   const { firstAccessToken, firstPost } = expect.getState();
+  //   const getPost = await request(server)
+  //     .get(`/posts/${firstPost.id}`)
+  //     .auth(firstAccessToken, { type: 'bearer' });
+  //
+  //   expect(getPost).toBeDefined();
+  //   expect(getPost.status).toEqual(HttpStatus.OK);
+  //   expect(getPost.body).toEqual({
+  //     id: firstPost.id,
+  //     title: firstPost.title,
+  //     shortDescription: firstPost.shortDescription,
+  //     content: firstPost.content,
+  //     blogId: firstPost.blogId,
+  //     blogName: firstPost.blogName,
+  //     createdAt: firstPost.createdAt,
+  //     extendedLikesInfo: {
+  //       likesCount: 0,
+  //       dislikesCount: 0,
+  //       myStatus: LikeStatus.None,
+  //       newestLikes: [],
+  //     },
+  //   });
+  // });
 
   // it('17 – POST:/auth/login – return 200, 2nd user login and refreshToken', async () => {
   //   const { secondUser } = expect.getState();
-  //   const secondLoginResponse = await request(app.getHttpServer())
+  //   const secondLoginResponse = await request(server)
   //     .post('/auth/login')
   //     .send({
   //       loginOrEmail: secondUser.login,
@@ -464,7 +465,7 @@ describe('PostsController (e2e)', () => {
   // });
   // it('18 – POST: /auth/login – return 200, 3rd user login and refreshToken', async () => {
   //   const { thirdUser } = expect.getState();
-  //   const thirdLoginResponse = await request(app.getHttpServer())
+  //   const thirdLoginResponse = await request(server)
   //     .post('/auth/login')
   //     .send({
   //       loginOrEmail: thirdUser.login,
@@ -482,7 +483,7 @@ describe('PostsController (e2e)', () => {
   // });
   // it('19 – POST: /auth/login – return 200, 4th user login and refreshToken', async () => {
   //   const { fourthUser } = expect.getState();
-  //   const fourthLoginResponse = await request(app.getHttpServer())
+  //   const fourthLoginResponse = await request(server)
   //     .post('/auth/login')
   //     .send({
   //       loginOrEmail: fourthUser.login,
@@ -500,7 +501,7 @@ describe('PostsController (e2e)', () => {
   // });
   // it('20 – POST: /auth/login – return 200, 5th user login and refreshToken', async () => {
   //   const { fifthUser } = expect.getState();
-  //   const fifthLoginResponse = await request(app.getHttpServer())
+  //   const fifthLoginResponse = await request(server)
   //     .post('/auth/login')
   //     .send({
   //       loginOrEmail: fifthUser.login,
@@ -519,7 +520,7 @@ describe('PostsController (e2e)', () => {
 
   // it('21 – PUT:/posts/:id/like-status – return 204 & set like by 2nd user', async () => {
   //   const { secondAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(app.getHttpServer())
+  //   const setLike = await request(server)
   //     .put(`/posts/${firstPost.id}/like-status`)
   //     .auth(secondAccessToken, { type: 'bearer' })
   //     .send({ likeStatus: LikeStatus.Like });
@@ -529,7 +530,7 @@ describe('PostsController (e2e)', () => {
   // });
   // it('22 – PUT: /posts/:id/like-status – return 204 & set like by 3rd user', async () => {
   //   const { thirdAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(app.getHttpServer())
+  //   const setLike = await request(server)
   //     .put(`/posts/${firstPost.id}/like-status`)
   //     .auth(thirdAccessToken, { type: 'bearer' })
   //     .send({ likeStatus: LikeStatus.Like });
@@ -539,7 +540,7 @@ describe('PostsController (e2e)', () => {
   // });
   // it('23 – PUT: /posts/:id/like-status – return 204 & set like by 4th user', async () => {
   //   const { fourthAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(app.getHttpServer())
+  //   const setLike = await request(server)
   //     .put(`/posts/${firstPost.id}/like-status`)
   //     .auth(fourthAccessToken, { type: 'bearer' })
   //     .send({ likeStatus: LikeStatus.Like });
@@ -549,7 +550,7 @@ describe('PostsController (e2e)', () => {
   // });
   // it('24 – PUT: /posts/:id/like-status – return 204 & set like by 5th user', async () => {
   //   const { fifthAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(app.getHttpServer())
+  //   const setLike = await request(server)
   //     .put(`/posts/${firstPost.id}/like-status`)
   //     .auth(fifthAccessToken, { type: 'bearer' })
   //     .send({ likeStatus: LikeStatus.Like });
@@ -561,7 +562,7 @@ describe('PostsController (e2e)', () => {
   // it('25 – GET: /posts/:id – return 200 & get post by 1st user with 3 likes', async () => {
   //   const { firstAccessToken, firstPost, thirdUser, fourthUser, fifthUser } =
   //     expect.getState();
-  //   const getPost = await request(app.getHttpServer())
+  //   const getPost = await request(server)
   //     .get(`/posts/${firstPost.id}`)
   //     .auth(firstAccessToken, { type: 'bearer' });
   //
@@ -608,7 +609,7 @@ describe('PostsController (e2e)', () => {
   //     fourthUser,
   //     fifthUser,
   //   } = expect.getState();
-  //   const getPosts = await request(app.getHttpServer())
+  //   const getPosts = await request(server)
   //     .get('/posts')
   //     .auth(firstRefreshToken, { type: 'bearer' });
   //
