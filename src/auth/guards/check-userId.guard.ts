@@ -9,7 +9,7 @@ export class CheckUserIdGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const refreshToken = this.extractTokenFromCookie(request);
+    const refreshToken = this.extractTokenFromHeaders(request);
     console.log({ refreshToken: refreshToken });
     if (!refreshToken) {
       request['userId'] = null;
@@ -22,15 +22,7 @@ export class CheckUserIdGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromCookie(request: Request): string | null {
-    // if (request.cookies && request.cookies.refreshToken) {
-    //   return request.cookies.refreshToken;
-    // }
-    // if (request.headers.authorization) {
-    //   return request.headers.authorization;
-    // } else {
-    //   return null;
-    // }
+  private extractTokenFromHeaders(request: Request): string | null {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : null;
   }
