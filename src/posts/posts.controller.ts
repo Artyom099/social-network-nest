@@ -85,7 +85,7 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    //todo - как здесь сначла проверять наличие поста по postId, а потом валидировать данные?
+    //todo - как здесь сначла проверять наличие поста по postId, а потом валидировать данные? test 11
     const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');

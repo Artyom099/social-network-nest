@@ -294,6 +294,7 @@ describe('PostsController (e2e)', () => {
   //     .auth(firstAccessToken, { type: 'bearer' })
   //     .expect(HttpStatus.NOT_FOUND);
   // });
+
   it('12 – PUT:/posts/:id – return 204 & update post', async () => {
     const firstUpdatePost = {
       title: 'valid-title-update',
@@ -321,15 +322,48 @@ describe('PostsController (e2e)', () => {
       .auth(firstAccessToken, { type: 'bearer' })
       .expect(HttpStatus.NOT_FOUND);
   });
-  // it('14 – DELETE:/posts/:id – return 204 & delete post', async () => {
-  //   const { firstPost, firstAccessToken } = expect.getState();
-  //   await request(server)
-  //     .delete(`/posts/${firstPost.id}`)
-  //     .auth(firstAccessToken, { type: 'bearer' })
-  //     .expect(HttpStatus.NO_CONTENT);
-  // });
+  it('14 – DELETE:/posts/:id – return 204 & delete post', async () => {
+    const { firstPost, firstAccessToken } = expect.getState();
+    await request(server)
+      .delete(`/posts/${firstPost.id}`)
+      .auth(firstAccessToken, { type: 'bearer' })
+      .expect(HttpStatus.NO_CONTENT);
+  });
 
-  it('15 – PUT:/posts/:id/like-status – return 204 & set like', async () => {
+  it('15 – POST:/posts – return 201 & create post by 1st user', async () => {
+    const { firstCreatedBlog, firstPost } = expect.getState();
+
+    const createPostResponse = await request(server)
+      .post('/posts')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({
+        title: firstPost.title,
+        shortDescription: firstPost.shortDescription,
+        content: firstPost.content,
+        blogId: firstCreatedBlog.id,
+      });
+    expect(createPostResponse).toBeDefined();
+    expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
+    expect(createPostResponse.body).toEqual({
+      id: expect.any(String),
+      title: firstPost.title,
+      shortDescription: firstPost.shortDescription,
+      content: firstPost.content,
+      blogId: firstCreatedBlog.id,
+      blogName: firstCreatedBlog.name,
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: LikeStatus.None,
+        newestLikes: [],
+      },
+    });
+    expect.setState({ firstPost: createPostResponse.body });
+    // console.log({ firstPost: createPostResponse.body });
+  });
+
+  it('16 – PUT:/posts/:id/like-status – return 204 & set like', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
     const setLike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
@@ -339,7 +373,7 @@ describe('PostsController (e2e)', () => {
     expect(setLike).toBeDefined();
     expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('16 – GET:/posts/:id – return 200 & get post with 1 like', async () => {
+  it('17 – GET:/posts/:id – return 200 & get post with 1 like', async () => {
     const {
       firstAccessToken,
       firstPost,
@@ -355,9 +389,9 @@ describe('PostsController (e2e)', () => {
     expect(getPost.status).toEqual(HttpStatus.OK);
     expect(getPost.body).toEqual({
       id: firstPost.id,
-      title: firstUpdatePost.title,
-      shortDescription: firstUpdatePost.shortDescription,
-      content: firstUpdatePost.content,
+      title: firstPost.title,
+      shortDescription: firstPost.shortDescription,
+      content: firstPost.content,
       blogId: firstPost.blogId,
       blogName: firstPost.blogName,
       createdAt: firstPost.createdAt,
@@ -375,7 +409,7 @@ describe('PostsController (e2e)', () => {
       },
     });
   });
-  it('17 – PUT: /posts/:id/like-status – return 204 & set dislike', async () => {
+  it('18 – PUT:/posts/:id/like-status – return 204 & set dislike', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
     const setDislike = await request(server)
       .put(`/posts/${firstPost.id}/like-status`)
@@ -385,7 +419,7 @@ describe('PostsController (e2e)', () => {
     expect(setDislike).toBeDefined();
     expect(setDislike.status).toEqual(HttpStatus.NO_CONTENT);
   });
-  it('18 – GET: /posts/:id – return 200 & get post with 1 dislike', async () => {
+  it('19 – GET:/posts/:id – return 200 & get post with 1 dislike', async () => {
     const { firstAccessToken, firstPost } = expect.getState();
     const getPost = await request(server)
       .get(`/posts/${firstPost.id}`)
@@ -409,252 +443,237 @@ describe('PostsController (e2e)', () => {
       },
     });
   });
+  it('20 – PUT:/posts/:id/like-status – return 204 & delete dislike', async () => {
+    const { firstAccessToken, firstPost } = expect.getState();
+    const setNone = await request(server)
+      .put(`/posts/${firstPost.id}/like-status`)
+      .auth(firstAccessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatus.None });
 
-  // it('19 – PUT: /posts/:id/like-status – return 204 & delete dislike', async () => {
-  //   const { firstAccessToken, firstPost } = expect.getState();
-  //   const setNone = await request(server)
-  //     .put(`/posts/${firstPost.id}/like-status`)
-  //     .auth(firstAccessToken, { type: 'bearer' })
-  //     .send({ likeStatus: LikeStatus.None });
-  //
-  //   expect(setNone).toBeDefined();
-  //   expect(setNone.status).toEqual(HttpStatus.NO_CONTENT);
-  // });
-  // it('20 – GET: /posts/:id – return 200 & get post', async () => {
-  //   const { firstAccessToken, firstPost } = expect.getState();
-  //   const getPost = await request(server)
-  //     .get(`/posts/${firstPost.id}`)
-  //     .auth(firstAccessToken, { type: 'bearer' });
-  //
-  //   expect(getPost).toBeDefined();
-  //   expect(getPost.status).toEqual(HttpStatus.OK);
-  //   expect(getPost.body).toEqual({
-  //     id: firstPost.id,
-  //     title: firstPost.title,
-  //     shortDescription: firstPost.shortDescription,
-  //     content: firstPost.content,
-  //     blogId: firstPost.blogId,
-  //     blogName: firstPost.blogName,
-  //     createdAt: firstPost.createdAt,
-  //     extendedLikesInfo: {
-  //       likesCount: 0,
-  //       dislikesCount: 0,
-  //       myStatus: LikeStatus.None,
-  //       newestLikes: [],
-  //     },
-  //   });
-  // });
+    expect(setNone).toBeDefined();
+    expect(setNone.status).toEqual(HttpStatus.NO_CONTENT);
+  });
+  it('21 – GET:/posts/:id – return 200 & get post', async () => {
+    const { firstAccessToken, firstPost } = expect.getState();
+    const getPost = await request(server)
+      .get(`/posts/${firstPost.id}`)
+      .auth(firstAccessToken, { type: 'bearer' });
 
-  // it('17 – POST:/auth/login – return 200, 2nd user login and refreshToken', async () => {
-  //   const { secondUser } = expect.getState();
-  //   const secondLoginResponse = await request(server)
-  //     .post('/auth/login')
-  //     .send({
-  //       loginOrEmail: secondUser.login,
-  //       password: secondUser.password,
-  //     });
-  //
-  //   expect(secondLoginResponse).toBeDefined();
-  //   expect(secondLoginResponse.status).toBe(HttpStatus.OK);
-  //   expect(secondLoginResponse.body).toEqual({
-  //     accessToken: expect.any(String),
-  //   });
-  //   const { accessToken } = secondLoginResponse.body;
-  //
-  //   expect.setState({ secondAccessToken: accessToken });
-  // });
-  // it('18 – POST: /auth/login – return 200, 3rd user login and refreshToken', async () => {
-  //   const { thirdUser } = expect.getState();
-  //   const thirdLoginResponse = await request(server)
-  //     .post('/auth/login')
-  //     .send({
-  //       loginOrEmail: thirdUser.login,
-  //       password: thirdUser.password,
-  //     });
-  //
-  //   expect(thirdLoginResponse).toBeDefined();
-  //   expect(thirdLoginResponse.status).toBe(HttpStatus.OK);
-  //   expect(thirdLoginResponse.body).toEqual({
-  //     accessToken: expect.any(String),
-  //   });
-  //   const { accessToken } = thirdLoginResponse.body;
-  //
-  //   expect.setState({ thirdAccessToken: accessToken });
-  // });
-  // it('19 – POST: /auth/login – return 200, 4th user login and refreshToken', async () => {
-  //   const { fourthUser } = expect.getState();
-  //   const fourthLoginResponse = await request(server)
-  //     .post('/auth/login')
-  //     .send({
-  //       loginOrEmail: fourthUser.login,
-  //       password: fourthUser.password,
-  //     });
-  //
-  //   expect(fourthLoginResponse).toBeDefined();
-  //   expect(fourthLoginResponse.status).toBe(HttpStatus.OK);
-  //   expect(fourthLoginResponse.body).toEqual({
-  //     accessToken: expect.any(String),
-  //   });
-  //   const { accessToken } = fourthLoginResponse.body;
-  //
-  //   expect.setState({ fourthAccessToken: accessToken });
-  // });
-  // it('20 – POST: /auth/login – return 200, 5th user login and refreshToken', async () => {
-  //   const { fifthUser } = expect.getState();
-  //   const fifthLoginResponse = await request(server)
-  //     .post('/auth/login')
-  //     .send({
-  //       loginOrEmail: fifthUser.login,
-  //       password: fifthUser.password,
-  //     });
-  //
-  //   expect(fifthLoginResponse).toBeDefined();
-  //   expect(fifthLoginResponse.status).toBe(HttpStatus.OK);
-  //   expect(fifthLoginResponse.body).toEqual({
-  //     accessToken: expect.any(String),
-  //   });
-  //   const { accessToken } = fifthLoginResponse.body;
-  //
-  //   expect.setState({ fifthAccessToken: accessToken });
-  // });
+    expect(getPost).toBeDefined();
+    expect(getPost.status).toEqual(HttpStatus.OK);
+    expect(getPost.body).toEqual({
+      id: firstPost.id,
+      title: firstPost.title,
+      shortDescription: firstPost.shortDescription,
+      content: firstPost.content,
+      blogId: firstPost.blogId,
+      blogName: firstPost.blogName,
+      createdAt: firstPost.createdAt,
+      extendedLikesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: LikeStatus.None,
+        newestLikes: [],
+      },
+    });
+  });
 
-  // it('21 – PUT:/posts/:id/like-status – return 204 & set like by 2nd user', async () => {
-  //   const { secondAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(server)
-  //     .put(`/posts/${firstPost.id}/like-status`)
-  //     .auth(secondAccessToken, { type: 'bearer' })
-  //     .send({ likeStatus: LikeStatus.Like });
-  //
-  //   expect(setLike).toBeDefined();
-  //   expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
-  // });
-  // it('22 – PUT: /posts/:id/like-status – return 204 & set like by 3rd user', async () => {
-  //   const { thirdAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(server)
-  //     .put(`/posts/${firstPost.id}/like-status`)
-  //     .auth(thirdAccessToken, { type: 'bearer' })
-  //     .send({ likeStatus: LikeStatus.Like });
-  //
-  //   expect(setLike).toBeDefined();
-  //   expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
-  // });
-  // it('23 – PUT: /posts/:id/like-status – return 204 & set like by 4th user', async () => {
-  //   const { fourthAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(server)
-  //     .put(`/posts/${firstPost.id}/like-status`)
-  //     .auth(fourthAccessToken, { type: 'bearer' })
-  //     .send({ likeStatus: LikeStatus.Like });
-  //
-  //   expect(setLike).toBeDefined();
-  //   expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
-  // });
-  // it('24 – PUT: /posts/:id/like-status – return 204 & set like by 5th user', async () => {
-  //   const { fifthAccessToken, firstPost } = expect.getState();
-  //   const setLike = await request(server)
-  //     .put(`/posts/${firstPost.id}/like-status`)
-  //     .auth(fifthAccessToken, { type: 'bearer' })
-  //     .send({ likeStatus: LikeStatus.Like });
-  //
-  //   expect(setLike).toBeDefined();
-  //   expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
-  // });
-  //
-  // it('25 – GET: /posts/:id – return 200 & get post by 1st user with 3 likes', async () => {
-  //   const { firstAccessToken, firstPost, thirdUser, fourthUser, fifthUser } =
-  //     expect.getState();
-  //   const getPost = await request(server)
-  //     .get(`/posts/${firstPost.id}`)
-  //     .auth(firstAccessToken, { type: 'bearer' });
-  //
-  //   expect(getPost).toBeDefined();
-  //   expect(getPost.status).toEqual(HttpStatus.OK);
-  //   expect(getPost.body).toEqual({
-  //     id: firstPost.id,
-  //     title: firstPost.title,
-  //     shortDescription: firstPost.shortDescription,
-  //     content: firstPost.content,
-  //     blogId: firstPost.blogId,
-  //     blogName: firstPost.blogName,
-  //     createdAt: firstPost.createdAt,
-  //     extendedLikesInfo: {
-  //       likesCount: 4,
-  //       dislikesCount: 0,
-  //       myStatus: LikeStatus.None,
-  //       newestLikes: [
-  //         {
-  //           addedAt: expect.any(String),
-  //           userId: expect.any(String),
-  //           login: fifthUser.login,
-  //         },
-  //         {
-  //           addedAt: expect.any(String),
-  //           userId: expect.any(String),
-  //           login: fourthUser.login,
-  //         },
-  //         {
-  //           addedAt: expect.any(String),
-  //           userId: expect.any(String),
-  //           login: thirdUser.login,
-  //         },
-  //       ],
-  //     },
-  //   });
-  // });
-  // it('26 – GET: /posts – return 200 and post by 1st user with 3 likes', async () => {
-  //   const {
-  //     firstRefreshToken,
-  //     firstPost,
-  //     blogId,
-  //     thirdUser,
-  //     fourthUser,
-  //     fifthUser,
-  //   } = expect.getState();
-  //   const getPosts = await request(server)
-  //     .get('/posts')
-  //     .auth(firstRefreshToken, { type: 'bearer' });
-  //
-  //   expect(getPosts).toBeDefined();
-  //   expect(getPosts.status).toEqual(HttpStatus.OK);
-  //   expect(getPosts.body).toEqual({
-  //     pagesCount: 1,
-  //     page: 1,
-  //     pageSize: 10,
-  //     totalCount: 1,
-  //     items: [
-  //       {
-  //         id: firstPost.id,
-  //         title: firstPost.title,
-  //         shortDescription: firstPost.shortDescription,
-  //         content: firstPost.content,
-  //         blogId,
-  //         blogName: firstPost.blogName,
-  //         createdAt: firstPost.createdAt,
-  //         extendedLikesInfo: {
-  //           likesCount: 4,
-  //           dislikesCount: 0,
-  //           myStatus: firstPost.extendedLikesInfo.myStatus,
-  //           newestLikes: [
-  //             {
-  //               addedAt: expect.any(String),
-  //               userId: expect.any(String),
-  //               login: fifthUser.login,
-  //             },
-  //             {
-  //               addedAt: expect.any(String),
-  //               userId: expect.any(String),
-  //               login: fourthUser.login,
-  //             },
-  //             {
-  //               addedAt: expect.any(String),
-  //               userId: expect.any(String),
-  //               login: thirdUser.login,
-  //             },
-  //           ],
-  //         },
-  //       },
-  //     ],
-  //   });
-  // });
+  it('22 – POST:/auth/login – return 200, 2nd user login and refreshToken', async () => {
+    const { secondUser } = expect.getState();
+    const secondLoginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: secondUser.login,
+      password: secondUser.password,
+    });
+
+    expect(secondLoginResponse).toBeDefined();
+    expect(secondLoginResponse.status).toBe(HttpStatus.OK);
+    expect(secondLoginResponse.body).toEqual({
+      accessToken: expect.any(String),
+    });
+    const { accessToken } = secondLoginResponse.body;
+
+    expect.setState({ secondAccessToken: accessToken });
+  });
+  it('23 – POST:/auth/login – return 200, 3rd user login and refreshToken', async () => {
+    const { thirdUser } = expect.getState();
+    const thirdLoginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: thirdUser.login,
+      password: thirdUser.password,
+    });
+
+    expect(thirdLoginResponse).toBeDefined();
+    expect(thirdLoginResponse.status).toBe(HttpStatus.OK);
+    expect(thirdLoginResponse.body).toEqual({
+      accessToken: expect.any(String),
+    });
+    const { accessToken } = thirdLoginResponse.body;
+
+    expect.setState({ thirdAccessToken: accessToken });
+  });
+  it('24 – POST:/auth/login – return 200, 4th user login and refreshToken', async () => {
+    const { fourthUser } = expect.getState();
+    const fourthLoginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: fourthUser.login,
+      password: fourthUser.password,
+    });
+
+    expect(fourthLoginResponse).toBeDefined();
+    expect(fourthLoginResponse.status).toBe(HttpStatus.OK);
+    expect(fourthLoginResponse.body).toEqual({
+      accessToken: expect.any(String),
+    });
+    const { accessToken } = fourthLoginResponse.body;
+
+    expect.setState({ fourthAccessToken: accessToken });
+  });
+  it('25 – POST:/auth/login – return 200, 5th user login and refreshToken', async () => {
+    const { fifthUser } = expect.getState();
+    const fifthLoginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: fifthUser.login,
+      password: fifthUser.password,
+    });
+
+    expect(fifthLoginResponse).toBeDefined();
+    expect(fifthLoginResponse.status).toBe(HttpStatus.OK);
+    expect(fifthLoginResponse.body).toEqual({
+      accessToken: expect.any(String),
+    });
+    const { accessToken } = fifthLoginResponse.body;
+
+    expect.setState({ fifthAccessToken: accessToken });
+  });
+
+  it('26 – PUT:/posts/:id/like-status – return 204 & set like by 2nd user', async () => {
+    const { secondAccessToken, firstPost } = expect.getState();
+    const setLike = await request(server)
+      .put(`/posts/${firstPost.id}/like-status`)
+      .auth(secondAccessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatus.Like });
+
+    expect(setLike).toBeDefined();
+    expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
+  });
+  it('27 – PUT:/posts/:id/like-status – return 204 & set like by 3rd user', async () => {
+    const { thirdAccessToken, firstPost } = expect.getState();
+    const setLike = await request(server)
+      .put(`/posts/${firstPost.id}/like-status`)
+      .auth(thirdAccessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatus.Like });
+
+    expect(setLike).toBeDefined();
+    expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
+  });
+  it('28 – PUT:/posts/:id/like-status – return 204 & set like by 4th user', async () => {
+    const { fourthAccessToken, firstPost } = expect.getState();
+    const setLike = await request(server)
+      .put(`/posts/${firstPost.id}/like-status`)
+      .auth(fourthAccessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatus.Like });
+
+    expect(setLike).toBeDefined();
+    expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
+  });
+  it('29 – PUT:/posts/:id/like-status – return 204 & set like by 5th user', async () => {
+    const { fifthAccessToken, firstPost } = expect.getState();
+    const setLike = await request(server)
+      .put(`/posts/${firstPost.id}/like-status`)
+      .auth(fifthAccessToken, { type: 'bearer' })
+      .send({ likeStatus: LikeStatus.Like });
+
+    expect(setLike).toBeDefined();
+    expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
+  });
+
+  it('30 – GET:/posts/:id – return 200 & get post by 1st user with 3 likes', async () => {
+    const { firstAccessToken, firstPost, thirdUser, fourthUser, fifthUser } =
+      expect.getState();
+    const getPost = await request(server)
+      .get(`/posts/${firstPost.id}`)
+      .auth(firstAccessToken, { type: 'bearer' });
+
+    expect(getPost).toBeDefined();
+    expect(getPost.status).toEqual(HttpStatus.OK);
+    expect(getPost.body).toEqual({
+      id: firstPost.id,
+      title: firstPost.title,
+      shortDescription: firstPost.shortDescription,
+      content: firstPost.content,
+      blogId: firstPost.blogId,
+      blogName: firstPost.blogName,
+      createdAt: firstPost.createdAt,
+      extendedLikesInfo: {
+        likesCount: 4,
+        dislikesCount: 0,
+        myStatus: LikeStatus.None,
+        newestLikes: [
+          {
+            addedAt: expect.any(String),
+            userId: expect.any(String),
+            login: fifthUser.login,
+          },
+          {
+            addedAt: expect.any(String),
+            userId: expect.any(String),
+            login: fourthUser.login,
+          },
+          {
+            addedAt: expect.any(String),
+            userId: expect.any(String),
+            login: thirdUser.login,
+          },
+        ],
+      },
+    });
+  });
+  it('31 – GET:/posts – return 200 and post by 1st user with 3 likes', async () => {
+    const { firstRefreshToken, firstPost, thirdUser, fourthUser, fifthUser } =
+      expect.getState();
+    const getPosts = await request(server)
+      .get('/posts')
+      .auth(firstRefreshToken, { type: 'bearer' });
+
+    expect(getPosts).toBeDefined();
+    expect(getPosts.status).toEqual(HttpStatus.OK);
+    expect(getPosts.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          id: firstPost.id,
+          title: firstPost.title,
+          shortDescription: firstPost.shortDescription,
+          content: firstPost.content,
+          blogId: firstPost.blogId,
+          blogName: firstPost.blogName,
+          createdAt: firstPost.createdAt,
+          extendedLikesInfo: {
+            likesCount: 4,
+            dislikesCount: 0,
+            myStatus: firstPost.extendedLikesInfo.myStatus,
+            newestLikes: [
+              {
+                addedAt: expect.any(String),
+                userId: expect.any(String),
+                login: fifthUser.login,
+              },
+              {
+                addedAt: expect.any(String),
+                userId: expect.any(String),
+                login: fourthUser.login,
+              },
+              {
+                addedAt: expect.any(String),
+                userId: expect.any(String),
+                login: thirdUser.login,
+              },
+            ],
+          },
+        },
+      ],
+    });
+  });
 
   afterAll(async () => {
     await app.close();
