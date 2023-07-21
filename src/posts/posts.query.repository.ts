@@ -57,6 +57,7 @@ export class PostsQueryRepository {
   }
 
   async getSortedPosts(
+    currentUserId: string | null,
     pageNumber: number,
     pageSize: number,
     sortBy: string,
@@ -71,13 +72,12 @@ export class PostsQueryRepository {
       .lean()
       .exec();
     const items = sortedPosts.map((p) => {
-      const myStatus = LikeStatus.None;
+      let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: NewestLikesViewModel[] = [];
-      // todo - как узнать currentUserId без мидлвейр?
       p.extendedLikesInfo.forEach((s: ExtendedLikesInfoDBModel) => {
-        // if (s.userId === currentUserId) myStatus = s.status;
+        if (s.userId === currentUserId) myStatus = s.status;
         if (s.status === LikeStatus.Dislike) dislikesCount++;
         if (s.status === LikeStatus.Like) {
           likesCount++;
@@ -117,6 +117,7 @@ export class PostsQueryRepository {
   }
 
   async getSortedPostsCurrentBlog(
+    currentUserId: string | null,
     blogId: string,
     pageNumber: number,
     pageSize: number,
@@ -133,13 +134,12 @@ export class PostsQueryRepository {
       .lean()
       .exec();
     const items = sortedPosts.map((p) => {
-      const myStatus = LikeStatus.None;
+      let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: any[] = [];
-      // todo - как узнать currentUserId без мидлвейр?
       p.extendedLikesInfo.forEach((s: ExtendedLikesInfoDBModel) => {
-        // if (s.userId === currentUserId) myStatus = s.status;
+        if (s.userId === currentUserId) myStatus = s.status;
         if (s.status === LikeStatus.Dislike) dislikesCount++;
         if (s.status === LikeStatus.Like) {
           likesCount++;

@@ -13,6 +13,7 @@ export class CommentsQueryRepository {
   ) {}
 
   async getCommentsCurrentPost(
+    currentUserId: string | null,
     postId: string,
     pageNumber: number,
     pageSize: number,
@@ -29,12 +30,11 @@ export class CommentsQueryRepository {
       .lean()
       .exec();
     const items = sortedComments.map((c) => {
-      const myStatus = LikeStatus.None;
+      let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
-      // todo - как узнать currentUserId без мидлвейр?
       c.likesInfo.forEach((s) => {
-        // if (s.userId === currentUserId) myStatus = s.status;
+        if (s.userId === currentUserId) myStatus = s.status;
         if (s.status === LikeStatus.Like) likesCount++;
         if (s.status === LikeStatus.Dislike) dislikesCount++;
       });
@@ -42,8 +42,8 @@ export class CommentsQueryRepository {
         id: c.id,
         content: c.content,
         commentatorInfo: {
-          userId: c.commentatorIno.userId,
-          userLogin: c.commentatorIno.userLogin,
+          userId: c.commentatorInfo.userId,
+          userLogin: c.commentatorInfo.userLogin,
         },
         createdAt: c.createdAt,
         likesInfo: {

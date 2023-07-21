@@ -287,13 +287,23 @@ describe('PostsController (e2e)', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  // it('11 – PUT:/posts/:id – return 404 with not existing postId', async () => {
-  //   const { firstAccessToken } = expect.getState();
-  //   await request(server)
-  //     .put('/posts/123')
-  //     .auth(firstAccessToken, { type: 'bearer' })
-  //     .expect(HttpStatus.NOT_FOUND);
-  // });
+  it('11 – PUT:/posts/:id – return 404 with not existing postId', async () => {
+    const { firstAccessToken } = expect.getState();
+    const firstUpdatePost = {
+      title: 'valid-title-update',
+      shortDescription: 'valid-shortDescription-update',
+      content: 'valid-content-update',
+    };
+    await request(server)
+      .put('/posts/123')
+      .auth(firstAccessToken, { type: 'bearer' })
+      .send({
+        title: firstUpdatePost.title,
+        shortDescription: firstUpdatePost.shortDescription,
+        content: firstUpdatePost.content,
+      })
+      .expect(HttpStatus.NOT_FOUND);
+  });
 
   it('12 – PUT:/posts/:id – return 204 & update post', async () => {
     const firstUpdatePost = {
@@ -374,13 +384,8 @@ describe('PostsController (e2e)', () => {
     expect(setLike.status).toEqual(HttpStatus.NO_CONTENT);
   });
   it('17 – GET:/posts/:id – return 200 & get post with 1 like', async () => {
-    const {
-      firstAccessToken,
-      firstPost,
-      firstUpdatePost,
-      firstUser,
-      firstCreatedUser,
-    } = expect.getState();
+    const { firstAccessToken, firstPost, firstUser, firstCreatedUser } =
+      expect.getState();
     const getPost = await request(server)
       .get(`/posts/${firstPost.id}`)
       .auth(firstAccessToken, { type: 'bearer' });

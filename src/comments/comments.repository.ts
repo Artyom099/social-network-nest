@@ -15,15 +15,17 @@ export class CommentsRepository {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
   ) {}
 
-  async getComment(id: string): Promise<CommentViewModel | null> {
+  async getComment(
+    id: string,
+    currentUserId?: string | null,
+  ): Promise<CommentViewModel | null> {
     const comment = await this.commentModel.findOne({ id }).exec();
     if (!comment) return null;
-    const myStatus = LikeStatus.None;
+    let myStatus = LikeStatus.None;
     let likesCount = 0;
     let dislikesCount = 0;
-    // todo - как узнать currentUserId без мидлвейр?
     comment.likesInfo.forEach((s) => {
-      // if (s.userId === currentUserId) myStatus = s.status;
+      if (s.userId === currentUserId) myStatus = s.status;
       if (s.status === LikeStatus.Like) likesCount++;
       if (s.status === LikeStatus.Dislike) dislikesCount++;
     });
@@ -31,8 +33,8 @@ export class CommentsRepository {
       id: comment.id,
       content: comment.content,
       commentatorInfo: {
-        userId: comment.commentatorIno.userId,
-        userLogin: comment.commentatorIno.userLogin,
+        userId: comment.commentatorInfo.userId,
+        userLogin: comment.commentatorInfo.userLogin,
       },
       createdAt: comment.createdAt,
       likesInfo: {
@@ -42,10 +44,11 @@ export class CommentsRepository {
       },
     };
   }
+
   async createComment(
     createdComment: CommentDBModel,
   ): Promise<CommentViewModel> {
-    await this.commentModel.insertMany(createdComment);
+    await this.commentModel.create(createdComment);
     return {
       id: createdComment.id,
       content: createdComment.content,
@@ -61,6 +64,7 @@ export class CommentsRepository {
       },
     };
   }
+
   async updateComment(id: string, content: CommentInputModel) {
     await this.commentModel.updateOne({ id }, { content });
   }
@@ -69,17 +73,16 @@ export class CommentsRepository {
   }
   async updateCommentLikes(
     id: string,
+    currentUserId: string,
     newLikeStatus: LikeStatus,
   ): Promise<boolean> {
-    const currentUserId = 'mock';
-
     const comment = await this.commentModel.findOne({ id });
     if (!comment) return false;
-    // если юзер есть в массиве, обновляем его статус
+    // если юзер есть в массиве likesInfo, обновляем его статус
     for (const s of comment.likesInfo) {
       if (s.userId === currentUserId) {
         if (s.status === newLikeStatus) return true;
-        const result = await this.commentModel.updateOne(
+        await this.commentModel.updateOne(
           { id },
           {
             likesInfo: {
@@ -88,11 +91,11 @@ export class CommentsRepository {
             },
           },
         );
-        return result.modifiedCount === 1;
+        return true;
       }
     }
     // иначе добавляем юзера и его статус в массив
-    const result = await this.commentModel.updateOne(
+    await this.commentModel.updateOne(
       { id },
       {
         $addToSet: {
@@ -100,6 +103,6 @@ export class CommentsRepository {
         },
       },
     );
-    return result.modifiedCount === 1;
+    return true;
   }
 }

@@ -1,8 +1,6 @@
 import { IsNotEmpty, IsString, IsUrl, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-//todo - не работает валидация данных на пост и пут
-
 export class BlogInputModel {
   @IsString()
   @IsNotEmpty()

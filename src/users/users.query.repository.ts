@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 @Injectable()
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
   getViewModel(user): UserViewModel {
     return {
       id: user.id,

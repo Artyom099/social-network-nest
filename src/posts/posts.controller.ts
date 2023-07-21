@@ -24,6 +24,7 @@ import { BearerAuthGuard } from '../auth/guards/bearer-auth.guard';
 import { CommentInputModel } from '../comments/comments.models';
 import { CommentsService } from '../comments/comments.service';
 import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
+import { UsersQueryRepository } from '../users/users.query.repository';
 
 @Controller('posts')
 export class PostsController {
@@ -32,18 +33,20 @@ export class PostsController {
     private blogService: BlogsService,
     private commentsService: CommentsService,
     private postsQueryRepository: PostsQueryRepository,
+    private usersQueryRepository: UsersQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @Get()
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
-  async getPosts(@Query() query: GetItemsWithPaging) {
+  async getPosts(@Req() req, @Query() query: GetItemsWithPaging) {
     const pageNumber = query.pageNumber ?? 1;
     const pageSize = query.pageSize ?? 10;
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
     return this.postsQueryRepository.getSortedPosts(
+      req.userId,
       Number(pageNumber),
       Number(pageSize),
       sortBy,
@@ -84,7 +87,6 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    //todo - как здесь сначла проверять наличие поста по postId, а потом валидировать данные? test 11
     const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
@@ -109,6 +111,7 @@ export class PostsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getCommentsCurrentPost(
+    @Req() req,
     @Param('id') postId: string,
     @Query() query: GetItemsWithPaging,
   ) {
@@ -121,6 +124,7 @@ export class PostsController {
       const sortBy = query.sortBy ?? SortBy.default;
       const sortDirection = query.sortDirection ?? SortDirection.default;
       return this.commentsQueryRepository.getCommentsCurrentPost(
+        req.userId,
         postId,
         Number(pageNumber),
         Number(pageSize),
@@ -133,7 +137,7 @@ export class PostsController {
   @Post(':id/comments')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.CREATED)
-  async createComment(
+  async createCommentCurrentPost(
     @Req() req,
     @Param('id') postId: string,
     @Body() inputModel: CommentInputModel,
@@ -141,14 +145,16 @@ export class PostsController {
     const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
+    }
+    const user = await this.usersQueryRepository.getUserById(req.userId);
+    if (!user) {
+      throw new NotFoundException('user not found');
     } else {
-      const userId = req.userId;
-      const userLogin = 'mock'; //todo-как и где искать userLogin
       return this.commentsService.createComment(
         postId,
-        inputModel,
-        userId,
-        userLogin,
+        inputModel.content,
+        user.id,
+        user.login,
       );
     }
   }

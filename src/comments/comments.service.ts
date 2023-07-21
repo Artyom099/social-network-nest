@@ -12,13 +12,16 @@ import { randomUUID } from 'crypto';
 export class CommentsService {
   constructor(protected commentsRepository: CommentsRepository) {}
 
-  async getComment(commentId: string): Promise<CommentViewModel | null> {
-    return this.commentsRepository.getComment(commentId);
+  async getComment(
+    commentId: string,
+    currentUserId?: string | null,
+  ): Promise<CommentViewModel | null> {
+    return this.commentsRepository.getComment(commentId, currentUserId);
   }
 
   async createComment(
     postId: string,
-    content: CommentInputModel,
+    content: string,
     userId: string,
     userLogin: string,
   ): Promise<CommentViewModel> {
@@ -44,7 +47,15 @@ export class CommentsService {
     await this.commentsRepository.deleteComment(commentId);
   }
 
-  async updateCommentLikes(commentId: string, likeStatus: LikeStatus) {
-    return this.commentsRepository.updateCommentLikes(commentId, likeStatus);
+  async updateCommentLikes(
+    commentId: string,
+    currentUserId: string,
+    likeStatus: LikeStatus,
+  ) {
+    return this.commentsRepository.updateCommentLikes(
+      commentId,
+      currentUserId,
+      likeStatus,
+    );
   }
 }

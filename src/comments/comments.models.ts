@@ -1,5 +1,5 @@
 import { LikeStatus } from '../utils/constants';
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CommentInputModel {
@@ -8,6 +8,13 @@ export class CommentInputModel {
   @Length(20, 300)
   @Transform(({ value }) => value?.trim())
   content: string;
+}
+
+export class LikeStatusInputModel {
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(LikeStatus)
+  likeStatus: LikeStatus;
 }
 
 export type CommentDBModel = {

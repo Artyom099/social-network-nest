@@ -31,7 +31,7 @@ export class Comment {
   @Prop({ required: true })
   content: string;
   @Prop({ type: CommentatorInfoSchema, required: true })
-  commentatorIno: CommentatorInfo;
+  commentatorInfo: CommentatorInfo;
   @Prop({ required: true })
   createdAt: string;
   @Prop({ type: [LikesInfoSchema], required: true })

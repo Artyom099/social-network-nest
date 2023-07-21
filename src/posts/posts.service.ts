@@ -33,7 +33,6 @@ export class PostsService {
     userId: string,
     likeStatus: LikeStatus,
   ) {
-    //todo - нормально, что PostsService лезет в usersRepository?
     const user = await this.usersRepository.getUserById(userId);
     const addedAt = new Date();
     return this.postsRepository.updatePostLikes(

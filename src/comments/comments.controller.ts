@@ -3,39 +3,51 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
-import { CommentInputModel, CommentViewModel } from './comments.models';
-import { LikeStatus } from '../utils/constants';
+import {
+  CommentInputModel,
+  CommentViewModel,
+  LikeStatusInputModel,
+} from './comments.models';
 import { BearerAuthGuard } from '../auth/guards/bearer-auth.guard';
+import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 
 @Controller('comments')
 export class CommentsController {
   constructor(protected commentsService: CommentsService) {}
 
-  @Get()
+  @Get(':id')
+  @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getComment(
+    @Req() req,
     @Param('id') commentId: string,
   ): Promise<CommentViewModel | null> {
-    const foundComment = await this.commentsService.getComment(commentId);
+    const foundComment = await this.commentsService.getComment(
+      commentId,
+      req.userId,
+    );
     if (!foundComment) {
       throw new NotFoundException();
     } else {
-      return this.commentsService.getComment(commentId);
+      return foundComment;
     }
   }
 
-  @Put()
+  @Put(':id')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateComment(
+    @Req() req,
     @Param('id') commentId: string,
     @Body() content: CommentInputModel,
   ) {
@@ -43,34 +55,47 @@ export class CommentsController {
     if (!foundComment) {
       throw new NotFoundException();
     }
-    //todo - добавить проверку юзер айди найденного коммента - FORBIDDEN_403
+    if (req.userId !== foundComment.commentatorInfo.userId) {
+      throw new ForbiddenException();
+    }
     return this.commentsService.updateComment(commentId, content);
   }
 
-  @Delete()
+  @Delete(':id')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteComment(@Param('id') commentId: string) {
-    const foundComment = await this.commentsService.getComment(commentId);
+  async deleteComment(@Req() req, @Param('id') commentId: string) {
+    const foundComment = await this.commentsService.getComment(
+      commentId,
+      req.userId,
+    );
     if (!foundComment) {
       throw new NotFoundException();
     }
-    //todo - добавить проверку юзер айди найденного коммента - FORBIDDEN_403
+    if (req.userId !== foundComment.commentatorInfo.userId) {
+      throw new ForbiddenException();
+    }
     return this.commentsService.deleteComment(commentId);
   }
 
-  @Put()
+  @Put(':id/like-status')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
+    @Req() req,
     @Param('id') commentId: string,
-    @Body() likeStatus: LikeStatus,
+    @Body() InputModel: LikeStatusInputModel,
   ) {
     const foundComment = await this.commentsService.getComment(commentId);
+    console.log({ foundComment: foundComment });
     if (!foundComment) {
       throw new NotFoundException();
     } else {
-      return this.commentsService.updateCommentLikes(commentId, likeStatus);
+      return this.commentsService.updateCommentLikes(
+        commentId,
+        req.userId,
+        InputModel.likeStatus,
+      );
     }
   }
 }

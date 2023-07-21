@@ -10,6 +10,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { BlogInputModel } from './blogs.models';
@@ -24,7 +25,6 @@ import { BlogsQueryRepository } from './blogs.query.repository';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
 import { SortBy, SortDirection } from '../utils/constants';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
-import { CookieGuard } from '../auth/guards/cookie.guard';
 import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 
 @Controller('blogs')
@@ -102,6 +102,7 @@ export class BlogsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getPostsCurrentBlog(
+    @Req() req,
     @Param('id') blogId: string,
     @Query() query: GetItemsWithPaging,
   ) {
@@ -114,6 +115,7 @@ export class BlogsController {
       const sortBy = query.sortBy ?? SortBy.default;
       const sortDirection = query.sortDirection ?? SortDirection.default;
       return this.postsQueryRepository.getSortedPostsCurrentBlog(
+        req.userId,
         blogId,
         Number(pageNumber),
         Number(pageSize),
