@@ -9,6 +9,10 @@ import { Model } from 'mongoose';
 export class BlogsQueryRepository {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
+  async getBlog(id: string): Promise<BlogViewModel | null> {
+    return this.blogModel.findOne({ id }, { _id: 0 });
+  }
+
   async getSortedBlogs(
     searchNameTerm: string | null,
     pageNumber: number,
