@@ -28,6 +28,7 @@ import {
 import { CommentsService } from '../comments/comments.service';
 import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 import { UsersQueryRepository } from '../users/users.query.repository';
+import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -58,6 +59,7 @@ export class PostsController {
   }
 
   @Post()
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() inputModel: PostInputModelWithBlogId) {
     const foundBLog = await this.blogService.getBlog(inputModel.blogId);
@@ -84,7 +86,7 @@ export class PostsController {
   }
 
   @Put(':id')
-  @UseGuards(BearerAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
     @Param('id') postId: string,
@@ -99,7 +101,7 @@ export class PostsController {
   }
 
   @Delete(':id')
-  @UseGuards(BearerAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') postId: string) {
     const foundPost = await this.postsService.getPost(postId);
