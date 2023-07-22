@@ -19,9 +19,12 @@ import { PostInputModel, PostInputModelWithBlogId } from './posts.models';
 import { BlogsService } from '../blogs/blogs.service';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
-import { LikeStatus, SortBy, SortDirection } from '../utils/constants';
+import { SortBy, SortDirection } from '../utils/constants';
 import { BearerAuthGuard } from '../auth/guards/bearer-auth.guard';
-import { CommentInputModel } from '../comments/comments.models';
+import {
+  CommentInputModel,
+  LikeStatusInputModel,
+} from '../comments/comments.models';
 import { CommentsService } from '../comments/comments.service';
 import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 import { UsersQueryRepository } from '../users/users.query.repository';
@@ -165,14 +168,18 @@ export class PostsController {
   async updateLikeStatus(
     @Req() req,
     @Param('id') postId: string,
-    @Body() body: { likeStatus: LikeStatus },
+    @Body() inputModel: LikeStatusInputModel,
   ) {
     const foundPost = await this.postsService.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
       const userId = req.userId;
-      return this.postsService.updatePostLikes(postId, userId, body.likeStatus);
+      return this.postsService.updatePostLikes(
+        postId,
+        userId,
+        inputModel.likeStatus,
+      );
     }
   }
 }
