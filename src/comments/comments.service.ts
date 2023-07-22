@@ -39,7 +39,7 @@ export class CommentsService {
     return this.commentsRepository.createComment(createdComment);
   }
 
-  async updateComment(commentId: string, content: CommentInputModel) {
+  async updateComment(commentId: string, content: string) {
     await this.commentsRepository.updateComment(commentId, content);
   }
 

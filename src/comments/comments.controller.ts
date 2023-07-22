@@ -49,7 +49,7 @@ export class CommentsController {
   async updateComment(
     @Req() req,
     @Param('id') commentId: string,
-    @Body() content: CommentInputModel,
+    @Body() InputModel: CommentInputModel,
   ) {
     const foundComment = await this.commentsService.getComment(commentId);
     if (!foundComment) {
@@ -58,7 +58,7 @@ export class CommentsController {
     if (req.userId !== foundComment.commentatorInfo.userId) {
       throw new ForbiddenException();
     }
-    return this.commentsService.updateComment(commentId, content);
+    return this.commentsService.updateComment(commentId, InputModel.content);
   }
 
   @Delete(':id')

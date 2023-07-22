@@ -65,7 +65,7 @@ export class CommentsRepository {
     };
   }
 
-  async updateComment(id: string, content: CommentInputModel) {
+  async updateComment(id: string, content: string) {
     await this.commentModel.updateOne({ id }, { content });
   }
   async deleteComment(id: string) {
