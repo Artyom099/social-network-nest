@@ -18,11 +18,11 @@ export const appSettings = (app: INestApplication) => {
       stopAtFirstError: true,
       // forbidUnknownValues: false,
       exceptionFactory: (errors) => {
-        console.log({ errors: errors });
+        // console.log({ errors: errors });
 
         const errorsForResponse: any = [];
         errors.forEach((err) => {
-          console.log({ err: err });
+          // console.log({ err: err });
           const keys = Object.keys(err.constraints || {});
           keys.forEach((key) => {
             if (err.constraints) {

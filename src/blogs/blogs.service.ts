@@ -7,9 +7,6 @@ import { Blog } from './blogs.schema';
 export class BlogsService {
   constructor(protected blogsRepository: BlogsRepository) {}
 
-  // async getBlog(blogId: string): Promise<BlogViewModel | null> {
-  //   return this.blogsRepository.getBlog(blogId);
-  // }
   async createBlog(InputModel: BlogInputModel): Promise<BlogViewModel> {
     const createdBlog = Blog.create(InputModel);
     return this.blogsRepository.createBlog(createdBlog);

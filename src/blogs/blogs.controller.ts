@@ -30,7 +30,7 @@ import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    protected blogsService: BlogsService,
+    private blogsService: BlogsService,
     private postsService: PostsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,

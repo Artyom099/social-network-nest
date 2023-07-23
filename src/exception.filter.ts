@@ -27,7 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         //todo можно ли оставить never?
         responseBody.message.forEach((m: never) => errorsMessages.push(m));
       }
-      console.log({ errorsMessages: errorsMessages });
+      // console.log({ errorsMessages: errorsMessages });
       response.status(status).json({ errorsMessages });
     } else {
       response.status(status).json({
