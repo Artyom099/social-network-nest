@@ -18,7 +18,6 @@ export class BlogExists implements ValidatorConstraintInterface {
     const blog = await this.blogsQueryRepo.getBlog(id);
     return !!blog;
   }
-
   defaultMessage(args: ValidationArguments) {
     return "Blog with this id doesn't exist";
   }
@@ -102,4 +101,5 @@ export type ExtendedLikesInfoDBModel = {
   addedAt: string;
   status: LikeStatus;
 };
+
 export type PostCreateDTO = Omit<PostDBModel, 'id'>;

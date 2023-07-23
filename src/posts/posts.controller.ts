@@ -29,6 +29,7 @@ import { CommentsService } from '../comments/comments.service';
 import { CheckUserIdGuard } from '../auth/guards/check-userId.guard';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { BasicAuthGuard } from '../auth/guards/basic-auth.guard';
+import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
 
 @Controller('posts')
 export class PostsController {
@@ -37,6 +38,7 @@ export class PostsController {
     private blogService: BlogsService,
     private commentsService: CommentsService,
     private postsQueryRepository: PostsQueryRepository,
+    private blogsQueryRepository: BlogsQueryRepository,
     private usersQueryRepository: UsersQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
   ) {}
@@ -62,7 +64,9 @@ export class PostsController {
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createPost(@Body() inputModel: PostInputModelWithBlogId) {
-    const foundBLog = await this.blogService.getBlog(inputModel.blogId);
+    const foundBLog = await this.blogsQueryRepository.getBlog(
+      inputModel.blogId,
+    );
     if (!foundBLog) {
       throw new NotFoundException('blog not found');
     } else {

@@ -78,7 +78,7 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
-    const foundBlog = await this.blogsService.getBlog(blogId);
+    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
@@ -90,7 +90,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') blogId: string) {
-    const foundBlog = await this.blogsService.getBlog(blogId);
+    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
@@ -106,7 +106,7 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Query() query: GetItemsWithPaging,
   ) {
-    const foundBlog = await this.blogsService.getBlog(blogId);
+    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
@@ -132,7 +132,7 @@ export class BlogsController {
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    const foundBlog = await this.blogsService.getBlog(blogId);
+    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
