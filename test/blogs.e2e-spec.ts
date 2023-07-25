@@ -48,7 +48,7 @@ describe('/blogs', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it("5 – POST:/blogs – shouldn't create blog – NO Auth", async () => {
+  it("5 – POST:/blogs – return 401 – shouldn't create blog – NO Auth", async () => {
     await request(server)
       .post('/blogs')
       .send({
