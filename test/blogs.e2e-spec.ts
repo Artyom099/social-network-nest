@@ -67,7 +67,7 @@ describe('/blogs', () => {
     });
   });
 
-  it("6 – POST:/blogs – shouldn't create blog with name = null", async () => {
+  it("6 – POST:/blogs – shouldn't create blog – name = null", async () => {
     await request(server)
       .post('/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
@@ -88,8 +88,7 @@ describe('/blogs', () => {
       items: [],
     });
   });
-
-  it("7 – POST:/blogs – shouldn't create blog with short description", async () => {
+  it("7 – POST:/blogs – shouldn't create blog – short description", async () => {
     await request(server)
       .post('/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
@@ -114,7 +113,7 @@ describe('/blogs', () => {
       items: [],
     });
   });
-  it("8 - POST:/blogs – shouldn't create blog with incorrect input data - (Invalid websiteUrl)", async () => {
+  it("8 - POST:/blogs – shouldn't create blog – Invalid websiteUrl", async () => {
     await request(server)
       .post('/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
