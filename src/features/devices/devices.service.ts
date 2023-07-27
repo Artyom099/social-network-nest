@@ -7,13 +7,12 @@ import { SessionViewModel } from './devices.models';
 export class DevicesService {
   constructor(private securityRepository: DevicesRepository) {}
 
-  async getSession(deviceId: string): Promise<SessionViewModel | null> {
-    return this.securityRepository.getSession(deviceId);
-  }
-  //todo - : Promise<SessionViewModel[]>
-  async getSessions(userId: string) {
-    return this.securityRepository.getSessions(userId);
-  }
+  // async getSession(deviceId: string): Promise<SessionViewModel | null> {
+  //   return this.securityRepository.getSession(deviceId);
+  // }
+  // async getSessions(userId: string) {
+  //   return this.securityRepository.getSessions(userId);
+  // }
 
   async createSession(
     ip: string,

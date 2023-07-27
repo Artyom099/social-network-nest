@@ -9,10 +9,12 @@ import {
   Param,
   Req,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { DevicesService } from './devices.service';
 import { AuthService } from '../auth/auth.service';
 import { DevicesQueryRepository } from './devices.query.repository';
+import { CookieGuard } from '../../infrastructure/guards/cookie.guard';
 
 @Controller('security')
 export class DevicesController {
@@ -23,6 +25,7 @@ export class DevicesController {
   ) {}
 
   @Get('devices')
+  @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
   async getActiveSessions(@Req() req) {
     const tokenPayload = await this.authService.getTokenPayload(
@@ -33,33 +36,30 @@ export class DevicesController {
   }
 
   @Delete('devices')
+  @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteOtherSessions(@Req() req) {
-    const tokenPayload = this.authService.getTokenPayload(
+    const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-
-    if (tokenPayload)
-      await this.devicesService.deleteOtherSessions(tokenPayload.deviceId);
+    if (payload)
+      await this.devicesService.deleteOtherSessions(payload.deviceId);
   }
 
   @Delete('devices/:id')
+  @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCurrentSession(@Req() req, @Param('id') deviceId: string) {
-    const currentSession = await this.devicesService.getSession(deviceId);
-    if (!currentSession) {
-      throw new NotFoundException();
-    }
-    const tokenPayload = this.authService.getTokenPayload(
-      req.cookies.refreshToken,
+    const currentSession = await this.devicesQueryRepository.getSession(
+      deviceId,
     );
+    if (!currentSession) throw new NotFoundException();
 
-    if (!tokenPayload) {
-      throw new UnauthorizedException();
-    }
+    const payload = this.authService.getTokenPayload(req.cookies.refreshToken);
+    if (!payload) throw new UnauthorizedException();
 
-    const activeSessions = await this.devicesService.getSessions(
-      tokenPayload.userId,
+    const activeSessions = await this.devicesQueryRepository.getSessions(
+      payload.userId,
     );
     if (!activeSessions.find((s) => s.deviceId === currentSession.deviceId)) {
       throw new ForbiddenException();

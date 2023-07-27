@@ -20,6 +20,7 @@ import { CreateUserInputModel } from '../users/users.models';
 import { AuthInputModel, EmailInputModel } from './auth.models';
 import { CookieGuard } from '../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
+import { DevicesQueryRepository } from '../devices/devices.query.repository';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +29,7 @@ export class AuthController {
     private authService: AuthService,
     private securityService: DevicesService,
     private usersQueryRepository: UsersQueryRepository,
+    private devicesQueryRepository: DevicesQueryRepository,
   ) {}
 
   @Get('me')
@@ -86,7 +88,7 @@ export class AuthController {
     const tokenIssuedAt = new Date(
       refreshTokenPayload!.iat * 1000,
     ).toISOString();
-    const lastActiveSession = await this.securityService.getSession(
+    const lastActiveSession = await this.devicesQueryRepository.getSession(
       refreshTokenPayload!.deviceId,
     );
 
@@ -148,9 +150,6 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   //для моих тестов дожно быть OK
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
-    console.log({
-      recoveryCode_1: await this.authService.sendRecoveryCode(InputModel.email),
-    });
     return {
       recoveryCode: await this.authService.sendRecoveryCode(InputModel.email),
     };

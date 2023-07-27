@@ -10,6 +10,7 @@ import { DevicesService } from '../devices/devices.service';
 import { DevicesRepository } from '../devices/devices.repository';
 import { Session, SessionSchema } from '../devices/devices.schema';
 import { UsersQueryRepository } from '../users/users.query.repository';
+import { DevicesQueryRepository } from '../devices/devices.query.repository';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersQueryRepository } from '../users/users.query.repository';
     UsersRepository,
     DevicesRepository,
     UsersQueryRepository,
+    DevicesQueryRepository,
   ],
   controllers: [AuthController],
   exports: [AuthService],
