@@ -21,7 +21,6 @@ export class DevicesRepository {
         deviceId: session.deviceId,
       };
   }
-  //todo - : Promise<SessionViewModel[]>
   async getSessions(userId: string) {
     return this.sessionModel
       .find({ userId }, { projection: { _id: 0, userId: 0 } })

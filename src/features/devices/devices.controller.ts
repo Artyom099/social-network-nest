@@ -12,12 +12,14 @@ import {
 } from '@nestjs/common';
 import { DevicesService } from './devices.service';
 import { AuthService } from '../auth/auth.service';
+import { DevicesQueryRepository } from './devices.query.repository';
 
 @Controller('security')
 export class DevicesController {
   constructor(
     private authService: AuthService,
     private devicesService: DevicesService,
+    private devicesQueryRepository: DevicesQueryRepository,
   ) {}
 
   @Get('devices')
@@ -26,7 +28,8 @@ export class DevicesController {
     const tokenPayload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    // return this.devicesService.getSessions(tokenPayload.userId);
+    if (!tokenPayload) throw new Error();
+    return this.devicesQueryRepository.getSessions(tokenPayload.userId);
   }
 
   @Delete('devices')

@@ -35,6 +35,7 @@ import { Session, SessionSchema } from './features/devices/devices.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './features/auth/constants';
 import { BlogExistsConstraint } from './features/posts/posts.models';
+import { DevicesQueryRepository } from './features/devices/devices.query.repository';
 
 config();
 
@@ -89,6 +90,7 @@ config();
 
     DevicesService,
     DevicesRepository,
+    DevicesQueryRepository,
   ],
 })
 export class AppModule {}
