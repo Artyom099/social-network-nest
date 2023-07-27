@@ -6,9 +6,9 @@ import { AuthRepository } from './auth.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../users/users.schema';
 import { UsersRepository } from '../users/users.repository';
-import { SecurityService } from '../devices/security.service';
-import { SecurityRepository } from '../devices/security.repository';
-import { Session, SessionSchema } from '../devices/security.schema';
+import { DevicesService } from '../devices/devices.service';
+import { DevicesRepository } from '../devices/devices.repository';
+import { Session, SessionSchema } from '../devices/devices.schema';
 import { UsersQueryRepository } from '../users/users.query.repository';
 
 @Module({
@@ -21,12 +21,12 @@ import { UsersQueryRepository } from '../users/users.query.repository';
   ],
   providers: [
     AuthService,
-    SecurityService,
+    DevicesService,
     // { provide: APP_GUARD, useClass: AuthGuard },
     // BasicStrategy,
     AuthRepository,
     UsersRepository,
-    SecurityRepository,
+    DevicesRepository,
     UsersQueryRepository,
   ],
   controllers: [AuthController],

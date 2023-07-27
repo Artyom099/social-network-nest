@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { SessionDBModel, SessionViewModel } from './security.models';
+import { SessionDBModel, SessionViewModel } from './devices.models';
 import { InjectModel } from '@nestjs/mongoose';
-import { Session, SessionDocument } from './security.schema';
+import { Session, SessionDocument } from './devices.schema';
 import { Model } from 'mongoose';
 
 @Injectable()
-export class SecurityRepository {
+export class DevicesRepository {
   constructor(
     @InjectModel(Session.name) private sessionModel: Model<SessionDocument>,
   ) {}

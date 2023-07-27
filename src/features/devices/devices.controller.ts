@@ -10,14 +10,14 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SecurityService } from './security.service';
+import { DevicesService } from './devices.service';
 import { AuthService } from '../auth/auth.service';
 
 @Controller('security')
-export class SecurityController {
+export class DevicesController {
   constructor(
     private authService: AuthService,
-    private securityService: SecurityService,
+    private devicesService: DevicesService,
   ) {}
 
   @Get('devices')
@@ -26,7 +26,7 @@ export class SecurityController {
     const tokenPayload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    // return this.securityService.getSessions(tokenPayload.userId);
+    // return this.devicesService.getSessions(tokenPayload.userId);
   }
 
   @Delete('devices')
@@ -37,13 +37,13 @@ export class SecurityController {
     );
 
     if (tokenPayload)
-      await this.securityService.deleteOtherSessions(tokenPayload.deviceId);
+      await this.devicesService.deleteOtherSessions(tokenPayload.deviceId);
   }
 
   @Delete('devices/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCurrentSession(@Req() req, @Param('id') deviceId: string) {
-    const currentSession = await this.securityService.getSession(deviceId);
+    const currentSession = await this.devicesService.getSession(deviceId);
     if (!currentSession) {
       throw new NotFoundException();
     }
@@ -55,13 +55,13 @@ export class SecurityController {
       throw new UnauthorizedException();
     }
 
-    const activeSessions = await this.securityService.getSessions(
+    const activeSessions = await this.devicesService.getSessions(
       tokenPayload.userId,
     );
     if (!activeSessions.find((s) => s.deviceId === currentSession.deviceId)) {
       throw new ForbiddenException();
     } else {
-      await this.securityService.deleteCurrentSession(deviceId);
+      await this.devicesService.deleteCurrentSession(deviceId);
     }
   }
 }

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { SecurityRepository } from './security.repository';
-import { Session } from './security.schema';
-import { SessionViewModel } from './security.models';
+import { DevicesRepository } from './devices.repository';
+import { Session } from './devices.schema';
+import { SessionViewModel } from './devices.models';
 
 @Injectable()
-export class SecurityService {
-  constructor(private securityRepository: SecurityRepository) {}
+export class DevicesService {
+  constructor(private securityRepository: DevicesRepository) {}
 
   async getSession(deviceId: string): Promise<SessionViewModel | null> {
     return this.securityRepository.getSession(deviceId);

@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { BearerAuthGuard } from '../../infrastructure/guards/bearer-auth.guard';
-import { SecurityService } from '../devices/security.service';
+import { DevicesService } from '../devices/devices.service';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { CreateUserInputModel } from '../users/users.models';
 import { AuthInputModel, EmailInputModel } from './auth.models';
@@ -26,7 +26,7 @@ export class AuthController {
   constructor(
     private jwtService: JwtService,
     private authService: AuthService,
-    private securityService: SecurityService,
+    private securityService: DevicesService,
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 

@@ -28,10 +28,10 @@ import { config } from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
-import { SecurityService } from './features/devices/security.service';
-import { SecurityRepository } from './features/devices/security.repository';
-import { SecurityController } from './features/devices/security.controller';
-import { Session, SessionSchema } from './features/devices/security.schema';
+import { DevicesService } from './features/devices/devices.service';
+import { DevicesRepository } from './features/devices/devices.repository';
+import { DevicesController } from './features/devices/devices.controller';
+import { Session, SessionSchema } from './features/devices/devices.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './features/auth/constants';
 import { BlogExistsConstraint } from './features/posts/posts.models';
@@ -64,7 +64,7 @@ config();
     BlogsController,
     PostsController,
     CommentsController,
-    SecurityController,
+    DevicesController,
   ],
   providers: [
     AppService,
@@ -87,8 +87,8 @@ config();
     CommentsRepository,
     CommentsQueryRepository,
 
-    SecurityService,
-    SecurityRepository,
+    DevicesService,
+    DevicesRepository,
   ],
 })
 export class AppModule {}
