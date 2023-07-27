@@ -34,6 +34,7 @@ import { SecurityController } from './security/security.controller';
 import { Session, SessionSchema } from './security/security.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
+import { BlogExistsConstraint } from './posts/posts.models';
 
 config();
 
@@ -68,6 +69,7 @@ config();
   providers: [
     AppService,
     TestRepository,
+    BlogExistsConstraint,
 
     UsersService,
     UsersRepository,

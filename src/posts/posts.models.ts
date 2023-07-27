@@ -10,18 +10,20 @@ import {
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { BlogsQueryRepository } from '../blogs/blogs.query.repository';
+import { Injectable } from '@nestjs/common';
 
-// @ValidatorConstraint({ name: 'BlogExists', async: true })
-// export class BlogExists implements ValidatorConstraintInterface {
-//   constructor(private blogsQueryRepo: BlogsQueryRepository) {}
-//   async validate(id: string, args: ValidationArguments) {
-//     const blog = await this.blogsQueryRepo.getBlog(id);
-//     return !!blog;
-//   }
-//   defaultMessage(args: ValidationArguments) {
-//     return "Blog with this id doesn't exist";
-//   }
-// }
+@Injectable()
+@ValidatorConstraint({ name: 'BlogExists', async: true })
+export class BlogExistsConstraint implements ValidatorConstraintInterface {
+  constructor(private blogsQueryRepo: BlogsQueryRepository) {}
+  async validate(id: string, args: ValidationArguments) {
+    const blog = await this.blogsQueryRepo.getBlog(id);
+    return !!blog;
+  }
+  defaultMessage(args: ValidationArguments) {
+    return "Blog with this id doesn't exist";
+  }
+}
 
 export class PostInputModelWithBlogId {
   @IsString()
@@ -42,7 +44,7 @@ export class PostInputModelWithBlogId {
   @IsString()
   @IsNotEmpty()
   @Transform(({ value }) => value?.trim())
-  // @Validate(BlogExists)
+  @Validate(BlogExistsConstraint)
   blogId: string;
 }
 export class PostInputModel {

@@ -114,7 +114,7 @@ describe('/blogs', () => {
       items: [],
     });
   });
-  it("8 - shouldn't create blog with incorrect input data - (Invalid websiteUrl)", async () => {
+  it("8 - POST:/blogs – shouldn't create blog with incorrect input data - (Invalid websiteUrl)", async () => {
     await request(server)
       .post('/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
