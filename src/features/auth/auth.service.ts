@@ -65,9 +65,11 @@ export class AuthService {
       const payload = { userId: user.id, deviceId: randomUUID() };
       return {
         accessToken: await this.jwtService.signAsync(payload, {
+          secret: jwtConstants.secret,
           expiresIn: '10s',
         }),
         refreshToken: await this.jwtService.signAsync(payload, {
+          secret: jwtConstants.secret,
           expiresIn: '20s',
         }),
       };
