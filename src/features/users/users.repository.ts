@@ -13,24 +13,6 @@ export class UsersRepository {
   async getUserById(id: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ id });
   }
-  async getUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UserDocument | null> {
-    return this.userModel.findOne({
-      $or: [
-        { 'accountData.email': loginOrEmail },
-        { 'accountData.login': loginOrEmail },
-      ],
-    });
-  }
-  async getUserByRecoveryCode(code: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ recoveryCode: code });
-  }
-  async getUserByConfirmationCode(code: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({
-      'emailConfirmation.confirmationCode': code,
-    });
-  }
 
   async createUser(
     InputModel: CreateUserInputModel,

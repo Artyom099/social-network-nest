@@ -161,15 +161,13 @@ export class AuthController {
   @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
-    const existUserEmail = await this.authService.getUserByLoginOrEmail(
-      inputModel.email,
-    );
+    const existUserEmail =
+      await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.email);
     if (existUserEmail) {
       throw new BadRequestException('email exist=>email');
     }
-    const existUserLogin = await this.authService.getUserByLoginOrEmail(
-      inputModel.login,
-    );
+    const existUserLogin =
+      await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.login);
     if (existUserLogin) {
       throw new BadRequestException('login exist=>login');
     } else {
@@ -195,7 +193,9 @@ export class AuthController {
   @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: { email: string }) {
-    const existUser = await this.authService.getUserByLoginOrEmail(body.email);
+    const existUser = await this.usersQueryRepository.getUserByLoginOrEmail(
+      body.email,
+    );
     if (!existUser || existUser.emailConfirmation.isConfirmed) {
       throw new BadRequestException('email not exist or confirm=>email');
     } else {

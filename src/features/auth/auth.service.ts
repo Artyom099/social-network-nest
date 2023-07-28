@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 import { UsersRepository } from '../users/users.repository';
 import { CreateUserInputModel, UserViewModel } from '../users/users.models';
 import { emailManager } from '../../infrastructure/services/email.manager';
-import { User } from '../users/users.schema';
+import { UsersQueryRepository } from '../users/users.query.repository';
 
 @Injectable()
 export class AuthService {
@@ -14,11 +14,8 @@ export class AuthService {
     private jwtService: JwtService,
     private usersService: UsersService,
     private usersRepository: UsersRepository,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
-
-  async getUserByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
-    return this.usersRepository.getUserByLoginOrEmail(loginOrEmail);
-  }
 
   async createUser(
     InputModel: CreateUserInputModel,
@@ -53,7 +50,9 @@ export class AuthService {
     loginOrEmail,
     password,
   ): Promise<{ accessToken: string; refreshToken: string } | null> {
-    const user = await this.usersRepository.getUserByLoginOrEmail(loginOrEmail);
+    const user = await this.usersQueryRepository.getUserByLoginOrEmail(
+      loginOrEmail,
+    );
     if (!user) return null;
     const passwordHash = await this._generateHash(
       password,
@@ -93,11 +92,12 @@ export class AuthService {
     } catch (e) {
       return null;
     }
-    // typeof payload === 'string' ||
   }
 
   async confirmEmail(code: string): Promise<boolean> {
-    const user = await this.usersRepository.getUserByConfirmationCode(code);
+    const user = await this.usersQueryRepository.getUserByConfirmationCode(
+      code,
+    );
     if (!user) {
       return false;
     }
@@ -105,14 +105,16 @@ export class AuthService {
       return false;
     } else {
       await this.usersRepository.save(user);
-      const user2 = await this.usersRepository.getUserByConfirmationCode(code);
+      const user2 = await this.usersQueryRepository.getUserByConfirmationCode(
+        code,
+      );
       console.log({ user_after: user2 });
       return true;
     }
   }
 
   async updateConfirmationCode(email: string): Promise<string | null> {
-    const user = await this.usersRepository.getUserByLoginOrEmail(email);
+    const user = await this.usersQueryRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
     //обновили у него ConfirmationCode
     const newConfirmationCode = user.updateConfirmationCode();
@@ -132,7 +134,7 @@ export class AuthService {
   }
 
   async sendRecoveryCode(email: string): Promise<string | null> {
-    const user = await this.usersRepository.getUserByLoginOrEmail(email);
+    const user = await this.usersQueryRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
     const recoveryCode = user.updateRecoveryCode();
     await this.usersRepository.save(user);
@@ -145,14 +147,14 @@ export class AuthService {
   }
 
   async checkRecoveryCode(code: string) {
-    return this.usersRepository.getUserByRecoveryCode(code);
+    return this.usersQueryRepository.getUserByRecoveryCode(code);
   }
 
   async updatePassword(code: string, password: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(password, passwordSalt);
 
-    const user = await this.usersRepository.getUserByRecoveryCode(code);
+    const user = await this.usersQueryRepository.getUserByRecoveryCode(code);
     if (!user) return null;
 
     user.updateSaltAndHash(passwordSalt, passwordHash);
