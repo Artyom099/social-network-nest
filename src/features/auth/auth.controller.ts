@@ -7,7 +7,6 @@ import {
   HttpStatus,
   Post,
   Req,
-  Request,
   Res,
   UnauthorizedException,
   UseGuards,
@@ -36,7 +35,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async getMyInfo(@Request() req) {
+  async getMyInfo(@Req() req) {
     console.log(req.userId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
     return {
