@@ -132,7 +132,7 @@ export class AuthController {
   }
 
   @Post('new-password')
-  // @UseGuards(ReteLimitGuard)
+  @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(
     @Body() body: { recoveryCode: string; newPassword: string },
@@ -149,7 +149,7 @@ export class AuthController {
   }
 
   @Post('password-recovery')
-  // @UseGuards(ReteLimitGuard)
+  @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
     return {
@@ -158,7 +158,7 @@ export class AuthController {
   }
 
   @Post('registration')
-  // @UseGuards(ReteLimitGuard)
+  @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
     const existUserEmail = await this.authService.getUserByLoginOrEmail(
@@ -178,7 +178,7 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
-  // @UseGuards(ReteLimitGuard)
+  @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendConfirmationEmail(@Body() body: { code: string }) {
     const confirmEmail = await this.authService.confirmEmail(body.code);
