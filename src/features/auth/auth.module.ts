@@ -25,7 +25,7 @@ import { DevicesController } from '../devices/devices.controller';
     UsersModule,
     JwtModule.register({
       global: true,
-      secret: jwtConstants.secret,
+      // secret: jwtConstants.secret,
       // signOptions: { expiresIn: '60s' },
     }),
     MongooseModule.forFeature([
