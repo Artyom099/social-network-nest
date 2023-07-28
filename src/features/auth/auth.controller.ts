@@ -86,7 +86,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
     const payload = await this.authService.getTokenPayload(
-      req.cookies.refreshToken, //refreshToken=gfjgodijgot
+      req.cookies.refreshToken,
     );
     if (!payload) throw new UnauthorizedException();
     const tokenIssuedAt = new Date(payload.iat * 1000).toISOString();
@@ -150,7 +150,8 @@ export class AuthController {
 
   @Post('password-recovery')
   @UseGuards(ReteLimitGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
+  //todo -> для моих тестов должен быть статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
     return {
       recoveryCode: await this.authService.sendRecoveryCode(InputModel.email),

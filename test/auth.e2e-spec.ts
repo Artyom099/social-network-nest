@@ -11,6 +11,8 @@ import {
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
 
+// refreshToken - expiresIn: '40s'
+
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let server: any;
@@ -80,7 +82,7 @@ describe('AuthController (e2e)', () => {
       firstCreateResponse: firstCreateResponse,
     });
   });
-  it('4 – GET:/auth/me – return created user', async () => {
+  it('4 – GET:/auth/me – return created 1st user', async () => {
     const { firstUser, firstCreateResponse } = expect.getState();
     //чтобы .split не ругался на возможный undefined
     if (!firstCreateResponse.headers.authorization) return new Error();
@@ -327,89 +329,89 @@ describe('AuthController (e2e)', () => {
     expect(newPasswordResponse.status).toBe(HttpStatus.NO_CONTENT);
   });
 
-  // it('21 – POST:/auth/password-recovery – return 429', async () => {
-  //   const { firstUser } = expect.getState();
-  //   await sleep(10);
-  //
-  //   await request(server)
-  //     .post('/auth/password-recovery')
-  //     .set('user-agent', 'device-2')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.OK);
-  //
-  //   await request(server)
-  //     .post('/auth/password-recovery')
-  //     .set('user-agent', 'device-3')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.OK);
-  //
-  //   await request(server)
-  //     .post('/auth/password-recovery')
-  //     .set('user-agent', 'device-4')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.OK);
-  //
-  //   await request(server)
-  //     .post('/auth/password-recovery')
-  //     .set('user-agent', 'device-5')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.OK);
-  //
-  //   await request(server)
-  //     .post('/auth/password-recovery')
-  //     .set('user-agent', 'device-6')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.OK);
-  //
-  //   const loginResponse = await request(server)
-  //     .post('/auth/password-recovery')
-  //     .set('user-agent', 'device-7')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.TOO_MANY_REQUESTS);
-  //
-  //   expect(loginResponse).toBeDefined();
-  // });
-  // it('22 – POST:/auth/new-password – return 429', async () => {
-  //   const { firstUser } = expect.getState();
-  //
-  //   await request(server)
-  //     .post('/auth/new-password')
-  //     .set('user-agent', 'device-2')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   await request(server)
-  //     .post('/auth/new-password')
-  //     .set('user-agent', 'device-3')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   await request(server)
-  //     .post('/auth/new-password')
-  //     .set('user-agent', 'device-4')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   await request(server)
-  //     .post('/auth/new-password')
-  //     .set('user-agent', 'device-5')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   await request(server)
-  //     .post('/auth/new-password')
-  //     .set('user-agent', 'device-6')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   const loginResponse = await request(server)
-  //     .post('/auth/new-password')
-  //     .set('user-agent', 'device-7')
-  //     .send({ email: firstUser.email })
-  //     .expect(HttpStatus.TOO_MANY_REQUESTS);
-  //
-  //   expect(loginResponse).toBeDefined();
-  // });
+  it('21 – POST:/auth/password-recovery – return 429', async () => {
+    const { firstUser } = expect.getState();
+    await sleep(10);
+
+    await request(server)
+      .post('/auth/password-recovery')
+      .set('user-agent', 'device-2')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.OK);
+
+    await request(server)
+      .post('/auth/password-recovery')
+      .set('user-agent', 'device-3')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.OK);
+
+    await request(server)
+      .post('/auth/password-recovery')
+      .set('user-agent', 'device-4')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.OK);
+
+    await request(server)
+      .post('/auth/password-recovery')
+      .set('user-agent', 'device-5')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.OK);
+
+    await request(server)
+      .post('/auth/password-recovery')
+      .set('user-agent', 'device-6')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.OK);
+
+    const loginResponse = await request(server)
+      .post('/auth/password-recovery')
+      .set('user-agent', 'device-7')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.TOO_MANY_REQUESTS);
+
+    expect(loginResponse).toBeDefined();
+  });
+  it('22 – POST:/auth/new-password – return 429', async () => {
+    const { firstUser } = expect.getState();
+
+    await request(server)
+      .post('/auth/new-password')
+      .set('user-agent', 'device-2')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    await request(server)
+      .post('/auth/new-password')
+      .set('user-agent', 'device-3')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    await request(server)
+      .post('/auth/new-password')
+      .set('user-agent', 'device-4')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    await request(server)
+      .post('/auth/new-password')
+      .set('user-agent', 'device-5')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    await request(server)
+      .post('/auth/new-password')
+      .set('user-agent', 'device-6')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    const loginResponse = await request(server)
+      .post('/auth/new-password')
+      .set('user-agent', 'device-7')
+      .send({ email: firstUser.email })
+      .expect(HttpStatus.TOO_MANY_REQUESTS);
+
+    expect(loginResponse).toBeDefined();
+  });
 
   it('23 – POST:/auth/logout – return 204 & logout', async () => {
     const { secondRefreshToken } = expect.getState();
