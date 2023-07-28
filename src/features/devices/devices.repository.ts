@@ -20,7 +20,10 @@ export class DevicesRepository {
     };
   }
   async updateLastActiveDate(deviceId: string, date: string) {
-    return this.sessionModel.updateOne({ deviceId }, { lastActiveDate: date });
+    return this.sessionModel.updateOne(
+      { deviceId },
+      { $set: { lastActiveDate: date } },
+    );
   }
 
   async deleteOtherSessions(deviceId: string) {
