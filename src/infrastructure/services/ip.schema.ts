@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type RequestDocument = HydratedDocument<Request>;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Request {
   @Prop({ type: String, required: true })
   ip: string;

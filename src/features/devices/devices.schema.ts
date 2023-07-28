@@ -3,7 +3,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type DeviceDocument = HydratedDocument<Device>;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Device {
   @Prop({ type: String, required: true })
   ip: string;
