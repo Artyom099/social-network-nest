@@ -16,10 +16,18 @@ import {
   Request,
   RequestSchema,
 } from '../../infrastructure/services/ip.schema';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './constants';
+import { DevicesController } from '../devices/devices.controller';
 
 @Module({
   imports: [
     UsersModule,
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      // signOptions: { expiresIn: '60s' },
+    }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Device.name, schema: DeviceSchema },
@@ -39,7 +47,7 @@ import {
     DevicesRepository,
     DevicesQueryRepository,
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, DevicesController],
   exports: [AuthService],
 })
 export class AuthModule {}

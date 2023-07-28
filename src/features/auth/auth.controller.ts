@@ -87,8 +87,9 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
     const payload = await this.authService.getTokenPayload(
-      req.cookies.refreshToken,
+      req.cookies.refreshToken, //refreshToken=gfjgodijgot
     );
+    if (!payload) throw new UnauthorizedException();
     const tokenIssuedAt = new Date(payload.iat * 1000).toISOString();
     const lastActiveSession = await this.devicesQueryRepository.getSession(
       payload.deviceId,

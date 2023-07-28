@@ -55,11 +55,6 @@ config();
       { name: Request.name, schema: RequestSchema },
       { name: Comment.name, schema: CommentSchema },
     ]),
-    JwtModule.register({
-      global: true,
-      secret: jwtConstants.secret,
-      // signOptions: { expiresIn: '60s' },
-    }),
   ],
   controllers: [
     AppController,
@@ -68,7 +63,7 @@ config();
     BlogsController,
     PostsController,
     CommentsController,
-    DevicesController,
+    // DevicesController,
   ],
   providers: [
     IpService,
@@ -92,9 +87,9 @@ config();
     CommentsRepository,
     CommentsQueryRepository,
 
-    DevicesService,
-    DevicesRepository,
-    DevicesQueryRepository,
+    //DevicesService,
+    //DevicesRepository,
+    // DevicesQueryRepository,
   ],
 })
 export class AppModule {}
