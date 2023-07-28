@@ -21,6 +21,7 @@ import { CookieGuard } from '../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 import { DevicesQueryRepository } from '../devices/devices.query.repository';
 import { ReteLimitGuard } from '../../infrastructure/guards/rete.limit.guard';
+import { BearerAuthGuard } from '../../infrastructure/guards/bearer-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +34,7 @@ export class AuthController {
   ) {}
 
   @Get('me')
-  // @UseGuards(BearerAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Request() req) {
     console.log(req.userId);
@@ -46,7 +47,7 @@ export class AuthController {
   }
 
   @Post('login')
-  // @UseGuards(ReteLimitGuard)
+  @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.OK)
   async login(
     @Req() req,
@@ -131,6 +132,7 @@ export class AuthController {
   }
 
   @Post('new-password')
+  // @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(
     @Body() body: { recoveryCode: string; newPassword: string },
@@ -147,8 +149,8 @@ export class AuthController {
   }
 
   @Post('password-recovery')
+  // @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  //для моих тестов дожно быть OK
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
     return {
       recoveryCode: await this.authService.sendRecoveryCode(InputModel.email),
@@ -156,6 +158,7 @@ export class AuthController {
   }
 
   @Post('registration')
+  // @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
     const existUserEmail = await this.authService.getUserByLoginOrEmail(
@@ -175,6 +178,7 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
+  // @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendConfirmationEmail(@Body() body: { code: string }) {
     const confirmEmail = await this.authService.confirmEmail(body.code);
@@ -188,7 +192,7 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
-  // @UseGuards(ReteLimitGuard)
+  @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: { email: string }) {
     const existUser = await this.authService.getUserByLoginOrEmail(body.email);

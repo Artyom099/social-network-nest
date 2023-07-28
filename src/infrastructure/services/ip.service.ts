@@ -9,11 +9,7 @@ export class IpService {
     @InjectModel(Request.name) private requestModel: Model<RequestDocument>,
   ) {}
 
-  async countIpAndUrl(
-    ip: string,
-    url: string,
-    date: Date,
-  ): Promise<number | null> {
+  async countIpAndUrl(ip: string, url: string, date: Date): Promise<number> {
     return this.requestModel.countDocuments({
       $and: [{ ip }, { url }, { date: { $gte: date } }],
     });
