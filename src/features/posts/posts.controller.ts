@@ -14,12 +14,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { GetItemsWithPaging } from '../../utils/common.models';
+import { GetItemsWithPaging } from '../../infrastructure/utils/common.models';
 import { PostInputModelWithBlogId } from './posts.models';
 import { BlogsService } from '../blogs/blogs.service';
 import { PostsQueryRepository } from './posts.query.repository';
 import { CommentsQueryRepository } from '../comments/comments.query.repository';
-import { SortBy, SortDirection } from '../../utils/constants';
+import { SortBy, SortDirection } from '../../infrastructure/utils/constants';
 import { BearerAuthGuard } from '../../infrastructure/guards/bearer-auth.guard';
 import {
   CommentInputModel,

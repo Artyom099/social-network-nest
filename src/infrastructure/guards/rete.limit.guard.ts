@@ -18,12 +18,12 @@ export class ReteLimitGuard implements CanActivate {
     const dateNow = Date.now();
     const timeLimit = new Date(dateNow - 11_000);
 
-    const countIP = await this.ipService.countIpAndUrl(ip!, url, timeLimit);
+    const countIP = await this.ipService.countIpAndUrl(ip, url, timeLimit);
 
-    if (countIP! >= 5) {
+    if (!countIP && countIP! >= 5) {
       throw new HttpException('TooManyRequest', HttpStatus.TOO_MANY_REQUESTS);
     } else {
-      await this.ipService.addIpAndUrl(ip!, url, new Date(dateNow));
+      await this.ipService.addIpAndUrl(ip, url, new Date(dateNow));
       return true;
     }
   }

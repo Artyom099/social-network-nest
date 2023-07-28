@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PagingViewModel } from '../../utils/common.models';
+import { PagingViewModel } from '../../infrastructure/utils/common.models';
 import { BlogViewModel } from './blogs.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from './blogs.schema';

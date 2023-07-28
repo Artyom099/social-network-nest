@@ -65,7 +65,7 @@ export class AuthService {
       const payload = { userId: user.id, deviceId: randomUUID() };
       return {
         accessToken: await this.jwtService.signAsync(payload, {
-          expiresIn: '5m',
+          expiresIn: '10s',
         }),
         refreshToken: await this.jwtService.signAsync(payload, {
           expiresIn: '20s',
@@ -78,7 +78,7 @@ export class AuthService {
     const payload = { userId, deviceId };
     return {
       accessToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '5m',
+        expiresIn: '10s',
       }),
       refreshToken: await this.jwtService.signAsync(payload, {
         expiresIn: '20s',
@@ -86,21 +86,14 @@ export class AuthService {
     };
   }
 
-  getTokenPayload(
-    token: string,
-  ): { userId: string; deviceId: string; iat: number; exp: number } | null {
-    // { userId: '1682507411257', deviceId: '1682507411257', iat: 1682507422, exp: 1682511022 }
-    const payload = this.jwtService.decode(token);
-    if (typeof payload === 'string' || payload === null) {
+  async getTokenPayload(token: string): Promise<any | null> {
+    try {
+      // { userId: '1682507411257', deviceId: '1682507411257', iat: 1682507422, exp: 1682511022 }
+      return this.jwtService.decode(token);
+    } catch (e) {
       return null;
-    } else {
-      return {
-        deviceId: payload.deviceId,
-        exp: payload.exp,
-        iat: payload.iat,
-        userId: payload.userId,
-      };
     }
+    // typeof payload === 'string' ||
   }
 
   async confirmEmail(code: string): Promise<boolean> {

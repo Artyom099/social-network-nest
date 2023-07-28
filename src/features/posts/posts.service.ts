@@ -3,7 +3,7 @@ import { PostsRepository } from './posts.repository';
 import { PostInputModel, PostViewModel } from './posts.models';
 import { BlogViewModel } from '../blogs/blogs.models';
 import { Post } from './posts.schema';
-import { LikeStatus } from '../../utils/constants';
+import { LikeStatus } from '../../infrastructure/utils/constants';
 import { UsersRepository } from '../users/users.repository';
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { HydratedDocument } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { LikeStatus } from '../../utils/constants';
+import { LikeStatus } from '../../infrastructure/utils/constants';
 import { BlogViewModel } from '../blogs/blogs.models';
 import { PostInputModel } from './posts.models';
 import { randomUUID } from 'crypto';

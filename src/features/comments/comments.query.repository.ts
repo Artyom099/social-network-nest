@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CommentViewModel } from './comments.models';
-import { PagingViewModel } from '../../utils/common.models';
+import { PagingViewModel } from '../../infrastructure/utils/common.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment, CommentDocument } from './comments.schema';
-import { LikeStatus } from '../../utils/constants';
+import { LikeStatus } from '../../infrastructure/utils/constants';
 
 @Injectable()
 export class CommentsQueryRepository {

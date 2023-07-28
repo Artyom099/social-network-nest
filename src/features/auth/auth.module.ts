@@ -8,27 +8,35 @@ import { User, UserSchema } from '../users/users.schema';
 import { UsersRepository } from '../users/users.repository';
 import { DevicesService } from '../devices/devices.service';
 import { DevicesRepository } from '../devices/devices.repository';
-import { Session, SessionSchema } from '../devices/devices.schema';
+import { Device, DeviceSchema } from '../devices/devices.schema';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { DevicesQueryRepository } from '../devices/devices.query.repository';
+import { IpService } from '../../infrastructure/services/ip.service';
+import {
+  Request,
+  RequestSchema,
+} from '../../infrastructure/services/ip.schema';
 
 @Module({
   imports: [
     UsersModule,
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
-      { name: Session.name, schema: SessionSchema },
+      { name: Device.name, schema: DeviceSchema },
+      { name: Request.name, schema: RequestSchema },
     ]),
   ],
   providers: [
+    IpService,
+
     AuthService,
-    DevicesService,
-    // { provide: APP_GUARD, useClass: AuthGuard },
-    // BasicStrategy,
     AuthRepository,
+
     UsersRepository,
-    DevicesRepository,
     UsersQueryRepository,
+
+    DevicesService,
+    DevicesRepository,
     DevicesQueryRepository,
   ],
   controllers: [AuthController],

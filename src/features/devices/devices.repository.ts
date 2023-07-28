@@ -1,33 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { SessionDBModel, SessionViewModel } from './devices.models';
+import { DeviceDBModel, DeviceViewModel } from './devices.models';
 import { InjectModel } from '@nestjs/mongoose';
-import { Session, SessionDocument } from './devices.schema';
+import { Device, DeviceDocument } from './devices.schema';
 import { Model } from 'mongoose';
 
 @Injectable()
 export class DevicesRepository {
   constructor(
-    @InjectModel(Session.name) private sessionModel: Model<SessionDocument>,
+    @InjectModel(Device.name) private sessionModel: Model<DeviceDocument>,
   ) {}
 
-  // async getSession(deviceId: string): Promise<SessionViewModel | null> {
-  //   const session = await this.sessionModel.findOne({ deviceId }).exec();
-  //   if (!session) return null;
-  //   else
-  //     return {
-  //       ip: session.ip,
-  //       title: session.title,
-  //       lastActiveDate: session.lastActiveDate.toISOString(),
-  //       deviceId: session.deviceId,
-  //     };
-  // }
-  // async getSessions(userId: string) {
-  //   return this.sessionModel
-  //     .find({ userId }, { projection: { _id: 0, userId: 0 } })
-  //     .exec();
-  // }
-
-  async createSession(session: SessionDBModel): Promise<SessionViewModel> {
+  async createSession(session: DeviceDBModel): Promise<DeviceViewModel> {
     await this.sessionModel.create(session);
     return {
       ip: session.ip,

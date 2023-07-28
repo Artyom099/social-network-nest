@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PagingViewModel } from '../../utils/common.models';
+import { PagingViewModel } from '../../infrastructure/utils/common.models';
 import { UserViewModel } from './users.models';
 import { User, UserDocument } from './users.schema';
 import { Model } from 'mongoose';

@@ -8,7 +8,6 @@ import {
   NotFoundException,
   Param,
   Req,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { DevicesService } from './devices.service';
@@ -55,12 +54,13 @@ export class DevicesController {
     );
     if (!currentSession) throw new NotFoundException();
 
-    const payload = this.authService.getTokenPayload(req.cookies.refreshToken);
-    if (!payload) throw new UnauthorizedException();
-
+    const payload = await this.authService.getTokenPayload(
+      req.cookies.refreshToken,
+    );
     const activeSessions = await this.devicesQueryRepository.getSessions(
       payload.userId,
     );
+
     if (!activeSessions.find((s) => s.deviceId === currentSession.deviceId)) {
       throw new ForbiddenException();
     } else {

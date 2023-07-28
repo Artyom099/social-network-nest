@@ -18,12 +18,12 @@ import { BlogsService } from './blogs.service';
 import {
   GetItemsWithPaging,
   GetItemsWithPagingAndSearch,
-} from '../../utils/common.models';
+} from '../../infrastructure/utils/common.models';
 import { PostsService } from '../posts/posts.service';
 import { PostInputModel } from '../posts/posts.models';
 import { BlogsQueryRepository } from './blogs.query.repository';
 import { PostsQueryRepository } from '../posts/posts.query.repository';
-import { SortBy, SortDirection } from '../../utils/constants';
+import { SortBy, SortDirection } from '../../infrastructure/utils/constants';
 import { BasicAuthGuard } from '../../infrastructure/guards/basic-auth.guard';
 import { CheckUserIdGuard } from '../../infrastructure/guards/check-userId.guard';
 

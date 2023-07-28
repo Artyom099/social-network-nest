@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type SessionDocument = HydratedDocument<Session>;
+export type DeviceDocument = HydratedDocument<Device>;
 
 @Schema()
-export class Session {
+export class Device {
   @Prop({ type: String, required: true })
   ip: string;
   @Prop({ type: String, required: true })
@@ -23,13 +23,13 @@ export class Session {
     deviceId: string,
     userId: string,
   ) {
-    const session = new Session();
-    session.ip = ip;
-    session.title = title;
-    session.lastActiveDate = lastActiveDate;
-    session.deviceId = deviceId;
-    session.userId = userId;
-    return session;
+    const device = new Device();
+    device.ip = ip;
+    device.title = title;
+    device.lastActiveDate = lastActiveDate;
+    device.deviceId = deviceId;
+    device.userId = userId;
+    return device;
   }
 }
-export const SessionSchema = SchemaFactory.createForClass(Session);
+export const DeviceSchema = SchemaFactory.createForClass(Device);

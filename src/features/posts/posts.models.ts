@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../utils/constants';
+import { LikeStatus } from '../../infrastructure/utils/constants';
 import {
   IsNotEmpty,
   IsString,

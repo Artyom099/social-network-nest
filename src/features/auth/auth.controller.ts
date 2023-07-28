@@ -13,7 +13,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { BearerAuthGuard } from '../../infrastructure/guards/bearer-auth.guard';
 import { DevicesService } from '../devices/devices.service';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { CreateUserInputModel } from '../users/users.models';
@@ -21,6 +20,7 @@ import { AuthInputModel, EmailInputModel } from './auth.models';
 import { CookieGuard } from '../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 import { DevicesQueryRepository } from '../devices/devices.query.repository';
+import { ReteLimitGuard } from '../../infrastructure/guards/rete.limit.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +33,7 @@ export class AuthController {
   ) {}
 
   @Get('me')
-  @UseGuards(BearerAuthGuard)
+  // @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Request() req) {
     console.log(req.userId);
@@ -46,6 +46,7 @@ export class AuthController {
   }
 
   @Post('login')
+  // @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.OK)
   async login(
     @Req() req,
@@ -61,14 +62,16 @@ export class AuthController {
     } else {
       //'user-agent'  || 'device-1'
       const title = req.headers['host'];
-      const tokenPayload = this.authService.getTokenPayload(token.refreshToken);
-      const lastActiveDate = new Date(tokenPayload!.iat * 1000);
+      const payload = await this.authService.getTokenPayload(
+        token.refreshToken,
+      );
+      const lastActiveDate = new Date(payload.iat * 1000);
       await this.securityService.createSession(
         req.ip,
         title,
         lastActiveDate,
-        tokenPayload!.deviceId,
-        tokenPayload!.userId,
+        payload.deviceId,
+        payload.userId,
       );
       res.cookie('refreshToken', token.refreshToken, {
         httpOnly: true,
@@ -82,31 +85,30 @@ export class AuthController {
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
-    const refreshTokenPayload = this.authService.getTokenPayload(
+    const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    const tokenIssuedAt = new Date(
-      refreshTokenPayload!.iat * 1000,
-    ).toISOString();
+    const tokenIssuedAt = new Date(payload.iat * 1000).toISOString();
     const lastActiveSession = await this.devicesQueryRepository.getSession(
-      refreshTokenPayload!.deviceId,
+      payload.deviceId,
     );
 
-    if (tokenIssuedAt !== lastActiveSession!.lastActiveDate) {
+    if (
+      !lastActiveSession ||
+      tokenIssuedAt !== lastActiveSession.lastActiveDate
+    ) {
       throw new UnauthorizedException();
     } else {
       const token = await this.authService.updateJWT(
-        refreshTokenPayload!.userId,
-        refreshTokenPayload!.deviceId,
+        payload.userId,
+        payload.deviceId,
       );
-      const newTokenPayload = this.authService.getTokenPayload(
+      const newPayload = await this.authService.getTokenPayload(
         token.refreshToken,
       );
-      const lastActiveDate = new Date(
-        newTokenPayload!.iat * 1000,
-      ).toISOString();
+      const lastActiveDate = new Date(newPayload.iat * 1000).toISOString();
       await this.securityService.updateLastActiveDate(
-        refreshTokenPayload!.deviceId,
+        payload.deviceId,
         lastActiveDate,
       );
 
@@ -122,12 +124,10 @@ export class AuthController {
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req) {
-    const refreshTokenPayload = this.authService.getTokenPayload(
+    const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    await this.securityService.deleteCurrentSession(
-      refreshTokenPayload!.deviceId,
-    );
+    await this.securityService.deleteCurrentSession(payload.deviceId);
   }
 
   @Post('new-password')
@@ -188,6 +188,7 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
+  // @UseGuards(ReteLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: { email: string }) {
     const existUser = await this.authService.getUserByLoginOrEmail(body.email);

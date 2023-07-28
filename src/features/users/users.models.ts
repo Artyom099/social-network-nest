@@ -1,4 +1,4 @@
-import { SortBy, SortDirection } from '../../utils/constants';
+import { SortBy, SortDirection } from '../../infrastructure/utils/constants';
 import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 

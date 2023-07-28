@@ -31,11 +31,13 @@ import { UsersModule } from './features/users/users.module';
 import { DevicesService } from './features/devices/devices.service';
 import { DevicesRepository } from './features/devices/devices.repository';
 import { DevicesController } from './features/devices/devices.controller';
-import { Session, SessionSchema } from './features/devices/devices.schema';
+import { Device, DeviceSchema } from './features/devices/devices.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './features/auth/constants';
 import { BlogExistsConstraint } from './features/posts/posts.models';
 import { DevicesQueryRepository } from './features/devices/devices.query.repository';
+import { IpService } from './infrastructure/services/ip.service';
+import { Request, RequestSchema } from './infrastructure/services/ip.schema';
 
 config();
 
@@ -49,8 +51,9 @@ config();
       { name: User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
+      { name: Device.name, schema: DeviceSchema },
+      { name: Request.name, schema: RequestSchema },
       { name: Comment.name, schema: CommentSchema },
-      { name: Session.name, schema: SessionSchema },
     ]),
     JwtModule.register({
       global: true,
@@ -68,6 +71,7 @@ config();
     DevicesController,
   ],
   providers: [
+    IpService,
     AppService,
     TestRepository,
     BlogExistsConstraint,

@@ -1,7 +1,7 @@
 import { CommentsRepository } from './comments.repository';
 import { CommentDBModel, CommentViewModel } from './comments.models';
 import { Injectable } from '@nestjs/common';
-import { LikeStatus } from '../../utils/constants';
+import { LikeStatus } from '../../infrastructure/utils/constants';
 import { randomUUID } from 'crypto';
 
 @Injectable()

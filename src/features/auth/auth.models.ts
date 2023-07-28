@@ -18,3 +18,10 @@ export class EmailInputModel {
   @Transform(({ value }) => value?.trim())
   email: string;
 }
+
+export type TokenPayloadType = {
+  userId: string;
+  deviceId: string;
+  iat: number;
+  exp: number;
+};

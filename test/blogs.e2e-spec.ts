@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { LikeStatus } from '../src/utils/constants';
+import { LikeStatus } from '../src/infrastructure/utils/constants';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
 
 describe('/blogs', () => {

@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
 import request from 'supertest';
-import { getRefreshTokenByResponseWithTokenName } from '../src/utils/utils';
+import { getRefreshTokenByResponseWithTokenName } from '../src/infrastructure/utils/utils';
 
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
@@ -249,7 +249,7 @@ describe('DevicesController (e2e)', () => {
     expect(deleteResponse.status).toBe(HttpStatus.FORBIDDEN);
   });
 
-  it('10 – return 200, newRefreshToken & newAccessToken', async () => {
+  it('10 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
     const { firstRefreshToken } = expect.getState();
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/refresh-token')
@@ -269,7 +269,7 @@ describe('DevicesController (e2e)', () => {
     expect(newFirstRefreshToken).not.toBe(firstRefreshToken);
     expect.setState({ newFirstRefreshToken });
   });
-  it('11 – return all login devices 1st user - other lastActiveDate 1st device', async () => {
+  it('11 – GET:/security/devices – return all login devices 1st user – other lastActiveDate 1st device', async () => {
     const { newFirstRefreshToken, firstLastActiveDateFirstUser } =
       expect.getState();
     const getResponse = await request(server)
@@ -285,7 +285,7 @@ describe('DevicesController (e2e)', () => {
 
     expect.setState({ firstDeviceIdFirstUser: getResponse.body[0].deviceId });
   });
-  it("12 – return 204 & delete 1st user's 2nd device", async () => {
+  it("12 – DELETE:/security/devices/:id – return 204 & delete 1st user's 2nd device", async () => {
     const { newFirstRefreshToken, secondDeviceIdFirstUser } = expect.getState();
     const deleteResponse = await request(server)
       .delete(`/security/devices/${secondDeviceIdFirstUser}`)
@@ -294,7 +294,7 @@ describe('DevicesController (e2e)', () => {
     expect(deleteResponse).toBeDefined();
     expect(deleteResponse.status).toBe(HttpStatus.NO_CONTENT);
   });
-  it('13 – return all login devices 1st user - without 2nd device', async () => {
+  it('13 – GET:/security/devices – return all login devices 1st user – without 2nd device', async () => {
     const { newFirstRefreshToken } = expect.getState();
     const getResponse = await request(server)
       .get('/security/devices')
@@ -305,7 +305,7 @@ describe('DevicesController (e2e)', () => {
     expect(getResponse.body.length).toEqual(3);
   });
 
-  it('14 – return 204 & logout 3rd device', async () => {
+  it('14 – POST:/auth/logout – return 204 & logout 3rd device', async () => {
     const { thirdRefreshToken } = expect.getState();
     const logoutResponse = await request(server)
       .post('/auth/logout')
@@ -314,7 +314,7 @@ describe('DevicesController (e2e)', () => {
     expect(logoutResponse).toBeDefined();
     expect(logoutResponse.status).toBe(HttpStatus.NO_CONTENT);
   });
-  it('15 – return all login devices 1st user - without 3rd device', async () => {
+  it('15 – GET:/security/devices – return all login devices 1st user – without 3rd device', async () => {
     const { newFirstRefreshToken } = expect.getState();
     const getResponse = await request(server)
       .get('/security/devices')
@@ -325,7 +325,7 @@ describe('DevicesController (e2e)', () => {
     expect(getResponse.body.length).toEqual(2);
   });
 
-  it("16 – return 204 & terminate all other (exclude current) device's sessions", async () => {
+  it("16 – DELETE:/security/devices – return 204 & terminate all other (exclude current) device's sessions", async () => {
     const { firstRefreshToken } = expect.getState();
     const getResponse = await request(server)
       .delete('/security/devices')
@@ -334,7 +334,7 @@ describe('DevicesController (e2e)', () => {
     expect(getResponse).toBeDefined();
     expect(getResponse.status).toBe(HttpStatus.NO_CONTENT);
   });
-  it('17 – return all login devices 1st user - only 1st device', async () => {
+  it('17 – GET:/security/devices – return all login devices 1st user – only 1st device', async () => {
     const { newFirstRefreshToken } = expect.getState();
     const getResponse = await request(server)
       .get('/security/devices')

@@ -16,7 +16,7 @@ import {
   CreateUserInputModel,
   GetUsersWithPagingAndSearch,
 } from './users.models';
-import { SortBy, SortDirection } from '../../utils/constants';
+import { SortBy, SortDirection } from '../../infrastructure/utils/constants';
 import { UsersQueryRepository } from './users.query.repository';
 import { BasicAuthGuard } from '../../infrastructure/guards/basic-auth.guard';
 
