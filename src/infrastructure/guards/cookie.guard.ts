@@ -17,15 +17,14 @@ export class CookieGuard implements CanActivate {
     const refreshToken = this.extractTokenFromCookie(request);
     if (!refreshToken) throw new UnauthorizedException();
 
-    const payload = await this.jwtService.verifyAsync(refreshToken, {
-      secret: jwtConstants.secret,
-    });
-
-    if (!payload.userId) {
-      throw new UnauthorizedException();
-    } else {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: jwtConstants.secret,
+      });
       request['userId'] = payload.userId;
       return true;
+    } catch (e) {
+      throw new UnauthorizedException();
     }
   }
 
