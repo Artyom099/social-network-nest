@@ -150,7 +150,7 @@ export class AuthController {
 
   @Post('password-recovery')
   @UseGuards(ReteLimitGuard)
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   //todo -> для моих тестов должен быть статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
     return {
