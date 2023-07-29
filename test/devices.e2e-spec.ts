@@ -24,6 +24,7 @@ describe('DevicesController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
+  // создаю пользователя
   it('1 – POST:/users – return 201 & create user by admin', async () => {
     const password1 = 'qwerty1';
     const createResponse = await request(server)
@@ -57,7 +58,7 @@ describe('DevicesController (e2e)', () => {
 
     expect.setState({ createdUser1, password1 });
   });
-
+  // логиню его с 4х девайсов
   it('2 – POST:/auth/login – return 200 & login 1st user – 1st device', async () => {
     const { createdUser1, password1 } = expect.getState();
 
@@ -163,7 +164,7 @@ describe('DevicesController (e2e)', () => {
       fourthRefreshToken: refreshToken,
     });
   });
-
+  // получаю активные сессии этих девайсов
   it('6 – GET:/security/devices – return all login devices 1st user', async () => {
     const { firstRefreshToken } = expect.getState();
     const getResponse = await request(server)
@@ -180,7 +181,7 @@ describe('DevicesController (e2e)', () => {
       secondDeviceIdFirstUser: getResponse.body[1].deviceId,
     });
   });
-
+  // пробую удалить несуществующий девайс
   it('7 – DELETE:/security/devices/:id – return 404 if try to delete non-existent device', async () => {
     const { firstRefreshToken } = expect.getState();
     const deleteResponse = await request(server)
@@ -214,6 +215,7 @@ describe('DevicesController (e2e)', () => {
       HttpStatus.UNAUTHORIZED,
     );
   });
+  // пробую удалить активную сессию другого девайса
   it("9 – DELETE:/security/devices/:id – return 403 if try to delete 1st user's devise by 2nd user", async () => {
     // create 2nd user
     const password = 'qwerty2';
@@ -248,7 +250,7 @@ describe('DevicesController (e2e)', () => {
     expect(deleteResponse).toBeDefined();
     expect(deleteResponse.status).toBe(HttpStatus.FORBIDDEN);
   });
-
+  // получаю новую пру токенов
   it('10 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
     const { firstRefreshToken } = expect.getState();
     const goodRefreshTokenResponse = await request(server)
@@ -269,6 +271,7 @@ describe('DevicesController (e2e)', () => {
     expect(newFirstRefreshToken).not.toBe(firstRefreshToken);
     expect.setState({ newFirstRefreshToken });
   });
+  // ???
   it('11 – GET:/security/devices – return all login devices 1st user – other lastActiveDate 1st device', async () => {
     const { newFirstRefreshToken, firstLastActiveDateFirstUser } =
       expect.getState();

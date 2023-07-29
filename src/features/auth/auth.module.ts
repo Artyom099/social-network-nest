@@ -17,7 +17,6 @@ import {
   RequestSchema,
 } from '../../infrastructure/services/ip.schema';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
 import { DevicesController } from '../devices/devices.controller';
 
 @Module({

@@ -27,9 +27,9 @@ export class DevicesRepository {
   }
 
   async deleteOtherSessions(deviceId: string) {
-    return this.sessionModel.deleteMany({ $nor: [{ deviceId }] });
+    await this.sessionModel.deleteMany({ $nor: [{ deviceId }] });
   }
   async deleteCurrentSession(deviceId: string) {
-    return this.sessionModel.deleteOne({ deviceId });
+    await this.sessionModel.deleteOne({ deviceId });
   }
 }

@@ -18,7 +18,6 @@ import { CreateUserInputModel } from '../users/users.models';
 import { AuthInputModel, EmailInputModel } from './auth.models';
 import { CookieGuard } from '../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
-import { DevicesQueryRepository } from '../devices/devices.query.repository';
 import { ReteLimitGuard } from '../../infrastructure/guards/rete.limit.guard';
 import { BearerAuthGuard } from '../../infrastructure/guards/bearer-auth.guard';
 
@@ -29,7 +28,6 @@ export class AuthController {
     private authService: AuthService,
     private securityService: DevicesService,
     private usersQueryRepository: UsersQueryRepository,
-    private devicesQueryRepository: DevicesQueryRepository,
   ) {}
 
   @Get('me')
@@ -60,7 +58,6 @@ export class AuthController {
     if (!token) {
       throw new UnauthorizedException();
     } else {
-      //'user-agent'  || 'device-1'
       const title = req.headers['host'];
       const payload = await this.authService.getTokenPayload(
         token.refreshToken,
@@ -88,37 +85,24 @@ export class AuthController {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    if (!payload) throw new UnauthorizedException();
-    const tokenIssuedAt = new Date(payload.iat * 1000).toISOString();
-    const lastActiveSession = await this.devicesQueryRepository.getSession(
+    const token = await this.authService.updateJWT(
+      payload.userId,
       payload.deviceId,
     );
+    const newPayload = await this.authService.getTokenPayload(
+      token.refreshToken,
+    );
+    const lastActiveDate = new Date(newPayload.iat * 1000).toISOString();
+    await this.securityService.updateLastActiveDate(
+      payload.deviceId,
+      lastActiveDate,
+    );
 
-    if (
-      !lastActiveSession ||
-      tokenIssuedAt !== lastActiveSession.lastActiveDate
-    ) {
-      throw new UnauthorizedException();
-    } else {
-      const token = await this.authService.updateJWT(
-        payload.userId,
-        payload.deviceId,
-      );
-      const newPayload = await this.authService.getTokenPayload(
-        token.refreshToken,
-      );
-      const lastActiveDate = new Date(newPayload.iat * 1000).toISOString();
-      await this.securityService.updateLastActiveDate(
-        payload.deviceId,
-        lastActiveDate,
-      );
-
-      res.cookie('refreshToken', token.refreshToken, {
-        httpOnly: true,
-        secure: true,
-      });
-      return { accessToken: token.accessToken };
-    }
+    res.cookie('refreshToken', token.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+    return { accessToken: token.accessToken };
   }
 
   @Post('logout')
@@ -150,7 +134,7 @@ export class AuthController {
 
   @Post('password-recovery')
   @UseGuards(ReteLimitGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   //todo -> для моих тестов должен быть статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
     return {

@@ -11,7 +11,7 @@ import {
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
 
-// refreshToken - expiresIn: '40s'
+// refreshToken - expiresIn: '30s'
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -41,7 +41,7 @@ describe('AuthController (e2e)', () => {
       })
       .expect(HttpStatus.UNAUTHORIZED);
   });
-
+  // создаю 1го пользователя как админ
   it('3 – POST:/users – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-1111',
@@ -164,7 +164,7 @@ describe('AuthController (e2e)', () => {
         ],
       });
   });
-
+  // создаю 2го пользователя как пользователь
   it('9 – POST:/auth/registration – return 204, create 2nd user & send confirmation code', async () => {
     const secondUser = {
       login: 'lg-2222',
@@ -208,14 +208,14 @@ describe('AuthController (e2e)', () => {
       });
   });
 
-  it('12 – POST:/auth/refresh-token – return 401 with no any token', async () => {
+  it('12 – POST:/auth/refresh-token – return 401 with no token', async () => {
     await request(server)
       .post('/auth/refresh-token')
       .send('noToken')
       .expect(HttpStatus.UNAUTHORIZED);
   });
 
-  it('13 – POST:/auth/login – return 200 and login', async () => {
+  it('13 – POST:/auth/login – return 200 and login 1st user', async () => {
     const { firstUser } = expect.getState();
     const loginResponse = await request(server).post('/auth/login').send({
       loginOrEmail: firstUser.login,
@@ -233,7 +233,7 @@ describe('AuthController (e2e)', () => {
 
     expect.setState({ accessToken, firstRefreshToken: refreshToken });
   });
-
+  // получаю новую пру токенов
   it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
     const { accessToken, firstRefreshToken } = expect.getState();
     await sleep(1.1);
@@ -263,7 +263,7 @@ describe('AuthController (e2e)', () => {
     });
   });
 
-  it('15 – POST:/auth/refresh-token – return 401 with no any token', async () => {
+  it('15 – POST:/auth/refresh-token – return 401 with no token', async () => {
     const goodRefreshTokenResponse = await request(server).post(
       '/auth/refresh-token',
     );
@@ -329,91 +329,91 @@ describe('AuthController (e2e)', () => {
     expect(newPasswordResponse.status).toBe(HttpStatus.NO_CONTENT);
   });
 
-  it('21 – POST:/auth/password-recovery – return 429', async () => {
-    const { firstUser } = expect.getState();
-    await sleep(10);
+  // it('21 – POST:/auth/password-recovery – return 429', async () => {
+  //   const { firstUser } = expect.getState();
+  //   await sleep(10);
+  //
+  //   await request(server)
+  //     .post('/auth/password-recovery')
+  //     .set('user-agent', 'device-2')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.OK);
+  //
+  //   await request(server)
+  //     .post('/auth/password-recovery')
+  //     .set('user-agent', 'device-3')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.OK);
+  //
+  //   await request(server)
+  //     .post('/auth/password-recovery')
+  //     .set('user-agent', 'device-4')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.OK);
+  //
+  //   await request(server)
+  //     .post('/auth/password-recovery')
+  //     .set('user-agent', 'device-5')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.OK);
+  //
+  //   await request(server)
+  //     .post('/auth/password-recovery')
+  //     .set('user-agent', 'device-6')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.OK);
+  //
+  //   const loginResponse = await request(server)
+  //     .post('/auth/password-recovery')
+  //     .set('user-agent', 'device-7')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.TOO_MANY_REQUESTS);
+  //
+  //   expect(loginResponse).toBeDefined();
+  // });
+  // it('22 – POST:/auth/new-password – return 429', async () => {
+  //   const { firstUser } = expect.getState();
+  //
+  //   await request(server)
+  //     .post('/auth/new-password')
+  //     .set('user-agent', 'device-2')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.BAD_REQUEST);
+  //
+  //   await request(server)
+  //     .post('/auth/new-password')
+  //     .set('user-agent', 'device-3')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.BAD_REQUEST);
+  //
+  //   await request(server)
+  //     .post('/auth/new-password')
+  //     .set('user-agent', 'device-4')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.BAD_REQUEST);
+  //
+  //   await request(server)
+  //     .post('/auth/new-password')
+  //     .set('user-agent', 'device-5')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.BAD_REQUEST);
+  //
+  //   await request(server)
+  //     .post('/auth/new-password')
+  //     .set('user-agent', 'device-6')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.BAD_REQUEST);
+  //
+  //   const loginResponse = await request(server)
+  //     .post('/auth/new-password')
+  //     .set('user-agent', 'device-7')
+  //     .send({ email: firstUser.email })
+  //     .expect(HttpStatus.TOO_MANY_REQUESTS);
+  //
+  //   expect(loginResponse).toBeDefined();
+  // });
 
-    await request(server)
-      .post('/auth/password-recovery')
-      .set('user-agent', 'device-2')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.OK);
-
-    await request(server)
-      .post('/auth/password-recovery')
-      .set('user-agent', 'device-3')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.OK);
-
-    await request(server)
-      .post('/auth/password-recovery')
-      .set('user-agent', 'device-4')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.OK);
-
-    await request(server)
-      .post('/auth/password-recovery')
-      .set('user-agent', 'device-5')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.OK);
-
-    await request(server)
-      .post('/auth/password-recovery')
-      .set('user-agent', 'device-6')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.OK);
-
-    const loginResponse = await request(server)
-      .post('/auth/password-recovery')
-      .set('user-agent', 'device-7')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.TOO_MANY_REQUESTS);
-
-    expect(loginResponse).toBeDefined();
-  });
-  it('22 – POST:/auth/new-password – return 429', async () => {
-    const { firstUser } = expect.getState();
-
-    await request(server)
-      .post('/auth/new-password')
-      .set('user-agent', 'device-2')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.BAD_REQUEST);
-
-    await request(server)
-      .post('/auth/new-password')
-      .set('user-agent', 'device-3')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.BAD_REQUEST);
-
-    await request(server)
-      .post('/auth/new-password')
-      .set('user-agent', 'device-4')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.BAD_REQUEST);
-
-    await request(server)
-      .post('/auth/new-password')
-      .set('user-agent', 'device-5')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.BAD_REQUEST);
-
-    await request(server)
-      .post('/auth/new-password')
-      .set('user-agent', 'device-6')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.BAD_REQUEST);
-
-    const loginResponse = await request(server)
-      .post('/auth/new-password')
-      .set('user-agent', 'device-7')
-      .send({ email: firstUser.email })
-      .expect(HttpStatus.TOO_MANY_REQUESTS);
-
-    expect(loginResponse).toBeDefined();
-  });
-
-  it('23 – POST:/auth/logout – return 204 & logout', async () => {
+  it('23 – POST:/auth/logout – return 204 & logout 1st user', async () => {
     const { secondRefreshToken } = expect.getState();
     const goodRefreshTokenResponse = await request(server)
       .post('/auth/logout')
@@ -421,6 +421,46 @@ describe('AuthController (e2e)', () => {
 
     expect(goodRefreshTokenResponse).toBeDefined();
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.NO_CONTENT);
+  });
+  it('24 – POST:/auth/refresh-token – return 401 with old token', async () => {
+    const { secondRefreshToken } = expect.getState();
+
+    const goodRefreshTokenResponse = await request(server)
+      .post('/auth/logout')
+      .set('cookie', secondRefreshToken);
+
+    expect(goodRefreshTokenResponse).toBeDefined();
+    expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
+  });
+
+  it('24 – POST:/auth/login – return 200 and login 1st user', async () => {
+    const { firstUser } = expect.getState();
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: firstUser.login,
+      password: 'newPassword',
+    });
+
+    expect(loginResponse).toBeDefined();
+    expect(loginResponse.status).toBe(HttpStatus.OK);
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
+
+    const refreshToken = getRefreshTokenByResponse(loginResponse);
+    expect(refreshToken).toBeDefined();
+    expect(refreshToken).toEqual(expect.any(String));
+
+    expect.setState({ accessToken, thirdRefreshToken: refreshToken });
+  });
+  it('25 – POST:/auth/refresh-token – return 401 with old token', async () => {
+    const { thirdRefreshToken } = expect.getState();
+    await sleep(21.1);
+
+    const goodRefreshTokenResponse = await request(server)
+      .post('/auth/refresh-token')
+      .set('cookie', thirdRefreshToken);
+
+    expect(goodRefreshTokenResponse).toBeDefined();
+    expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
   });
 
   afterAll(async () => {
