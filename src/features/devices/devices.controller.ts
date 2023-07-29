@@ -27,11 +27,11 @@ export class DevicesController {
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
   async getActiveSessions(@Req() req) {
-    const tokenPayload = await this.authService.getTokenPayload(
+    const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    if (!tokenPayload) throw new Error();
-    return this.devicesQueryRepository.getSessions(tokenPayload.userId);
+    // if (!tokenPayload) throw new Error();
+    return this.devicesQueryRepository.getSessions(payload.userId);
   }
 
   @Delete('devices')

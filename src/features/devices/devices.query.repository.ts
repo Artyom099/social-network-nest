@@ -21,10 +21,18 @@ export class DevicesQueryRepository {
         deviceId: device.deviceId,
       };
   }
-  //todo - : Promise<SessionViewModel[]>
-  async getSessions(userId: string) {
-    return this.devicesModel
+
+  async getSessions(userId: string): Promise<DeviceViewModel[]> {
+    const devices = await this.devicesModel
       .find({ userId }, { projection: { _id: 0, userId: 0 } })
       .exec();
+    return devices.map((d) => {
+      return {
+        ip: d.ip,
+        title: d.title,
+        lastActiveDate: d.lastActiveDate.toISOString(),
+        deviceId: d.deviceId,
+      };
+    });
   }
 }
