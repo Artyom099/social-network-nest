@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { CreateUserInputModel, UserViewModel } from './users.models';
+import { CreateUserInputModel, UserViewModel } from './api/users.models';
 import add from 'date-fns/add';
 
 @Schema({ _id: false, versionKey: false })

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { DevicesQueryRepository } from '../../features/devices/devices.query.repository';
+import { DevicesQueryRepository } from '../../features/devices/infrastructure/devices.query.repository';
 import { jwtConstants } from '../utils/settings';
 
 @Injectable()

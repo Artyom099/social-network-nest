@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { BlogInputModel } from './blogs.models';
+import { BlogInputModel } from './api/blogs.models';
 import { randomUUID } from 'crypto';
 
 export type BlogDocument = HydratedDocument<Blog>;
