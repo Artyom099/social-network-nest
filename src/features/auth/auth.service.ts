@@ -149,10 +149,6 @@ export class AuthService {
     return recoveryCode;
   }
 
-  async checkRecoveryCode(code: string) {
-    return this.usersQueryRepository.getUserByRecoveryCode(code);
-  }
-
   async updatePassword(code: string, password: string) {
     const passwordSalt = await bcrypt.genSalt(10);
     const passwordHash = await this._generateHash(password, passwordSalt);

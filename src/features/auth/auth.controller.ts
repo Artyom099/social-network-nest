@@ -121,8 +121,10 @@ export class AuthController {
   async setNewPassword(
     @Body() body: { recoveryCode: string; newPassword: string },
   ) {
-    const confirm = await this.authService.checkRecoveryCode(body.recoveryCode);
-    if (!confirm) {
+    const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(
+      body.recoveryCode,
+    );
+    if (!isUserConfirm) {
       throw new BadRequestException();
     } else {
       await this.authService.updatePassword(
