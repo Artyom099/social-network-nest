@@ -10,14 +10,14 @@ export class CheckUserIdGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const refreshToken = this.extractTokenFromHeaders(request);
-    // console.log({ refreshToken: refreshToken });
+
     if (!refreshToken) {
-      request['userId'] = null;
+      request.userId = null;
     } else {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: jwtConstants.secret,
+        secret: jwtConstants.refreshSecret,
       });
-      request['userId'] = payload.userId;
+      request.userId = payload.userId;
     }
     return true;
   }

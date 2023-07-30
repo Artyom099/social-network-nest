@@ -15,7 +15,11 @@ import { AuthService } from './auth.service';
 import { DevicesService } from '../devices/devices.service';
 import { UsersQueryRepository } from '../users/users.query.repository';
 import { CreateUserInputModel } from '../users/users.models';
-import { AuthInputModel, EmailInputModel } from './auth.models';
+import {
+  AuthInputModel,
+  EmailInputModel,
+  SetNewPasswordInputModel,
+} from './auth.models';
 import { CookieGuard } from '../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 import { RateLimitGuard } from '../../infrastructure/guards/rate.limit.guard';
@@ -118,18 +122,16 @@ export class AuthController {
   @Post('new-password')
   @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async setNewPassword(
-    @Body() body: { recoveryCode: string; newPassword: string },
-  ) {
+  async setNewPassword(@Body() InputModel: SetNewPasswordInputModel) {
     const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(
-      body.recoveryCode,
+      InputModel.recoveryCode,
     );
     if (!isUserConfirm) {
       throw new BadRequestException();
     } else {
       await this.authService.updatePassword(
-        body.recoveryCode,
-        body.newPassword,
+        InputModel.recoveryCode,
+        InputModel.newPassword,
       );
     }
   }

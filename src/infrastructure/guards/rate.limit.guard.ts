@@ -19,12 +19,6 @@ export class RateLimitGuard implements CanActivate {
     const timeLimit = new Date(dateNow - 10_000);
 
     const countIP = await this.ipService.countIpAndUrl(ip, url, timeLimit);
-    // console.log({
-    //   countIP: countIP,
-    //   url: url,
-    //   dateNow: new Date(dateNow),
-    //   timeLimit: timeLimit,
-    // });
 
     if (countIP >= 5) {
       throw new HttpException('TooManyRequest', HttpStatus.TOO_MANY_REQUESTS);

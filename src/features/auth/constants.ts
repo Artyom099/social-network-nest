@@ -1,5 +1,6 @@
 export const jwtConstants = {
-  secret: 'SECRET_KEY',
+  accessSecret: 'SECRET_KEY',
+  refreshSecret: 'REFRESH_TOKEN_SECRET_KEY',
 };
 
 export const basicAuthConstants = {

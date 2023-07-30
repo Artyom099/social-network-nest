@@ -18,6 +18,16 @@ export class EmailInputModel {
   @Transform(({ value }) => value?.trim())
   email: string;
 }
+export class SetNewPasswordInputModel {
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
+  recoveryCode: string;
+  @IsString()
+  @IsNotEmpty()
+  @Transform(({ value }) => value?.trim())
+  newPassword: string;
+}
 
 export type TokenPayloadType = {
   userId: string;

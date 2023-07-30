@@ -65,11 +65,11 @@ export class AuthService {
       const payload = { userId: user.id, deviceId: randomUUID() };
       return {
         accessToken: await this.jwtService.signAsync(payload, {
-          secret: jwtConstants.secret,
-          expiresIn: '10s',
+          secret: jwtConstants.accessSecret,
+          expiresIn: '5m',
         }),
         refreshToken: await this.jwtService.signAsync(payload, {
-          secret: jwtConstants.secret,
+          secret: jwtConstants.refreshSecret,
           expiresIn: '20s',
         }),
       };
@@ -80,12 +80,12 @@ export class AuthService {
     const payload = { userId, deviceId };
     return {
       accessToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '10s',
-        secret: jwtConstants.secret,
+        secret: jwtConstants.accessSecret,
+        expiresIn: '5m',
       }),
       refreshToken: await this.jwtService.signAsync(payload, {
+        secret: jwtConstants.refreshSecret,
         expiresIn: '20s',
-        secret: jwtConstants.secret,
       }),
     };
   }
