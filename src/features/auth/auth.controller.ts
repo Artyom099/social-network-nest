@@ -18,7 +18,7 @@ import { CreateUserInputModel } from '../users/users.models';
 import { AuthInputModel, EmailInputModel } from './auth.models';
 import { CookieGuard } from '../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
-import { ReteLimitGuard } from '../../infrastructure/guards/rete.limit.guard';
+import { RateLimitGuard } from '../../infrastructure/guards/rate.limit.guard';
 import { BearerAuthGuard } from '../../infrastructure/guards/bearer-auth.guard';
 
 @Controller('auth')
@@ -44,7 +44,7 @@ export class AuthController {
   }
 
   @Post('login')
-  @UseGuards(ReteLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   async login(
     @Req() req,
@@ -116,7 +116,7 @@ export class AuthController {
   }
 
   @Post('new-password')
-  @UseGuards(ReteLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(
     @Body() body: { recoveryCode: string; newPassword: string },
@@ -133,7 +133,7 @@ export class AuthController {
   }
 
   @Post('password-recovery')
-  @UseGuards(ReteLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   //todo -> для моих тестов должен быть статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
@@ -143,7 +143,7 @@ export class AuthController {
   }
 
   @Post('registration')
-  @UseGuards(ReteLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
     const existUserEmail =
@@ -161,7 +161,7 @@ export class AuthController {
   }
 
   @Post('registration-confirmation')
-  @UseGuards(ReteLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendConfirmationEmail(@Body() body: { code: string }) {
     const confirmEmail = await this.authService.confirmEmail(body.code);
@@ -175,7 +175,7 @@ export class AuthController {
   }
 
   @Post('registration-email-resending')
-  @UseGuards(ReteLimitGuard)
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: { email: string }) {
     const existUser = await this.usersQueryRepository.getUserByLoginOrEmail(

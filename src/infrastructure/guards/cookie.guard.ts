@@ -20,7 +20,6 @@ export class CookieGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const refreshToken = CookieGuard.extractTokenFromCookie(request);
     if (!refreshToken) throw new UnauthorizedException();
-    //добавить проверку на наличие активной сесси этого токена
 
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken, {

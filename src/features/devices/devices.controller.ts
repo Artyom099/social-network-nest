@@ -30,7 +30,6 @@ export class DevicesController {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    // if (!tokenPayload) throw new Error();
     return this.devicesQueryRepository.getSessions(payload.userId);
   }
 

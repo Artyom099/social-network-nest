@@ -110,10 +110,7 @@ export class AuthService {
       return false;
     } else {
       await this.usersRepository.save(user);
-      const user2 = await this.usersQueryRepository.getUserByConfirmationCode(
-        code,
-      );
-      console.log({ user_after: user2 });
+      await this.usersQueryRepository.getUserByConfirmationCode(code);
       return true;
     }
   }
@@ -144,6 +141,7 @@ export class AuthService {
     const recoveryCode = user.updateRecoveryCode();
     await this.usersRepository.save(user);
     try {
+      //await
       await emailManager.sendEmailRecoveryCode(email, recoveryCode);
     } catch (error) {
       return null;

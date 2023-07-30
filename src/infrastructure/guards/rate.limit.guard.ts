@@ -8,7 +8,7 @@ import {
 import { IpService } from '../services/ip.service';
 
 @Injectable()
-export class ReteLimitGuard implements CanActivate {
+export class RateLimitGuard implements CanActivate {
   constructor(private ipService: IpService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -16,7 +16,7 @@ export class ReteLimitGuard implements CanActivate {
     const ip = request.ip;
     const url = request.originalUrl;
     const dateNow = Date.now();
-    const timeLimit = new Date(dateNow - 11_000);
+    const timeLimit = new Date(dateNow - 10_000);
 
     const countIP = await this.ipService.countIpAndUrl(ip, url, timeLimit);
     // console.log({

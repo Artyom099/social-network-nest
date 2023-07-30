@@ -19,7 +19,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const errorsMessages: any = [];
       const responseBody: any = exception.getResponse();
 
-      // console.log({ responseBody_1: responseBody });
       if (typeof responseBody.message === 'string') {
         const [message, field] = responseBody.message.split('=>');
         errorsMessages.push({ message, field });
@@ -27,7 +26,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         //todo можно ли оставить never?
         responseBody.message.forEach((m: never) => errorsMessages.push(m));
       }
-      // console.log({ errorsMessages: errorsMessages });
+
       response.status(status).json({ errorsMessages });
     } else {
       response.status(status).json({
