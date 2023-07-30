@@ -11,8 +11,6 @@ import {
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
 
-// refreshToken - expiresIn: '30s'
-
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let server: any;

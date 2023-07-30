@@ -7,8 +7,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtConstants } from '../../features/auth/constants';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { jwtConstants } from '../utils/settings';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -24,13 +24,13 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
+    const accessToken = this.extractTokenFromHeader(request);
+    if (!accessToken) {
       throw new UnauthorizedException();
     }
     try {
-      request.user = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.refreshSecret,
+      request.user = await this.jwtService.verifyAsync(accessToken, {
+        secret: jwtConstants.accessSecret,
       });
     } catch {
       throw new UnauthorizedException();

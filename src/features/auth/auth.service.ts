@@ -7,7 +7,7 @@ import { UsersRepository } from '../users/users.repository';
 import { CreateUserInputModel, UserViewModel } from '../users/users.models';
 import { emailManager } from '../../infrastructure/services/email.manager';
 import { UsersQueryRepository } from '../users/users.query.repository';
-import { jwtConstants } from './constants';
+import { jwtConstants } from '../../infrastructure/utils/settings';
 
 @Injectable()
 export class AuthService {

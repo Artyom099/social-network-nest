@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { jwtConstants } from '../../features/auth/constants';
 import { DevicesQueryRepository } from '../../features/devices/devices.query.repository';
+import { jwtConstants } from '../utils/settings';
 
 @Injectable()
 export class CookieGuard implements CanActivate {
@@ -23,7 +23,7 @@ export class CookieGuard implements CanActivate {
 
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: jwtConstants.accessSecret,
+        secret: jwtConstants.refreshSecret,
       });
       const tokenIssuedAt = new Date(payload.iat * 1000).toISOString();
       const lastActiveSession = await this.devicesQueryRepository.getSession(

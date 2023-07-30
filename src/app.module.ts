@@ -28,14 +28,8 @@ import { config } from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
-import { DevicesService } from './features/devices/devices.service';
-import { DevicesRepository } from './features/devices/devices.repository';
-import { DevicesController } from './features/devices/devices.controller';
 import { Device, DeviceSchema } from './features/devices/devices.schema';
-import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './features/auth/constants';
 import { BlogExistsConstraint } from './features/posts/posts.models';
-import { DevicesQueryRepository } from './features/devices/devices.query.repository';
 import { IpService } from './infrastructure/services/ip.service';
 import { Request, RequestSchema } from './infrastructure/services/ip.schema';
 
