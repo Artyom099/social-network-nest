@@ -31,6 +31,7 @@ import { UsersModule } from './features/users/users.module';
 import { BlogExistsConstraint } from './features/posts/posts.models';
 import { IpService } from './infrastructure/services/ip.service';
 import { Request, RequestSchema } from './infrastructure/services/ip.schema';
+import { Device, DeviceSchema } from './features/devices/devices.schema';
 
 config();
 
@@ -44,6 +45,7 @@ config();
       { name: User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
+      { name: Device.name, schema: DeviceSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: Request.name, schema: RequestSchema },
     ]),
@@ -51,14 +53,16 @@ config();
   controllers: [
     AppController,
     TestController,
+
     UsersController,
     BlogsController,
     PostsController,
     CommentsController,
   ],
   providers: [
-    IpService,
     AppService,
+
+    IpService,
     TestRepository,
     BlogExistsConstraint,
 
