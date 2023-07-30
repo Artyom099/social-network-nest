@@ -4,7 +4,6 @@ import {
   IsString,
   Length,
   Validate,
-  ValidationArguments,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
@@ -16,11 +15,11 @@ import { Injectable } from '@nestjs/common';
 @ValidatorConstraint({ name: 'BlogExists', async: true })
 export class BlogExistsConstraint implements ValidatorConstraintInterface {
   constructor(private blogsQueryRepo: BlogsQueryRepository) {}
-  async validate(id: string, args: ValidationArguments) {
+  async validate(id: string) {
     const blog = await this.blogsQueryRepo.getBlog(id);
     return !!blog;
   }
-  defaultMessage(args: ValidationArguments) {
+  defaultMessage() {
     return "Blog with this id doesn't exist";
   }
 }

@@ -32,13 +32,17 @@ import { BlogExistsConstraint } from './features/posts/api/posts.models';
 import { IpService } from './infrastructure/services/ip.service';
 import { Request, RequestSchema } from './infrastructure/services/ip.schema';
 import { Device, DeviceSchema } from './features/devices/devices.schema';
+import { CqrsModule } from '@nestjs/cqrs';
 
 config();
 
 @Module({
   imports: [
+    // todo - зачем отдельно создвать эти 2 модуля?
     AuthModule,
     UsersModule,
+
+    CqrsModule,
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URL || ''),
     MongooseModule.forFeature([

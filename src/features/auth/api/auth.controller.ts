@@ -22,7 +22,6 @@ import {
 } from './auth.models';
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
-import { RateLimitGuard } from '../../../infrastructure/guards/rate.limit.guard';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 
 @Controller('auth')

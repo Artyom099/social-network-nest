@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModelType } from '../users.schema';
+import { User, UserModelType } from '../users.schema';
 import { CreateUserInputModel } from '../api/users.models';
 
 @Injectable()

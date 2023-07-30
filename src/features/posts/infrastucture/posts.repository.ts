@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import {
-  NewestLikesViewModel,
   PostDBModel,
   PostInputModel,
   PostViewModel,
