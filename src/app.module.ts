@@ -28,7 +28,6 @@ import { config } from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './features/auth/auth.module';
 import { UsersModule } from './features/users/users.module';
-import { Device, DeviceSchema } from './features/devices/devices.schema';
 import { BlogExistsConstraint } from './features/posts/posts.models';
 import { IpService } from './infrastructure/services/ip.service';
 import { Request, RequestSchema } from './infrastructure/services/ip.schema';
@@ -45,9 +44,8 @@ config();
       { name: User.name, schema: UserSchema },
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
-      { name: Device.name, schema: DeviceSchema },
-      { name: Request.name, schema: RequestSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: Request.name, schema: RequestSchema },
     ]),
   ],
   controllers: [
@@ -57,7 +55,6 @@ config();
     BlogsController,
     PostsController,
     CommentsController,
-    // DevicesController,
   ],
   providers: [
     IpService,
@@ -80,10 +77,6 @@ config();
     CommentsService,
     CommentsRepository,
     CommentsQueryRepository,
-
-    //DevicesService,
-    //DevicesRepository,
-    // DevicesQueryRepository,
   ],
 })
 export class AppModule {}
