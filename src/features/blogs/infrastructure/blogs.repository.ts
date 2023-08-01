@@ -18,6 +18,10 @@ export class BlogsRepository {
       websiteUrl: blog.websiteUrl,
       createdAt: blog.createdAt,
       isMembership: blog.isMembership,
+      blogOwnerInfo: {
+        userId: '',
+        userLogin: '',
+      },
     };
   }
   async updateBlog(id: string, InputModel: BlogInputModel) {
@@ -32,5 +36,12 @@ export class BlogsRepository {
   }
   async deleteBlog(id: string) {
     await this.blogModel.deleteOne({ id });
+  }
+
+  async updateBlogsUser(id: string, userId: string, login: string) {
+    await this.blogModel.updateOne(
+      { id },
+      { 'blogOwnerInfo.userId': userId, 'blogOwnerInfo.userLogin': login },
+    );
   }
 }

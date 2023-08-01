@@ -39,6 +39,7 @@ describe('AuthController (e2e)', () => {
       })
       .expect(HttpStatus.UNAUTHORIZED);
   });
+
   // создаю 1го пользователя как админ
   it('3 – POST:/users – create 1st user by admin', async () => {
     const firstUser = {
@@ -162,6 +163,7 @@ describe('AuthController (e2e)', () => {
         ],
       });
   });
+
   // создаю 2го пользователя как пользователь
   it('9 – POST:/auth/registration – return 204, create 2nd user & send confirmation code', async () => {
     const secondUser = {
@@ -231,6 +233,7 @@ describe('AuthController (e2e)', () => {
 
     expect.setState({ accessToken, firstRefreshToken: refreshToken });
   });
+
   // получаю новую пру токенов
   it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
     const { accessToken, firstRefreshToken } = expect.getState();

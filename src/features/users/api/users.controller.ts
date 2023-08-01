@@ -8,24 +8,31 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
 import {
+  BanUserInputModel,
   CreateUserInputModel,
   GetUsersWithPagingAndSearch,
 } from './users.models';
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
 import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
+import { CreateUserByAdminUseCase } from '../../auth/api/use.cases/create.user.use.case';
+import { BanUserUseCase } from '../../auth/api/use.cases/ban.user.use.case';
 
 @UseGuards(BasicAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
-    protected usersService: UsersService,
+    private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
+
+    private banUserUseCase: BanUserUseCase,
+    private createUserByAdminUseCase: CreateUserByAdminUseCase,
   ) {}
 
   @Get()
@@ -50,8 +57,8 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: CreateUserInputModel) {
-    const userId = await this.usersService.createUser(inputModel);
-    return this.usersQueryRepository.getUserById(userId);
+    return this.createUserByAdminUseCase.createUser(inputModel);
+    // return this.usersService.createUser(inputModel);
   }
 
   @Delete(':id')
@@ -63,5 +70,18 @@ export class UsersController {
     } else {
       return this.usersService.deleteUser(userId);
     }
+  }
+
+  @Put(':id/ban')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async banUser(
+    @Param('id') userId: string,
+    @Body() inputModel: BanUserInputModel,
+  ) {
+    return this.banUserUseCase.banUser(
+      userId,
+      inputModel.isBanned,
+      inputModel.banReason,
+    );
   }
 }

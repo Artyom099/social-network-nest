@@ -20,6 +20,15 @@ class AccountData {
 const AccountDataSchema = SchemaFactory.createForClass(AccountData);
 
 @Schema({ _id: false, versionKey: false })
+class BanInfo {
+  @Prop({ required: true, type: Boolean })
+  isBanned: boolean;
+  @Prop({ required: true, type: String })
+  banReason: string;
+}
+const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
+
+@Schema({ _id: false, versionKey: false })
 class EmailConfirmation {
   @Prop({ required: true, type: String })
   confirmationCode: string;
@@ -37,12 +46,14 @@ export class User {
   id: string;
   @Prop({ type: AccountDataSchema, required: true })
   accountData: AccountData;
+  @Prop({ type: BanInfoSchema, required: true })
+  banInfo: BanInfo;
   @Prop({ type: EmailConfirmationSchema, required: true })
   emailConfirmation: EmailConfirmation;
   @Prop({ type: String, required: true })
   recoveryCode: string;
 
-  static createUserClass(
+  static createUserByAdmin(
     InputModel: CreateUserInputModel,
     passwordSalt: string,
     passwordHash: string,
@@ -57,6 +68,10 @@ export class User {
         passwordHash,
         createdAt: new Date(),
       },
+      banInfo: {
+        isBanned: false,
+        banReason: '1',
+      },
       emailConfirmation: {
         confirmationCode: randomUUID(),
         expirationDate: add(new Date(), { minutes: 10 }),
@@ -66,6 +81,7 @@ export class User {
     };
     return new UserModel(data);
   }
+
   static createUserBySelf(
     InputModel: CreateUserInputModel,
     passwordSalt: string,
@@ -81,12 +97,16 @@ export class User {
         passwordHash,
         createdAt: new Date(),
       },
+      banInfo: {
+        isBanned: false,
+        banReason: '2',
+      },
       emailConfirmation: {
         confirmationCode: randomUUID(),
         expirationDate: add(new Date(), { minutes: 10 }),
         isConfirmed: false,
       },
-      recoveryCode: '1',
+      recoveryCode: '2',
     };
     return new UserModel(data);
   }
@@ -126,6 +146,10 @@ export class User {
     this.emailConfirmation.confirmationCode = newCode;
     return newCode;
   }
+  updateBanStatus(status: boolean, reason: string) {
+    this.banInfo.isBanned = status;
+    this.banInfo.banReason = reason;
+  }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 
@@ -135,9 +159,16 @@ UserSchema.methods = {
   updateSaltAndHash: User.prototype.updateSaltAndHash,
   updateRecoveryCode: User.prototype.updateRecoveryCode,
   updateConfirmationCode: User.prototype.updateConfirmationCode,
+  updateBanStatus: User.prototype.updateBanStatus,
 };
 export type UserModelStaticType = {
-  createUserClass: (
+  createUserByAdmin: (
+    InputModel: CreateUserInputModel,
+    passwordSalt: string,
+    passwordHash: string,
+    UserModel: UserModelType,
+  ) => UserDocument;
+  createUserBySelf: (
     InputModel: CreateUserInputModel,
     passwordSalt: string,
     passwordHash: string,
@@ -146,6 +177,7 @@ export type UserModelStaticType = {
 };
 export type UserModelType = Model<User> & UserModelStaticType;
 const userStaticMethods: UserModelStaticType = {
-  createUserClass: User.createUserClass,
+  createUserByAdmin: User.createUserByAdmin,
+  createUserBySelf: User.createUserBySelf,
 };
 UserSchema.statics = userStaticMethods;

@@ -1,5 +1,11 @@
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
-import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateUserInputModel {
@@ -17,6 +23,16 @@ export class CreateUserInputModel {
   @Length(6, 20)
   @Transform(({ value }) => value?.trim())
   password: string;
+}
+export class BanUserInputModel {
+  @IsBoolean()
+  @IsNotEmpty()
+  isBanned: boolean;
+  @IsString()
+  @IsNotEmpty()
+  @Length(20)
+  @Transform(({ value }) => value?.trim())
+  banReason: string;
 }
 export type UserViewModel = {
   id: string;

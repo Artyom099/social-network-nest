@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from '../users/users.module';
 import { AuthController } from './api/auth.controller';
 import { AuthService } from './application/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -17,10 +16,21 @@ import {
 } from '../../infrastructure/services/ip.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { DevicesController } from '../devices/api/devices.controller';
+import { UsersService } from '../users/application/users.service';
+import { UsersController } from '../users/api/users.controller';
+import { CreateUserByAdminUseCase } from './api/use.cases/create.user.use.case';
+import { RegisterUserUseCase } from './api/use.cases/register.user.use.case';
+import { BanUserUseCase } from './api/use.cases/ban.user.use.case';
+
+const useCases = [
+  CreateUserByAdminUseCase,
+  RegisterUserUseCase,
+  BanUserUseCase,
+];
 
 @Module({
   imports: [
-    UsersModule,
+    // UsersModule,
     JwtModule.register({
       global: true,
     }),
@@ -30,12 +40,15 @@ import { DevicesController } from '../devices/api/devices.controller';
       { name: Request.name, schema: RequestSchema },
     ]),
   ],
-  controllers: [AuthController, DevicesController],
+  controllers: [AuthController, UsersController, DevicesController],
   providers: [
+    ...useCases,
+
     IpService,
 
     AuthService,
 
+    UsersService,
     UsersRepository,
     UsersQueryRepository,
 
@@ -43,6 +56,6 @@ import { DevicesController } from '../devices/api/devices.controller';
     DevicesRepository,
     DevicesQueryRepository,
   ],
-  exports: [AuthService],
+  exports: [AuthService, UsersService, UsersRepository, UsersQueryRepository],
 })
 export class AuthModule {}

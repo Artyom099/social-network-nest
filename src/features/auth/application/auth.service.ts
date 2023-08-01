@@ -25,7 +25,7 @@ export class AuthService {
     InputModel: CreateUserInputModel,
   ): Promise<UserViewModel | null> {
     const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this._generateHash(
+    const passwordHash = await this.generateHash(
       InputModel.password,
       passwordSalt,
     );
@@ -37,6 +37,7 @@ export class AuthService {
     );
     // сохранение умного юзера через репозиторий
     await this.usersRepository.save(user);
+
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
       await emailManager.sendEmailConfirmationMessage(
@@ -58,7 +59,7 @@ export class AuthService {
       loginOrEmail,
     );
     if (!user) return null;
-    const passwordHash = await this._generateHash(
+    const passwordHash = await this.generateHash(
       password,
       user.accountData.passwordSalt,
     );
@@ -154,7 +155,7 @@ export class AuthService {
 
   async updatePassword(code: string, password: string) {
     const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this._generateHash(password, passwordSalt);
+    const passwordHash = await this.generateHash(password, passwordSalt);
 
     const user = await this.usersQueryRepository.getUserByRecoveryCode(code);
     if (!user) return null;
@@ -163,7 +164,7 @@ export class AuthService {
     await this.usersRepository.save(user);
   }
 
-  async _generateHash(password: string, salt: string) {
+  private async generateHash(password: string, salt: string) {
     return bcrypt.hash(password, salt);
   }
 }

@@ -3,8 +3,16 @@ import { HydratedDocument } from 'mongoose';
 import { BlogInputModel } from './api/blogs.models';
 import { randomUUID } from 'crypto';
 
-export type BlogDocument = HydratedDocument<Blog>;
+@Schema({ _id: false, versionKey: false })
+class BlogOwnerInfo {
+  @Prop({ required: false })
+  userId: string;
+  @Prop({ required: false })
+  userLogin: string;
+}
+const BlogOwnerInfoSchema = SchemaFactory.createForClass(BlogOwnerInfo);
 
+export type BlogDocument = HydratedDocument<Blog>;
 @Schema({ versionKey: false })
 export class Blog {
   @Prop({ required: true })
@@ -19,6 +27,8 @@ export class Blog {
   createdAt: string;
   @Prop({ required: true, default: false })
   isMembership: boolean;
+  @Prop({ type: BlogOwnerInfoSchema, required: true })
+  blogOwnerInfo: BlogOwnerInfo;
 
   static create(InputModel: BlogInputModel) {
     const blog = new Blog();
@@ -31,5 +41,4 @@ export class Blog {
     return blog;
   }
 }
-
 export const BlogSchema = SchemaFactory.createForClass(Blog);

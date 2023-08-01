@@ -5,23 +5,21 @@ import { CreateUserInputModel } from '../api/users.models';
 
 @Injectable()
 export class UsersRepository {
-  constructor(
-    @InjectModel(User.name)
-    private userModel: UserModelType,
-  ) {}
+  constructor(@InjectModel(User.name) private userModel: UserModelType) {}
 
-  async createUser(
+  async createUserByAdmin(
     InputModel: CreateUserInputModel,
     passwordSalt: string,
     passwordHash: string,
   ) {
-    return User.createUserClass(
+    return User.createUserByAdmin(
       InputModel,
       passwordSalt,
       passwordHash,
       this.userModel,
     );
   }
+
   async createUserBySelf(
     InputModel: CreateUserInputModel,
     passwordSalt: string,

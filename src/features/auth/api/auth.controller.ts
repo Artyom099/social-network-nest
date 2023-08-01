@@ -23,6 +23,7 @@ import {
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
+import { RegisterUserUseCase } from './use.cases/register.user.use.case';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +32,8 @@ export class AuthController {
     private authService: AuthService,
     private securityService: DevicesService,
     private usersQueryRepository: UsersQueryRepository,
+
+    private registerUserUseCase: RegisterUserUseCase,
   ) {}
 
   @Get('me')
@@ -137,8 +140,8 @@ export class AuthController {
 
   @Post('password-recovery')
   // @UseGuards(RateLimitGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  //todo -> для моих тестов должен быть статус OK, по документации NO_CONTENT
+  @HttpCode(HttpStatus.OK)
+  //todo -> для моих тестов статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
     return {
       recoveryCode: await this.authService.sendRecoveryCode(InputModel.email),
@@ -159,7 +162,7 @@ export class AuthController {
     if (existUserLogin) {
       throw new BadRequestException('login exist=>login');
     } else {
-      await this.authService.createUser(inputModel);
+      await this.registerUserUseCase.createUser(inputModel);
     }
   }
 

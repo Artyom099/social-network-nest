@@ -26,6 +26,7 @@ import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repo
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
+import { BindBlogUseCase } from '../application/use.cases/bind.blog.use.case';
 
 @Controller('blogs')
 export class BlogsController {
@@ -34,6 +35,8 @@ export class BlogsController {
     private postsService: PostsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
+
+    private bindBlogUseCase: BindBlogUseCase,
   ) {}
 
   @Get()
@@ -137,6 +140,21 @@ export class BlogsController {
       throw new NotFoundException('blog not found');
     } else {
       return this.postsService.createPost(foundBlog, inputModel);
+    }
+  }
+
+  @Put(':id/bind-with-user/:userId')
+  @UseGuards(BasicAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async bindBlogWithUser(
+    @Param('id') blogId: string,
+    @Param('userId') userId: string,
+  ) {
+    const blog = await this.blogsQueryRepository.getBlog(blogId);
+    if (!blog || blog.blogOwnerInfo) {
+      throw new NotFoundException('blog not found');
+    } else {
+      return this.bindBlogUseCase.bindBlog(blogId, userId);
     }
   }
 }

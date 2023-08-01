@@ -27,4 +27,8 @@ export type BlogViewModel = {
   websiteUrl: string;
   createdAt: string;
   isMembership: boolean;
+  blogOwnerInfo: {
+    userId: string;
+    userLogin: string;
+  };
 };

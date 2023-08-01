@@ -26,13 +26,15 @@ export class UsersQueryRepository {
       return this.getViewModel(user);
     }
   }
-  async getUserByLoginOrEmail(
-    loginOrEmail: string,
-  ): Promise<UserDocument | null> {
+
+  async getUserById2(id: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ id });
+  }
+  async getUserByLoginOrEmail(logOrMail: string): Promise<UserDocument | null> {
     return this.userModel.findOne({
       $or: [
-        { 'accountData.email': loginOrEmail },
-        { 'accountData.login': loginOrEmail },
+        { 'accountData.email': logOrMail },
+        { 'accountData.login': logOrMail },
       ],
     });
   }
