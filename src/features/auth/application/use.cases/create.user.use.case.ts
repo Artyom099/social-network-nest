@@ -1,30 +1,33 @@
-import { UsersService } from '../../../users/application/users.service';
 import {
   CreateUserInputModel,
   UserViewModel,
 } from '../../../users/api/users.models';
+import { UsersService } from '../../../users/application/users.service';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-@Injectable()
-export class RegisterUserUseCase {
+export class CreateUserByAdminCommand {
+  constructor(public InputModel: CreateUserInputModel) {}
+}
+
+@CommandHandler(CreateUserByAdminCommand)
+// implements ICommandHandler<CreateUserByAdminCommand>
+export class CreateUserByAdminUseCase {
   constructor(
     private usersService: UsersService,
     private usersRepository: UsersRepository,
   ) {}
-
+  // createUser || execute
   async createUser(InputModel: CreateUserInputModel): Promise<UserViewModel> {
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this.usersService.generateHash(
+    // console.log('CreateUserByAdminUseCase');
+    const { salt, hash } = await this.usersService.generateSaltAndHash(
       InputModel.password,
-      passwordSalt,
     );
     // создание умного юзера через репозиторий
-    const user = await this.usersRepository.createUserBySelf(
+    const user = await this.usersRepository.createUserByAdmin(
       InputModel,
-      passwordSalt,
-      passwordHash,
+      salt,
+      hash,
     );
     // сохранение умного юзера через репозиторий
     await this.usersRepository.save(user);

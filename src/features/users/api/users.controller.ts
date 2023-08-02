@@ -21,8 +21,9 @@ import {
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
 import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
-import { CreateUserByAdminUseCase } from '../../auth/api/use.cases/create.user.use.case';
-import { BanUserUseCase } from '../../auth/api/use.cases/ban.user.use.case';
+import { CreateUserByAdminUseCase } from '../../auth/application/use.cases/create.user.use.case';
+import { BanUserUseCase } from '../../auth/application/use.cases/ban.user.use.case';
+import { CommandBus } from '@nestjs/cqrs';
 
 @UseGuards(BasicAuthGuard)
 @Controller('users')
@@ -31,6 +32,7 @@ export class UsersController {
     private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
 
+    private commandBus: CommandBus,
     private banUserUseCase: BanUserUseCase,
     private createUserByAdminUseCase: CreateUserByAdminUseCase,
   ) {}
@@ -57,8 +59,12 @@ export class UsersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: CreateUserInputModel) {
+    //inputModel: CreateUserByAdminCommand || inputModel: CreateUserInputModel
+
+    // с этой строкой запускается, но тесты падают с 500 ошибкой
+    // return this.commandBus.execute(new CreateUserByAdminCommand(inputModel));
+
     return this.createUserByAdminUseCase.createUser(inputModel);
-    // return this.usersService.createUser(inputModel);
   }
 
   @Delete(':id')
@@ -83,5 +89,9 @@ export class UsersController {
       inputModel.isBanned,
       inputModel.banReason,
     );
+
+    // return this.commandBus.execute(
+    //   new BanUserCommand(userId, inputModel.isBanned, inputModel.banReason),
+    // );
   }
 }

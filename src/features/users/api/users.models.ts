@@ -64,3 +64,7 @@ export type GetUsersWithPagingAndSearch = {
   searchLoginTerm: string;
   searchEmailTerm: string;
 };
+export type SaltHashModel = {
+  salt: string;
+  hash: string;
+};

@@ -6,6 +6,7 @@ import { appSettings } from '../src/infrastructure/settings/app.settings';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
+  let server: any;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -14,12 +15,12 @@ describe('UsersController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     appSettings(app);
     await app.init();
-
-    await request(app.getHttpServer()).delete('/testing/all-data');
+    server = app.getHttpServer();
+    await request(server).delete('/testing/all-data');
   });
 
   it('1 – GET:/users – return 200 & empty array', async () => {
-    await request(app.getHttpServer())
+    await request(server)
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -37,7 +38,7 @@ describe('UsersController (e2e)', () => {
       password: 'qwerty1',
       email: 'valid-email@mail1.ru',
     };
-    const createResponse = await request(app.getHttpServer())
+    const createResponse = await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -56,7 +57,7 @@ describe('UsersController (e2e)', () => {
       createdAt: expect.any(String),
     });
 
-    await request(app.getHttpServer())
+    await request(server)
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -75,7 +76,7 @@ describe('UsersController (e2e)', () => {
       password: 'qwerty2',
       email: 'valid-email@mail2.ru',
     };
-    const createResponse = await request(app.getHttpServer())
+    const createResponse = await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -94,7 +95,7 @@ describe('UsersController (e2e)', () => {
       createdAt: expect.any(String),
     });
 
-    await request(app.getHttpServer())
+    await request(server)
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -113,7 +114,7 @@ describe('UsersController (e2e)', () => {
       password: 'qwerty3',
       email: 'valid-email@mail3.ru',
     };
-    const createResponse = await request(app.getHttpServer())
+    const createResponse = await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -132,7 +133,7 @@ describe('UsersController (e2e)', () => {
       createdAt: expect.any(String),
     });
 
-    await request(app.getHttpServer())
+    await request(server)
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -152,7 +153,7 @@ describe('UsersController (e2e)', () => {
       password: 'qwerty4',
       email: 'valid-email@mail4.ru',
     };
-    const createResponse = await request(app.getHttpServer())
+    const createResponse = await request(server)
       .post('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
@@ -171,7 +172,7 @@ describe('UsersController (e2e)', () => {
       createdAt: expect.any(String),
     });
 
-    await request(app.getHttpServer())
+    await request(server)
       .get('/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
@@ -190,14 +191,14 @@ describe('UsersController (e2e)', () => {
   });
 
   it('6 – DELETE:/users – return 404', async () => {
-    request(app.getHttpServer())
+    request(server)
       .delete('/users/1')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NOT_FOUND);
   });
   it('7 – DELETE:/users – return 204 & delete first user', async () => {
     const { firstCreatedUser } = expect.getState();
-    request(app.getHttpServer())
+    request(server)
       .delete(`/users/${firstCreatedUser.id}`)
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);

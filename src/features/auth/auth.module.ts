@@ -18,9 +18,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { DevicesController } from '../devices/api/devices.controller';
 import { UsersService } from '../users/application/users.service';
 import { UsersController } from '../users/api/users.controller';
-import { CreateUserByAdminUseCase } from './api/use.cases/create.user.use.case';
-import { RegisterUserUseCase } from './api/use.cases/register.user.use.case';
-import { BanUserUseCase } from './api/use.cases/ban.user.use.case';
+import { CreateUserByAdminUseCase } from './application/use.cases/create.user.use.case';
+import { RegisterUserUseCase } from './application/use.cases/register.user.use.case';
+import { BanUserUseCase } from './application/use.cases/ban.user.use.case';
+import { CqrsModule } from '@nestjs/cqrs';
 
 const useCases = [
   CreateUserByAdminUseCase,
@@ -30,7 +31,7 @@ const useCases = [
 
 @Module({
   imports: [
-    // UsersModule,
+    CqrsModule,
     JwtModule.register({
       global: true,
     }),

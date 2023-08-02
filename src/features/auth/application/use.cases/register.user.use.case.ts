@@ -1,30 +1,27 @@
+import { UsersService } from '../../../users/application/users.service';
 import {
   CreateUserInputModel,
   UserViewModel,
 } from '../../../users/api/users.models';
-import { UsersService } from '../../../users/application/users.service';
-import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class CreateUserByAdminUseCase {
+export class RegisterUserUseCase {
   constructor(
     private usersService: UsersService,
     private usersRepository: UsersRepository,
   ) {}
 
   async createUser(InputModel: CreateUserInputModel): Promise<UserViewModel> {
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this.usersService.generateHash(
+    const { salt, hash } = await this.usersService.generateSaltAndHash(
       InputModel.password,
-      passwordSalt,
     );
     // создание умного юзера через репозиторий
-    const user = await this.usersRepository.createUserByAdmin(
+    const user = await this.usersRepository.createUserBySelf(
       InputModel,
-      passwordSalt,
-      passwordHash,
+      salt,
+      hash,
     );
     // сохранение умного юзера через репозиторий
     await this.usersRepository.save(user);

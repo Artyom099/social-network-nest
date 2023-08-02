@@ -23,7 +23,7 @@ import {
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
-import { RegisterUserUseCase } from './use.cases/register.user.use.case';
+import { RegisterUserUseCase } from '../application/use.cases/register.user.use.case';
 
 @Controller('auth')
 export class AuthController {

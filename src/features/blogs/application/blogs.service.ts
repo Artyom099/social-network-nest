@@ -11,6 +11,7 @@ export class BlogsService {
     const createdBlog = Blog.create(InputModel);
     return this.blogsRepository.createBlog(createdBlog);
   }
+
   async updateBlog(blogId: string, InputModel: BlogInputModel) {
     return this.blogsRepository.updateBlog(blogId, InputModel);
   }

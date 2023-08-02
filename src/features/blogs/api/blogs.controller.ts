@@ -27,6 +27,7 @@ import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { BindBlogUseCase } from '../application/use.cases/bind.blog.use.case';
+import { CreateBlogUseCase } from '../application/use.cases/create.blog.use.case';
 
 @Controller('blogs')
 export class BlogsController {
@@ -37,6 +38,7 @@ export class BlogsController {
     private postsQueryRepository: PostsQueryRepository,
 
     private bindBlogUseCase: BindBlogUseCase,
+    private createBlogUseCase: CreateBlogUseCase,
   ) {}
 
   @Get()
@@ -60,7 +62,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Body() inputModel: BlogInputModel) {
-    return this.blogsService.createBlog(inputModel);
+    return this.createBlogUseCase.createBlog(inputModel);
   }
 
   @Get(':id')
