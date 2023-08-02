@@ -26,7 +26,7 @@ import { BanUserUseCase } from '../../auth/application/use.cases/ban.user.use.ca
 import { CommandBus } from '@nestjs/cqrs';
 
 @UseGuards(BasicAuthGuard)
-@Controller('users')
+@Controller('sa/users')
 export class UsersController {
   constructor(
     private usersService: UsersService,

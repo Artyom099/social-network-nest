@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { BlogsController } from './features/blogs/api/blogs.controller';
+import { BloggerBlogsController } from './features/blogs/api/blogger.blogs.controller';
 import { BlogsService } from './features/blogs/application/blogs.service';
 import { BlogsRepository } from './features/blogs/infrastructure/blogs.repository';
 import { PostsController } from './features/posts/api/posts.controller';
@@ -28,10 +28,11 @@ import { Request, RequestSchema } from './infrastructure/services/ip.schema';
 import { Device, DeviceSchema } from './features/devices/devices.schema';
 import { CqrsModule } from '@nestjs/cqrs';
 import { BindBlogUseCase } from './features/blogs/application/use.cases/bind.blog.use.case';
+import { CreateBlogUseCase } from './features/blogs/application/use.cases/create.blog.use.case';
 
 config();
 
-const useCases = [BindBlogUseCase];
+const useCases = [CreateBlogUseCase, BindBlogUseCase];
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ const useCases = [BindBlogUseCase];
     AppController,
     TestController,
 
-    BlogsController,
+    BloggerBlogsController,
     PostsController,
     CommentsController,
   ],

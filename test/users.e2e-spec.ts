@@ -19,9 +19,9 @@ describe('UsersController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
-  it('1 – GET:/users – return 200 & empty array', async () => {
+  it('1 – GET:/sa/users – return 200 & empty array', async () => {
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 0,
@@ -32,14 +32,14 @@ describe('UsersController (e2e)', () => {
       });
   });
 
-  it('2 – POST:/users – return 201 & create first user', async () => {
+  it('2 – POST:/sa/users – return 201 & create first user', async () => {
     const firstUser = {
       login: 'lg-111111',
       password: 'qwerty1',
       email: 'valid-email@mail1.ru',
     };
     const createResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: firstUser.login,
@@ -58,7 +58,7 @@ describe('UsersController (e2e)', () => {
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -69,7 +69,7 @@ describe('UsersController (e2e)', () => {
       });
     expect.setState({ firstCreatedUser: firstCreatedUser });
   });
-  it('3 – POST:/users – return 201 & create second user', async () => {
+  it('3 – POST:/sa/users – return 201 & create second user', async () => {
     const { firstCreatedUser } = expect.getState();
     const secondUser = {
       login: 'lg-222222',
@@ -77,7 +77,7 @@ describe('UsersController (e2e)', () => {
       email: 'valid-email@mail2.ru',
     };
     const createResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: secondUser.login,
@@ -96,7 +96,7 @@ describe('UsersController (e2e)', () => {
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -107,7 +107,7 @@ describe('UsersController (e2e)', () => {
       });
     expect.setState({ secondCreatedUser: secondCreatedUser });
   });
-  it('4 – POST:/users – return 201 & create third user', async () => {
+  it('4 – POST:/sa/users – return 201 & create third user', async () => {
     const { firstCreatedUser, secondCreatedUser } = expect.getState();
     const thirdUser = {
       login: 'lg-333333',
@@ -115,7 +115,7 @@ describe('UsersController (e2e)', () => {
       email: 'valid-email@mail3.ru',
     };
     const createResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: thirdUser.login,
@@ -134,7 +134,7 @@ describe('UsersController (e2e)', () => {
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -145,7 +145,7 @@ describe('UsersController (e2e)', () => {
       });
     expect.setState({ thirdCreatedUser: thirdCreatedUser });
   });
-  it('5 – POST:/users – return 201 & create fourth user', async () => {
+  it('5 – POST:/sa/users – return 201 & create fourth user', async () => {
     const { firstCreatedUser, secondCreatedUser, thirdCreatedUser } =
       expect.getState();
     const fourthUser = {
@@ -154,7 +154,7 @@ describe('UsersController (e2e)', () => {
       email: 'valid-email@mail4.ru',
     };
     const createResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: fourthUser.login,
@@ -173,7 +173,7 @@ describe('UsersController (e2e)', () => {
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -190,16 +190,16 @@ describe('UsersController (e2e)', () => {
     expect.setState({ fourthCreatedUser: fourthCreatedUser });
   });
 
-  it('6 – DELETE:/users – return 404', async () => {
+  it('6 – DELETE:/sa/users – return 404', async () => {
     request(server)
-      .delete('/users/1')
+      .delete('/sa/users/1')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it('7 – DELETE:/users – return 204 & delete first user', async () => {
+  it('7 – DELETE:/sa/users – return 204 & delete first user', async () => {
     const { firstCreatedUser } = expect.getState();
     request(server)
-      .delete(`/users/${firstCreatedUser.id}`)
+      .delete(`/sa/users/${firstCreatedUser.id}`)
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
   });

@@ -18,10 +18,6 @@ export class BlogsRepository {
       websiteUrl: blog.websiteUrl,
       createdAt: blog.createdAt,
       isMembership: blog.isMembership,
-      blogOwnerInfo: {
-        userId: '',
-        userLogin: '',
-      },
     };
   }
   async updateBlog(id: string, InputModel: BlogInputModel) {

@@ -1,44 +1,30 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
   Param,
-  Post,
-  Put,
   Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BlogInputModel } from './blogs.models';
-import { BlogsService } from '../application/blogs.service';
+import { BindBlogUseCase } from '../application/use.cases/bind.blog.use.case';
+import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 import {
   GetItemsWithPaging,
   GetItemsWithPagingAndSearch,
 } from '../../../infrastructure/utils/common.models';
-import { PostsService } from '../../posts/application/posts.service';
-import { PostInputModel } from '../../posts/api/posts.models';
-import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
-import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
-import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
-import { BindBlogUseCase } from '../application/use.cases/bind.blog.use.case';
-import { CreateBlogUseCase } from '../application/use.cases/create.blog.use.case';
+import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 
-@Controller('blogs')
+@Controller('/blogs')
 export class BlogsController {
   constructor(
-    private blogsService: BlogsService,
-    private postsService: PostsService,
+    private bindBlogUseCase: BindBlogUseCase,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
-
-    private bindBlogUseCase: BindBlogUseCase,
-    private createBlogUseCase: CreateBlogUseCase,
   ) {}
 
   @Get()
@@ -58,13 +44,6 @@ export class BlogsController {
     );
   }
 
-  @Post()
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async createBlog(@Body() inputModel: BlogInputModel) {
-    return this.createBlogUseCase.createBlog(inputModel);
-  }
-
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getBlog(@Param('id') blogId: string) {
@@ -73,33 +52,6 @@ export class BlogsController {
       throw new NotFoundException('blog not found');
     } else {
       return foundBlog;
-    }
-  }
-
-  @Put(':id')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updateBlog(
-    @Param('id') blogId: string,
-    @Body() inputModel: BlogInputModel,
-  ) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
-      throw new NotFoundException('blog not found');
-    } else {
-      return this.blogsService.updateBlog(blogId, inputModel);
-    }
-  }
-
-  @Delete(':id')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Param('id') blogId: string) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
-      throw new NotFoundException('blog not found');
-    } else {
-      return this.blogsService.deleteBlog(blogId);
     }
   }
 
@@ -127,36 +79,6 @@ export class BlogsController {
         sortBy,
         sortDirection,
       );
-    }
-  }
-
-  @Post(':id/posts')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async createPostCurrentBlog(
-    @Param('id') blogId: string,
-    @Body() inputModel: PostInputModel,
-  ) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
-      throw new NotFoundException('blog not found');
-    } else {
-      return this.postsService.createPost(foundBlog, inputModel);
-    }
-  }
-
-  @Put(':id/bind-with-user/:userId')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async bindBlogWithUser(
-    @Param('id') blogId: string,
-    @Param('userId') userId: string,
-  ) {
-    const blog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!blog || blog.blogOwnerInfo) {
-      throw new NotFoundException('blog not found');
-    } else {
-      return this.bindBlogUseCase.bindBlog(blogId, userId);
     }
   }
 }

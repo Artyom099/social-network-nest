@@ -5,7 +5,7 @@ import { AppModule } from '../src/app.module';
 import { LikeStatus } from '../src/infrastructure/utils/constants';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
 
-describe('/blogs', () => {
+describe('BlogsController (e2e)', () => {
   let app: INestApplication;
   let server: any;
   beforeAll(async () => {
@@ -20,8 +20,8 @@ describe('/blogs', () => {
     await request(server).delete('/testing/all-data');
   });
 
-  it('1 – GET:/blogs – return 200 and empty array', async () => {
-    await request(server).get('/blogs').expect(HttpStatus.OK, {
+  it('1 – GET:/blogger/blogs – return 200 and empty array', async () => {
+    await request(server).get('/blogger/blogs').expect(HttpStatus.OK, {
       pagesCount: 0,
       page: 1,
       pageSize: 10,
@@ -29,16 +29,18 @@ describe('/blogs', () => {
       items: [],
     });
   });
-
-  it('2 – GET:/blogs/:id – return 404 for not existing blog', async () => {
-    await request(server).get('/blogs/1').expect(HttpStatus.NOT_FOUND);
+  //негативные тесты
+  it('2 – GET:/blogger/blogs/:id – return 404 for not existing blog', async () => {
+    await request(server).get('/blogger/blogs/1').expect(HttpStatus.NOT_FOUND);
   });
-  it("3 – GET:/blogs/:id/posts – return 404 & can't get posts of not existing blog", async () => {
-    await request(server).get('/blogs/11/posts').expect(HttpStatus.NOT_FOUND);
-  });
-  it("4 – POST:/blogs/:id/posts – return 404 & can't create posts of not existing blog", async () => {
+  it("3 – GET:/blogger/blogs/:id/posts – return 404 & can't get posts of not existing blog", async () => {
     await request(server)
-      .post(`/blogs/11/posts`)
+      .get('/blogger/blogs/11/posts')
+      .expect(HttpStatus.NOT_FOUND);
+  });
+  it("4 – POST:/blogger/blogs/:id/posts – return 404 & can't create posts of not existing blog", async () => {
+    await request(server)
+      .post(`/blogger/blogs/11/posts`)
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         title: 'valid-title',
@@ -48,9 +50,9 @@ describe('/blogs', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it("5 – POST:/blogs – return 401 – shouldn't create blog – NO Auth", async () => {
+  it("5 – POST:/blogger/blogs – return 401 – shouldn't create blog – NO Auth", async () => {
     await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .send({
         name: 'valid name',
         description: 'valid description',
@@ -58,18 +60,20 @@ describe('/blogs', () => {
       })
       .expect(HttpStatus.UNAUTHORIZED);
 
-    await request(app.getHttpServer()).get('/blogs').expect(HttpStatus.OK, {
-      pagesCount: 0,
-      page: 1,
-      pageSize: 10,
-      totalCount: 0,
-      items: [],
-    });
+    await request(app.getHttpServer())
+      .get('/blogger/blogs')
+      .expect(HttpStatus.OK, {
+        pagesCount: 0,
+        page: 1,
+        pageSize: 10,
+        totalCount: 0,
+        items: [],
+      });
   });
 
-  it("6 – POST:/blogs – shouldn't create blog – name = null", async () => {
+  it("6 – POST:/blogger/blogs – shouldn't create blog – name = null", async () => {
     await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: null,
@@ -80,7 +84,7 @@ describe('/blogs', () => {
         HttpStatus.BAD_REQUEST,
         // { errorsMessages: [{ message: 'Invalid value', field: 'name' }],}
       );
-    await request(server).get('/blogs').expect(HttpStatus.OK, {
+    await request(server).get('/blogger/blogs').expect(HttpStatus.OK, {
       pagesCount: 0,
       page: 1,
       pageSize: 10,
@@ -88,9 +92,9 @@ describe('/blogs', () => {
       items: [],
     });
   });
-  it("7 – POST:/blogs – shouldn't create blog – short description", async () => {
+  it("7 – POST:/blogger/blogs – shouldn't create blog – short description", async () => {
     await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: 'valid name',
@@ -105,7 +109,7 @@ describe('/blogs', () => {
           },
         ],
       });
-    await request(server).get('/blogs').expect(HttpStatus.OK, {
+    await request(server).get('/blogger/blogs').expect(HttpStatus.OK, {
       pagesCount: 0,
       page: 1,
       pageSize: 10,
@@ -113,9 +117,9 @@ describe('/blogs', () => {
       items: [],
     });
   });
-  it("8 - POST:/blogs – shouldn't create blog – Invalid websiteUrl", async () => {
+  it("8 - POST:/blogger/blogs – shouldn't create blog – invalid websiteUrl", async () => {
     await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: 'valid name',
@@ -127,7 +131,7 @@ describe('/blogs', () => {
           { message: 'websiteUrl must be an URL address', field: 'websiteUrl' },
         ],
       });
-    await request(server).get('/blogs').expect(HttpStatus.OK, {
+    await request(server).get('/blogger/blogs').expect(HttpStatus.OK, {
       pagesCount: 0,
       page: 1,
       pageSize: 10,
@@ -136,14 +140,15 @@ describe('/blogs', () => {
     });
   });
 
-  it('9 – POST:/blogs – return 201 & create first blog', async () => {
+  it('9 – POST:/blogger/blogs – return 201 & create first blog', async () => {
     const firstBlog = {
       name: 'valid-blog',
       description: 'valid-description',
       websiteUrl: 'valid-websiteUrl.com',
     };
+    console.log('9--------9');
     const createResponse = await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: firstBlog.name,
@@ -163,7 +168,7 @@ describe('/blogs', () => {
     });
 
     await request(server)
-      .get('/blogs')
+      .get('/blogger/blogs')
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -174,7 +179,8 @@ describe('/blogs', () => {
 
     expect.setState({ firstCreatedBlog: firstCreatedBlog });
   });
-  it('10 – POST:/blogs – return 201 & create second blog', async () => {
+  it('10 – POST:/blogger/blogs – return 201 & create second blog', async () => {
+    console.log('10--------10');
     const { firstCreatedBlog } = expect.getState();
     const secondBlog = {
       name: 'second-blog',
@@ -182,7 +188,7 @@ describe('/blogs', () => {
       websiteUrl: '2-valid-websiteUrl.com',
     };
     const createResponse = await request(server)
-      .post('/blogs')
+      .post('/blogger/blogs')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: secondBlog.name,
@@ -202,7 +208,7 @@ describe('/blogs', () => {
     });
 
     await request(server)
-      .get('/blogs')
+      .get('/blogger/blogs')
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -214,9 +220,10 @@ describe('/blogs', () => {
     expect.setState({ secondCreatedBlog: secondCreatedBlog });
   });
 
-  it("11 – PUT:/blogs/:id – shouldn't update blog that not exist", async () => {
+  it("11 – PUT:/blogger/blogs/:id – shouldn't update blog that not exist", async () => {
+    console.log('11--------11');
     await request(server)
-      .put('/blogs/' + -3)
+      .put('/blogger/blogs/' + -3)
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: 'val_name update',
@@ -225,10 +232,10 @@ describe('/blogs', () => {
       })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it("12 – PUT:/blogs/:id – shouldn't update blog with long name", async () => {
+  it("12 – PUT:/blogger/blogs/:id – shouldn't update blog with long name", async () => {
     const { firstCreatedBlog } = expect.getState();
     await request(server)
-      .put('/blogs/' + firstCreatedBlog.id)
+      .put('/blogger/blogs/' + firstCreatedBlog.id)
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: 'invalid long name update',
@@ -238,11 +245,11 @@ describe('/blogs', () => {
       .expect(HttpStatus.BAD_REQUEST);
 
     await request(server)
-      .get('/blogs/' + firstCreatedBlog.id)
+      .get('/blogger/blogs/' + firstCreatedBlog.id)
       .expect(HttpStatus.OK, firstCreatedBlog);
   });
 
-  it('13 – PUT:/blogs/:id – return 202 & update blog', async () => {
+  it('13 – PUT:/blogger/blogs/:id – return 202 & update blog', async () => {
     const { firstCreatedBlog } = expect.getState();
     const firstUpdateBlog = {
       name: 'val_name update',
@@ -250,7 +257,7 @@ describe('/blogs', () => {
       websiteUrl: 'https://valid-Url-update.com',
     };
     await request(server)
-      .put('/blogs/' + firstCreatedBlog.id)
+      .put('/blogger/blogs/' + firstCreatedBlog.id)
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         name: firstUpdateBlog.name,
@@ -260,7 +267,7 @@ describe('/blogs', () => {
       .expect(HttpStatus.NO_CONTENT);
 
     await request(server)
-      .get('/blogs/' + firstCreatedBlog.id)
+      .get('/blogger/blogs/' + firstCreatedBlog.id)
       .expect(HttpStatus.OK, {
         ...firstCreatedBlog,
         name: firstUpdateBlog.name,
@@ -271,14 +278,14 @@ describe('/blogs', () => {
     expect.setState({ firstUpdateBlog: firstUpdateBlog });
   });
 
-  it('14 – DELETE:/blogs/:id – return 404 for delete non-exist blog', async () => {
+  it('14 – DELETE:/blogger/blogs/:id – return 404 for delete non-exist blog', async () => {
     await request(server)
-      .delete('/blogs/1')
+      .delete('/blogger/blogs/1')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it('15 – POST:/blogs/:id/posts – return 201 & create posts current blog', async () => {
+  it('15 – POST:/blogger/blogs/:id/posts – return 201 & create posts current blog', async () => {
     const { firstCreatedBlog, firstUpdateBlog } = expect.getState();
     const firstPost = {
       title: 'valid-title',
@@ -286,7 +293,7 @@ describe('/blogs', () => {
       content: 'valid-content',
     };
     const createPostResponse = await request(server)
-      .post(`/blogs/${firstCreatedBlog.id}/posts`)
+      .post(`/blogger/blogs/${firstCreatedBlog.id}/posts`)
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         title: firstPost.title,
@@ -314,10 +321,10 @@ describe('/blogs', () => {
 
     expect.setState({ createdPost: createPostResponse.body });
   });
-  it('16 – GET:/blogs/:id/posts – return 200 & get posts current blog with pagination', async () => {
+  it('16 – GET:/blogger/blogs/:id/posts – return 200 & get posts current blog with pagination', async () => {
     const { firstCreatedBlog, createdPost } = expect.getState();
     const getPostsRequest = await request(server).get(
-      `/blogs/${firstCreatedBlog.id}/posts`,
+      `/blogger/blogs/${firstCreatedBlog.id}/posts`,
     );
 
     expect(getPostsRequest).toBeDefined();
@@ -331,19 +338,19 @@ describe('/blogs', () => {
     });
   });
 
-  it('17 – DELETE:/blogs/:id – delete both blogs', async () => {
+  it('17 – DELETE:/blogger/blogs/:id – delete both blogs', async () => {
     const { firstCreatedBlog, secondCreatedBlog } = expect.getState();
     await request(server)
-      .delete('/blogs/' + firstCreatedBlog.id)
+      .delete('/blogger/blogs/' + firstCreatedBlog.id)
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
 
     await request(app.getHttpServer())
-      .get('/blogs/' + firstCreatedBlog.id)
+      .get('/blogger/blogs/' + firstCreatedBlog.id)
       .expect(HttpStatus.NOT_FOUND);
 
     await request(server)
-      .get('/blogs')
+      .get('/blogger/blogs')
       .expect(HttpStatus.OK, {
         pagesCount: 1,
         page: 1,
@@ -353,15 +360,15 @@ describe('/blogs', () => {
       });
 
     await request(server)
-      .delete('/blogs/' + secondCreatedBlog.id)
+      .delete('/blogger/blogs/' + secondCreatedBlog.id)
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
 
     await request(server)
-      .get('/blogs/' + secondCreatedBlog.id)
+      .get('/blogger/blogs/' + secondCreatedBlog.id)
       .expect(HttpStatus.NOT_FOUND);
 
-    await request(server).get('/blogs').expect(HttpStatus.OK, {
+    await request(server).get('/blogger/blogs').expect(HttpStatus.OK, {
       pagesCount: 0,
       page: 1,
       pageSize: 10,
