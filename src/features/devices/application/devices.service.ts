@@ -27,4 +27,7 @@ export class DevicesService {
   async deleteOtherSessions(deviceId: string) {
     return this.securityRepository.deleteOtherSessions(deviceId);
   }
+  async deleteAllSessions(userId: string) {
+    return this.securityRepository.deleteAllSessions(userId);
+  }
 }

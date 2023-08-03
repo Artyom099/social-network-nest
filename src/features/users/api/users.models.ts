@@ -29,7 +29,6 @@ export class BanUserInputModel {
   @IsNotEmpty()
   isBanned: boolean;
   @IsString()
-  @IsNotEmpty()
   @Length(20)
   @Transform(({ value }) => value?.trim())
   banReason: string;

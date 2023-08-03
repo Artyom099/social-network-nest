@@ -169,10 +169,13 @@ export class User {
     this.emailConfirmation.confirmationCode = newCode;
     return newCode;
   }
-  updateBanStatus(status: boolean, reason: string) {
-    this.banInfo.isBanned = status;
+  banUser(reason: string) {
+    this.banInfo.isBanned = true;
     this.banInfo.banReason = reason;
     this.banInfo.banDate = new Date();
+  }
+  unbanUser() {
+    this.banInfo.isBanned = false;
   }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -184,7 +187,8 @@ UserSchema.methods = {
   updateSaltAndHash: User.prototype.updateSaltAndHash,
   updateRecoveryCode: User.prototype.updateRecoveryCode,
   updateConfirmationCode: User.prototype.updateConfirmationCode,
-  updateBanStatus: User.prototype.updateBanStatus,
+  banUser: User.prototype.banUser,
+  unbanUser: User.prototype.unbanUser,
 };
 export type UserModelStaticType = {
   createUserByAdmin: (

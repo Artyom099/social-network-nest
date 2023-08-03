@@ -24,6 +24,8 @@ import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard'
 import { CreateUserByAdminUseCase } from '../../auth/application/use.cases/create.user.use.case';
 import { BanUserUseCase } from '../../auth/application/use.cases/ban.user.use.case';
 import { CommandBus } from '@nestjs/cqrs';
+import { UnbanUserUseCase } from '../../auth/application/use.cases/unban.user.use.case';
+import { DevicesService } from '../../devices/application/devices.service';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa/users')
@@ -31,9 +33,11 @@ export class UsersController {
   constructor(
     private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
+    private devicesService: DevicesService,
 
     private commandBus: CommandBus,
     private banUserUseCase: BanUserUseCase,
+    private unbanUserUseCase: UnbanUserUseCase,
     private createUserByAdminUseCase: CreateUserByAdminUseCase,
   ) {}
 
@@ -72,7 +76,7 @@ export class UsersController {
   async deleteUser(@Param('id') userId: string) {
     const foundUser = await this.usersQueryRepository.getUserById(userId);
     if (!foundUser) {
-      throw new NotFoundException('Blog not found');
+      throw new NotFoundException('User not found');
     } else {
       return this.usersService.deleteUser(userId);
     }
@@ -84,11 +88,19 @@ export class UsersController {
     @Param('id') userId: string,
     @Body() inputModel: BanUserInputModel,
   ) {
-    return this.banUserUseCase.banUser(
-      userId,
-      inputModel.isBanned,
-      inputModel.banReason,
-    );
+    const foundUser = await this.usersQueryRepository.getUserById2(userId);
+    if (!foundUser) throw new NotFoundException('User not found');
+
+    if (inputModel.isBanned) {
+      await this.banUserUseCase.banUser(
+        userId,
+        inputModel.isBanned,
+        inputModel.banReason,
+      );
+      await this.devicesService.deleteAllSessions(userId);
+    } else {
+      await this.unbanUserUseCase.unbanUser(userId);
+    }
 
     // return this.commandBus.execute(
     //   new BanUserCommand(userId, inputModel.isBanned, inputModel.banReason),

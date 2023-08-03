@@ -1,8 +1,8 @@
+import { CommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
-import { CommandHandler } from '@nestjs/cqrs';
 
-export class BanUserCommand {
+export class UnbanUserCommand {
   constructor(
     private userId: string,
     private banStatus: boolean,
@@ -10,19 +10,19 @@ export class BanUserCommand {
   ) {}
 }
 
-@CommandHandler(BanUserCommand)
-//implements ICommandHandler<BanUserCommand>
-export class BanUserUseCase {
+@CommandHandler(UnbanUserCommand)
+//implements ICommandHandler<UnbanUserCommand>
+export class UnbanUserUseCase {
   constructor(
     private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
   ) {}
   // banUser || execute
-  async banUser(userId: string, banStatus: boolean, banReason: string) {
+  async unbanUser(userId: string) {
     const user = await this.usersQueryRepository.getUserById2(userId);
     if (!user) return null;
 
-    user.banUser(banReason);
+    user.unbanUser();
     await this.usersRepository.save(user);
   }
 }

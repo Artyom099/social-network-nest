@@ -61,7 +61,11 @@ export class AuthController {
       InputModel.loginOrEmail,
       InputModel.password,
     );
-    if (!token) {
+    if (!token) throw new UnauthorizedException();
+    const payload = await this.authService.getTokenPayload(token.refreshToken);
+    const user = await this.usersQueryRepository.getUserById2(payload.userId);
+
+    if (!user?.banInfo.isBanned) {
       throw new UnauthorizedException();
     } else {
       const title = req.headers['host'];

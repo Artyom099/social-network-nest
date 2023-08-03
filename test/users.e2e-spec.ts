@@ -32,7 +32,7 @@ describe('UsersController (e2e)', () => {
       });
   });
 
-  it('2 – POST:/sa/users – return 201 & create first user', async () => {
+  it('2 – POST:/sa/users – return 201 & create 1st user', async () => {
     const firstUser = {
       login: 'lg-111111',
       password: 'qwerty1',
@@ -74,7 +74,7 @@ describe('UsersController (e2e)', () => {
       });
     expect.setState({ firstCreatedUser: firstCreatedUser });
   });
-  it('3 – POST:/sa/users – return 201 & create second user', async () => {
+  it('3 – POST:/sa/users – return 201 & create 2nd user', async () => {
     const { firstCreatedUser } = expect.getState();
     const secondUser = {
       login: 'lg-222222',
@@ -117,7 +117,7 @@ describe('UsersController (e2e)', () => {
       });
     expect.setState({ secondCreatedUser: secondCreatedUser });
   });
-  it('4 – POST:/sa/users – return 201 & create third user', async () => {
+  it('4 – POST:/sa/users – return 201 & create 3rd user', async () => {
     const { firstCreatedUser, secondCreatedUser } = expect.getState();
     const thirdUser = {
       login: 'lg-333333',
@@ -160,7 +160,7 @@ describe('UsersController (e2e)', () => {
       });
     expect.setState({ thirdCreatedUser: thirdCreatedUser });
   });
-  it('5 – POST:/sa/users – return 201 & create fourth user', async () => {
+  it('5 – POST:/sa/users – return 201 & create 4th user', async () => {
     const { firstCreatedUser, secondCreatedUser, thirdCreatedUser } =
       expect.getState();
     const fourthUser = {
@@ -207,21 +207,130 @@ describe('UsersController (e2e)', () => {
           firstCreatedUser,
         ],
       });
+
     expect.setState({ fourthCreatedUser: fourthCreatedUser });
   });
 
   it('6 – DELETE:/sa/users – return 404', async () => {
-    request(server)
+    await request(server)
       .delete('/sa/users/1')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it('7 – DELETE:/sa/users – return 204 & delete first user', async () => {
-    const { firstCreatedUser } = expect.getState();
-    request(server)
+  it('7 – DELETE:/sa/users – return 204 & delete 1st user', async () => {
+    const {
+      fourthCreatedUser,
+      thirdCreatedUser,
+      secondCreatedUser,
+      firstCreatedUser,
+    } = expect.getState();
+
+    await request(server)
       .delete(`/sa/users/${firstCreatedUser.id}`)
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.NO_CONTENT);
+
+    await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK, {
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 3,
+        items: [fourthCreatedUser, thirdCreatedUser, secondCreatedUser],
+      });
+  });
+
+  it('8 – PUT:/sa/users/:id/ban – return 404', async () => {
+    await request(server)
+      .put('/sa/users/1111/ban')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({
+        isBanned: true,
+        banReason: 'kmkmkmkmkkmkmkmkmkmkm',
+      })
+      .expect(HttpStatus.NOT_FOUND);
+  });
+  it('9 – PUT:/sa/users/:id/ban – return 204 & ban 2nd user', async () => {
+    const { fourthCreatedUser, thirdCreatedUser, secondCreatedUser } =
+      expect.getState();
+    const banInputModel = {
+      isBanned: true,
+      banReason: 'length_21-weqweqweqwq',
+    };
+
+    await request(server)
+      .put(`/sa/users/${secondCreatedUser.id}/ban`)
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send(banInputModel)
+      .expect(HttpStatus.NO_CONTENT);
+
+    const secondBannedUser = {
+      id: secondCreatedUser.id,
+      login: secondCreatedUser.login,
+      email: secondCreatedUser.email,
+      createdAt: secondCreatedUser.createdAt,
+      banInfo: {
+        isBanned: banInputModel.isBanned,
+        banDate: expect.any(String),
+        banReason: banInputModel.banReason,
+      },
+    };
+
+    const getUsers = await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK);
+
+    // todo (совет) если у body большая вложенность, использовть такой expect
+    expect(getUsers.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 3,
+      items: [fourthCreatedUser, thirdCreatedUser, secondBannedUser],
+    });
+  });
+  it('10 – PUT:/sa/users/:id/ban – return 204 & unban 2nd user', async () => {
+    const {
+      banInputModel,
+      fourthCreatedUser,
+      thirdCreatedUser,
+      secondCreatedUser,
+    } = expect.getState();
+    const unbanInputModel = { isBanned: false };
+
+    await request(server)
+      .put(`/sa/users/${secondCreatedUser.id}/ban`)
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({ isBanned: false })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const secondBannedUser = {
+      id: secondCreatedUser.id,
+      login: secondCreatedUser.login,
+      email: secondCreatedUser.email,
+      createdAt: secondCreatedUser.createdAt,
+      banInfo: {
+        isBanned: unbanInputModel.isBanned,
+        banDate: expect.any(String),
+        banReason: banInputModel.banReason,
+      },
+    };
+
+    const getUsers = await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK);
+
+    expect(getUsers.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 3,
+      items: [fourthCreatedUser, thirdCreatedUser, secondBannedUser],
+    });
   });
 
   afterAll(async () => {

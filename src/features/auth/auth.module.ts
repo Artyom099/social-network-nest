@@ -22,11 +22,13 @@ import { CreateUserByAdminUseCase } from './application/use.cases/create.user.us
 import { RegisterUserUseCase } from './application/use.cases/register.user.use.case';
 import { BanUserUseCase } from './application/use.cases/ban.user.use.case';
 import { CqrsModule } from '@nestjs/cqrs';
+import { UnbanUserUseCase } from './application/use.cases/unban.user.use.case';
 
 const useCases = [
   CreateUserByAdminUseCase,
   RegisterUserUseCase,
   BanUserUseCase,
+  UnbanUserUseCase,
 ];
 
 @Module({
