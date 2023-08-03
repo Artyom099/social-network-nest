@@ -9,28 +9,18 @@ export class UsersRepository {
 
   async createUserByAdmin(
     InputModel: CreateUserInputModel,
-    passwordSalt: string,
-    passwordHash: string,
+    salt: string,
+    hash: string,
   ) {
-    return User.createUserByAdmin(
-      InputModel,
-      passwordSalt,
-      passwordHash,
-      this.userModel,
-    );
+    return User.createUserByAdmin(InputModel, salt, hash, this.userModel);
   }
 
   async createUserBySelf(
     InputModel: CreateUserInputModel,
-    passwordSalt: string,
-    passwordHash: string,
+    salt: string,
+    hash: string,
   ) {
-    return User.createUserBySelf(
-      InputModel,
-      passwordSalt,
-      passwordHash,
-      this.userModel,
-    );
+    return User.createUserBySelf(InputModel, salt, hash, this.userModel);
   }
 
   async save(model: any) {

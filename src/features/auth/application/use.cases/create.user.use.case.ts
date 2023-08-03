@@ -1,10 +1,10 @@
 import {
   CreateUserInputModel,
-  UserViewModel,
+  SAUserViewModel,
 } from '../../../users/api/users.models';
 import { UsersService } from '../../../users/application/users.service';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler } from '@nestjs/cqrs';
 
 export class CreateUserByAdminCommand {
   constructor(public InputModel: CreateUserInputModel) {}
@@ -18,7 +18,7 @@ export class CreateUserByAdminUseCase {
     private usersRepository: UsersRepository,
   ) {}
   // createUser || execute
-  async createUser(InputModel: CreateUserInputModel): Promise<UserViewModel> {
+  async createUser(InputModel: CreateUserInputModel): Promise<SAUserViewModel> {
     // console.log('CreateUserByAdminUseCase');
     const { salt, hash } = await this.usersService.generateSaltAndHash(
       InputModel.password,
@@ -31,6 +31,6 @@ export class CreateUserByAdminUseCase {
     );
     // сохранение умного юзера через репозиторий
     await this.usersRepository.save(user);
-    return user.getViewModel();
+    return user.getSAViewModel();
   }
 }

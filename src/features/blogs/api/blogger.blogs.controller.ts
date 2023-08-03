@@ -20,7 +20,10 @@ import {
   GetItemsWithPagingAndSearch,
 } from '../../../infrastructure/utils/common.models';
 import { PostsService } from '../../posts/application/posts.service';
-import { PostInputModel } from '../../posts/api/posts.models';
+import {
+  PostInputModel,
+  PostInputModelWithBlogId,
+} from '../../posts/api/posts.models';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
@@ -39,15 +42,17 @@ export class BloggerBlogsController {
     private createBlogUseCase: CreateBlogUseCase,
   ) {}
 
+  // логика блогов блоггера
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getBlogs(@Query() query: GetItemsWithPagingAndSearch) {
+  async getBlogs(@Req() req, @Query() query: GetItemsWithPagingAndSearch) {
     const searchNameTerm = query.searchNameTerm ?? null;
     const pageNumber = query.pageNumber ?? 1;
     const pageSize = query.pageSize ?? 10;
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
-    return this.blogsQueryRepository.getSortedBlogs(
+    return this.blogsQueryRepository.getSortedBlogsCurrentBlogger(
+      req.userId,
       searchNameTerm,
       Number(pageNumber),
       Number(pageSize),
@@ -62,16 +67,16 @@ export class BloggerBlogsController {
     return this.createBlogUseCase.createBlog(inputModel, req.userId);
   }
 
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  async getBlog(@Param('id') blogId: string) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
-      throw new NotFoundException('blog not found');
-    } else {
-      return foundBlog;
-    }
-  }
+  // @Get(':id')
+  // @HttpCode(HttpStatus.OK)
+  // async getBlog(@Param('id') blogId: string) {
+  //   const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
+  //   if (!foundBlog) {
+  //     throw new NotFoundException('blog not found');
+  //   } else {
+  //     return foundBlog;
+  //   }
+  // }
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -97,6 +102,9 @@ export class BloggerBlogsController {
       return this.blogsService.deleteBlog(blogId);
     }
   }
+
+  //
+  // логика постов блоггера
 
   @Get(':id/posts')
   @HttpCode(HttpStatus.OK)
@@ -135,6 +143,31 @@ export class BloggerBlogsController {
       throw new NotFoundException('blog not found');
     } else {
       return this.postsService.createPost(foundBlog, inputModel);
+    }
+  }
+
+  @Put(':id/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePost(
+    @Param('id') postId: string,
+    @Body() inputModel: PostInputModelWithBlogId,
+  ) {
+    const foundPost = await this.postsQueryRepository.getPost(postId);
+    if (!foundPost) {
+      throw new NotFoundException('post not found');
+    } else {
+      return this.postsService.updatePost(postId, inputModel);
+    }
+  }
+
+  @Delete(':id/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(@Param('postId') postId: string) {
+    const foundPost = await this.postsQueryRepository.getPost(postId);
+    if (!foundPost) {
+      throw new NotFoundException('post not found');
+    } else {
+      return this.postsService.deletePost(postId);
     }
   }
 }

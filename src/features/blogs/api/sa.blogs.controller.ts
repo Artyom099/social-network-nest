@@ -17,6 +17,7 @@ import { GetItemsWithPagingAndSearch } from '../../../infrastructure/utils/commo
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
 
 @Controller('sa/blogs')
+@UseGuards(BasicAuthGuard)
 export class SABlogsController {
   constructor(
     private bindBlogUseCase: BindBlogUseCase,

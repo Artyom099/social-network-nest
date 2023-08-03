@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -15,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
 import { GetItemsWithPaging } from '../../../infrastructure/utils/common.models';
-import { PostInputModelWithBlogId } from './posts.models';
 import { BlogsService } from '../../blogs/application/blogs.service';
 import { PostsQueryRepository } from '../infrastucture/posts.query.repository';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments.query.repository';
@@ -28,7 +26,6 @@ import {
 import { CommentsService } from '../../comments/application/comments.service';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
-import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
 
 @Controller('posts')
@@ -60,20 +57,6 @@ export class PostsController {
     );
   }
 
-  @Post()
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async createPost(@Body() inputModel: PostInputModelWithBlogId) {
-    const foundBLog = await this.blogsQueryRepository.getBlog(
-      inputModel.blogId,
-    );
-    if (!foundBLog) {
-      throw new NotFoundException('blog not found');
-    } else {
-      return this.postsService.createPost(foundBLog, inputModel);
-    }
-  }
-
   @Get(':id')
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
@@ -86,33 +69,6 @@ export class PostsController {
       throw new NotFoundException('post not found');
     } else {
       return foundPost;
-    }
-  }
-
-  @Put(':id')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(
-    @Param('id') postId: string,
-    @Body() inputModel: PostInputModelWithBlogId,
-  ) {
-    const foundPost = await this.postsQueryRepository.getPost(postId);
-    if (!foundPost) {
-      throw new NotFoundException('post not found');
-    } else {
-      return this.postsService.updatePost(postId, inputModel);
-    }
-  }
-
-  @Delete(':id')
-  @UseGuards(BasicAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('id') postId: string) {
-    const foundPost = await this.postsQueryRepository.getPost(postId);
-    if (!foundPost) {
-      throw new NotFoundException('post not found');
-    } else {
-      return this.postsService.deletePost(postId);
     }
   }
 
@@ -187,4 +143,45 @@ export class PostsController {
       );
     }
   }
+
+  // @Post()
+  // @UseGuards(BasicAuthGuard)
+  // @HttpCode(HttpStatus.CREATED)
+  // async createPost(@Body() inputModel: PostInputModelWithBlogId) {
+  //   const foundBLog = await this.blogsQueryRepository.getBlog(
+  //     inputModel.blogId,
+  //   );
+  //   if (!foundBLog) {
+  //     throw new NotFoundException('blog not found');
+  //   } else {
+  //     return this.postsService.createPost(foundBLog, inputModel);
+  //   }
+  // }
+  //
+  // @Put(':id')
+  // @UseGuards(BasicAuthGuard)
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // async updatePost(
+  //   @Param('id') postId: string,
+  //   @Body() inputModel: PostInputModelWithBlogId,
+  // ) {
+  //   const foundPost = await this.postsQueryRepository.getPost(postId);
+  //   if (!foundPost) {
+  //     throw new NotFoundException('post not found');
+  //   } else {
+  //     return this.postsService.updatePost(postId, inputModel);
+  //   }
+  // }
+  //
+  // @Delete(':id')
+  // @UseGuards(BasicAuthGuard)
+  // @HttpCode(HttpStatus.NO_CONTENT)
+  // async deletePost(@Param('id') postId: string) {
+  //   const foundPost = await this.postsQueryRepository.getPost(postId);
+  //   if (!foundPost) {
+  //     throw new NotFoundException('post not found');
+  //   } else {
+  //     return this.postsService.deletePost(postId);
+  //   }
+  // }
 }

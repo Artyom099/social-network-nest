@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { CreateUserInputModel, UserViewModel } from './api/users.models';
+import {
+  CreateUserInputModel,
+  SAUserViewModel,
+  UserViewModel,
+} from './api/users.models';
 import add from 'date-fns/add';
 
 @Schema({ _id: false, versionKey: false })
@@ -23,7 +27,9 @@ const AccountDataSchema = SchemaFactory.createForClass(AccountData);
 class BanInfo {
   @Prop({ required: true, type: Boolean })
   isBanned: boolean;
-  @Prop({ required: true, type: String })
+  @Prop({ required: false, type: Date })
+  banDate: Date;
+  @Prop({ required: false, type: String })
   banReason: string;
 }
 const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
@@ -70,7 +76,8 @@ export class User {
       },
       banInfo: {
         isBanned: false,
-        banReason: '1',
+        banDate: null,
+        banReason: null,
       },
       emailConfirmation: {
         confirmationCode: randomUUID(),
@@ -99,7 +106,8 @@ export class User {
       },
       banInfo: {
         isBanned: false,
-        banReason: '2',
+        banDate: null,
+        banReason: null,
       },
       emailConfirmation: {
         confirmationCode: randomUUID(),
@@ -117,6 +125,21 @@ export class User {
       login: this.accountData.login,
       email: this.accountData.email,
       createdAt: this.accountData.createdAt.toISOString(),
+    };
+  }
+  getSAViewModel(): SAUserViewModel {
+    return {
+      id: this.id,
+      login: this.accountData.login,
+      email: this.accountData.email,
+      createdAt: this.accountData.createdAt.toISOString(),
+      banInfo: {
+        isBanned: this.banInfo.isBanned,
+        banDate: this.banInfo.banDate
+          ? this.banInfo.banDate.toISOString()
+          : null,
+        banReason: this.banInfo.banReason,
+      },
     };
   }
   confirmEmail(code: string): boolean {
@@ -149,12 +172,14 @@ export class User {
   updateBanStatus(status: boolean, reason: string) {
     this.banInfo.isBanned = status;
     this.banInfo.banReason = reason;
+    this.banInfo.banDate = new Date();
   }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods = {
   getViewModel: User.prototype.getViewModel,
+  getSAViewModel: User.prototype.getSAViewModel,
   confirmEmail: User.prototype.confirmEmail,
   updateSaltAndHash: User.prototype.updateSaltAndHash,
   updateRecoveryCode: User.prototype.updateRecoveryCode,

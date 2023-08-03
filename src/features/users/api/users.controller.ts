@@ -46,7 +46,7 @@ export class UsersController {
     const pageSize = query.pageSize ?? 10;
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
-    return this.usersQueryRepository.getSortedUsers(
+    return this.usersQueryRepository.getSortedUsersToSA(
       searchEmailTerm,
       searchLoginTerm,
       Number(pageNumber),

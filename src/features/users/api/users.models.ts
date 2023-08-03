@@ -34,12 +34,19 @@ export class BanUserInputModel {
   @Transform(({ value }) => value?.trim())
   banReason: string;
 }
-export type UserViewModel = {
+export type SAUserViewModel = {
   id: string;
   login: string;
   email: string;
   createdAt: string;
+  banInfo: {
+    isBanned: boolean;
+    banDate: string | null;
+    banReason: string | null;
+  };
 };
+export type UserViewModel = Omit<SAUserViewModel, 'banInfo'>;
+
 export type UserDBModel = {
   id: string;
   accountData: {

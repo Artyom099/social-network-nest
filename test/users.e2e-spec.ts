@@ -55,6 +55,11 @@ describe('UsersController (e2e)', () => {
       login: firstUser.login,
       email: firstUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
@@ -93,6 +98,11 @@ describe('UsersController (e2e)', () => {
       login: secondUser.login,
       email: secondUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
@@ -131,6 +141,11 @@ describe('UsersController (e2e)', () => {
       login: thirdUser.login,
       email: thirdUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
@@ -170,6 +185,11 @@ describe('UsersController (e2e)', () => {
       login: fourthUser.login,
       email: fourthUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
