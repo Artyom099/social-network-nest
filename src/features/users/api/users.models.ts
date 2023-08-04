@@ -1,4 +1,8 @@
-import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
+import {
+  BanStatus,
+  SortBy,
+  SortDirection,
+} from '../../../infrastructure/utils/constants';
 import {
   IsBoolean,
   IsEmail,
@@ -63,7 +67,7 @@ export type UserDBModel = {
   recoveryCode: string;
 };
 export type GetUsersWithPagingAndSearch = {
-  banStatus: boolean | null;
+  banStatus: BanStatus;
   sortBy: SortBy;
   sortDirection: SortDirection;
   pageNumber: number;

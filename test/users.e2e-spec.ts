@@ -291,36 +291,58 @@ describe('UsersController (e2e)', () => {
       totalCount: 3,
       items: [fourthCreatedUser, thirdCreatedUser, secondBannedUser],
     });
+
+    expect.setState({ secondBannedUser });
   });
 
   it('10 – GET:/sa/users – return 200 & 2, 3, 4 users', async () => {
-    const { fourthCreatedUser, thirdCreatedUser, secondCreatedUser } =
+    const { fourthCreatedUser, thirdCreatedUser, secondBannedUser } =
       expect.getState();
 
-    await request(server)
+    const getUsers = await request(server)
       .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
-      .expect(HttpStatus.OK, {
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 3,
-        items: [fourthCreatedUser, thirdCreatedUser, secondCreatedUser],
-      });
+      .expect(HttpStatus.OK);
+
+    expect(getUsers.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 3,
+      items: [fourthCreatedUser, thirdCreatedUser, secondBannedUser],
+    });
   });
   it('11 – GET:/sa/users – return 200 & 2 user', async () => {
-    const { secondCreatedUser } = expect.getState();
+    const { secondBannedUser } = expect.getState();
 
-    await request(server)
+    const getUsers = await request(server)
       .get('/sa/users?banStatus=banned')
       .auth('admin', 'qwerty', { type: 'basic' })
-      .expect(HttpStatus.OK, {
-        pagesCount: 1,
-        page: 1,
-        pageSize: 10,
-        totalCount: 1,
-        items: [secondCreatedUser],
-      });
+      .expect(HttpStatus.OK);
+
+    expect(getUsers.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [secondBannedUser],
+    });
+  });
+  it('12 – GET:/sa/users – return 200 & 3, 4 users', async () => {
+    const { fourthCreatedUser, thirdCreatedUser } = expect.getState();
+
+    const getUsers = await request(server)
+      .get('/sa/users?banStatus=notBanned')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK);
+
+    expect(getUsers.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 2,
+      items: [fourthCreatedUser, thirdCreatedUser],
+    });
   });
 
   it('11 – PUT:/sa/users/:id/ban – return 204 & unban 2nd user', async () => {

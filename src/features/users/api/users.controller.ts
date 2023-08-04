@@ -51,13 +51,12 @@ export class UsersController {
     const pageSize = query.pageSize ?? 10;
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
-    const banStatus = (query.banStatus = 'banned'
-      ? true
-      : (query.banStatus = 'notBanned' ? false : null));
-    //all -> null
-    //banned -> true
-    //notBanned-> false
-    //todo - Cast to Boolean failed for value "banned" (type string) at path "isBanned" for model "User"
+    const banStatus =
+      query.banStatus === BanStatus.banned
+        ? true
+        : query.banStatus === BanStatus.notBanned
+        ? false
+        : null;
     return this.usersQueryRepository.getSortedUsersToSA(
       searchEmailTerm,
       searchLoginTerm,

@@ -15,7 +15,7 @@ export enum SortBy {
   email = 'email',
 }
 export enum BanStatus {
-  all = 2,
-  banned = 1,
-  notBanned = 0,
+  all = 'all',
+  banned = 'banned',
+  notBanned = 'notBanned',
 }
