@@ -4,22 +4,24 @@ import {
 } from '../../../users/api/users.models';
 import { UsersService } from '../../../users/application/users.service';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { CommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class CreateUserByAdminCommand {
   constructor(public InputModel: CreateUserInputModel) {}
 }
 
 @CommandHandler(CreateUserByAdminCommand)
-// implements ICommandHandler<CreateUserByAdminCommand>
-export class CreateUserByAdminUseCase {
+export class CreateUserByAdminUseCase
+  implements ICommandHandler<CreateUserByAdminCommand>
+{
   constructor(
     private usersService: UsersService,
     private usersRepository: UsersRepository,
   ) {}
-  // createUser || execute
-  async createUser(InputModel: CreateUserInputModel): Promise<SAUserViewModel> {
-    // console.log('CreateUserByAdminUseCase');
+
+  async execute(command: CreateUserByAdminCommand): Promise<SAUserViewModel> {
+    // здесь нельзя вызывать query репозиторий
+    const { InputModel } = command;
     const { salt, hash } = await this.usersService.generateSaltAndHash(
       InputModel.password,
     );

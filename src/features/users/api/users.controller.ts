@@ -18,13 +18,17 @@ import {
   CreateUserInputModel,
   GetUsersWithPagingAndSearch,
 } from './users.models';
-import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
+import {
+  BanStatus,
+  SortBy,
+  SortDirection,
+} from '../../../infrastructure/utils/constants';
 import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
-import { CreateUserByAdminUseCase } from '../../auth/application/use.cases/create.user.use.case';
-import { BanUserUseCase } from '../../auth/application/use.cases/ban.user.use.case';
+import { CreateUserByAdminCommand } from '../../auth/application/use.cases/create.user.use.case';
+import { BanUserCommand } from '../../auth/application/use.cases/ban.user.use.case';
 import { CommandBus } from '@nestjs/cqrs';
-import { UnbanUserUseCase } from '../../auth/application/use.cases/unban.user.use.case';
+import { UnbanUserCommand } from '../../auth/application/use.cases/unban.user.use.case';
 import { DevicesService } from '../../devices/application/devices.service';
 
 @UseGuards(BasicAuthGuard)
@@ -36,9 +40,6 @@ export class UsersController {
     private devicesService: DevicesService,
 
     private commandBus: CommandBus,
-    private banUserUseCase: BanUserUseCase,
-    private unbanUserUseCase: UnbanUserUseCase,
-    private createUserByAdminUseCase: CreateUserByAdminUseCase,
   ) {}
 
   @Get()
@@ -50,6 +51,13 @@ export class UsersController {
     const pageSize = query.pageSize ?? 10;
     const sortBy = query.sortBy ?? SortBy.default;
     const sortDirection = query.sortDirection ?? SortDirection.default;
+    const banStatus = (query.banStatus = 'banned'
+      ? true
+      : (query.banStatus = 'notBanned' ? false : null));
+    //all -> null
+    //banned -> true
+    //notBanned-> false
+    //todo - Cast to Boolean failed for value "banned" (type string) at path "isBanned" for model "User"
     return this.usersQueryRepository.getSortedUsersToSA(
       searchEmailTerm,
       searchLoginTerm,
@@ -57,18 +65,17 @@ export class UsersController {
       Number(pageSize),
       sortBy,
       sortDirection,
+      banStatus,
     );
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: CreateUserInputModel) {
-    //inputModel: CreateUserByAdminCommand || inputModel: CreateUserInputModel
+    return this.commandBus.execute(new CreateUserByAdminCommand(inputModel));
 
-    // с этой строкой запускается, но тесты падают с 500 ошибкой
-    // return this.commandBus.execute(new CreateUserByAdminCommand(inputModel));
-
-    return this.createUserByAdminUseCase.createUser(inputModel);
+    // старый вариант
+    // return this.createUserByAdminUseCase.createUser(inputModel);
   }
 
   @Delete(':id')
@@ -92,18 +99,10 @@ export class UsersController {
     if (!foundUser) throw new NotFoundException('User not found');
 
     if (inputModel.isBanned) {
-      await this.banUserUseCase.banUser(
-        userId,
-        inputModel.isBanned,
-        inputModel.banReason,
-      );
+      await this.commandBus.execute(new BanUserCommand(userId, inputModel));
       await this.devicesService.deleteAllSessions(userId);
     } else {
-      await this.unbanUserUseCase.unbanUser(userId);
+      await this.commandBus.execute(new UnbanUserCommand(userId));
     }
-
-    // return this.commandBus.execute(
-    //   new BanUserCommand(userId, inputModel.isBanned, inputModel.banReason),
-    // );
   }
 }

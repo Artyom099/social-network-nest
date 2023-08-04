@@ -63,6 +63,7 @@ export type UserDBModel = {
   recoveryCode: string;
 };
 export type GetUsersWithPagingAndSearch = {
+  banStatus: boolean | null;
   sortBy: SortBy;
   sortDirection: SortDirection;
   pageNumber: number;

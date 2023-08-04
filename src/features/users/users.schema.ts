@@ -27,10 +27,10 @@ const AccountDataSchema = SchemaFactory.createForClass(AccountData);
 class BanInfo {
   @Prop({ required: true, type: Boolean })
   isBanned: boolean;
-  @Prop({ required: false, type: Date })
-  banDate: Date;
-  @Prop({ required: false, type: String })
-  banReason: string;
+  @Prop({ required: false, type: Date || null })
+  banDate: Date | null;
+  @Prop({ required: false, type: String || null })
+  banReason: string | null;
 }
 const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
 
@@ -176,6 +176,8 @@ export class User {
   }
   unbanUser() {
     this.banInfo.isBanned = false;
+    this.banInfo.banReason = null;
+    this.banInfo.banDate = null;
   }
 }
 export const UserSchema = SchemaFactory.createForClass(User);

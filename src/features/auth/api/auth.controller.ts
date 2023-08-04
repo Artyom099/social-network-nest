@@ -23,7 +23,8 @@ import {
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
-import { RegisterUserUseCase } from '../application/use.cases/register.user.use.case';
+import { RegisterUserCommand } from '../application/use.cases/register.user.use.case';
+import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('auth')
 export class AuthController {
@@ -32,8 +33,7 @@ export class AuthController {
     private authService: AuthService,
     private securityService: DevicesService,
     private usersQueryRepository: UsersQueryRepository,
-
-    private registerUserUseCase: RegisterUserUseCase,
+    private commandBus: CommandBus,
   ) {}
 
   @Get('me')
@@ -65,7 +65,7 @@ export class AuthController {
     const payload = await this.authService.getTokenPayload(token.refreshToken);
     const user = await this.usersQueryRepository.getUserById2(payload.userId);
 
-    if (!user?.banInfo.isBanned) {
+    if (user?.banInfo.isBanned) {
       throw new UnauthorizedException();
     } else {
       const title = req.headers['host'];
@@ -166,7 +166,7 @@ export class AuthController {
     if (existUserLogin) {
       throw new BadRequestException('login exist=>login');
     } else {
-      await this.registerUserUseCase.createUser(inputModel);
+      await this.commandBus.execute(new RegisterUserCommand(inputModel));
     }
   }
 

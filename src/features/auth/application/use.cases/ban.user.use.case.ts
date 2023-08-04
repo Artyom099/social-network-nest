@@ -1,28 +1,24 @@
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
-import { CommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BanUserInputModel } from '../../../users/api/users.models';
 
 export class BanUserCommand {
-  constructor(
-    private userId: string,
-    private banStatus: boolean,
-    private banReason: string,
-  ) {}
+  constructor(public userId: string, public inputModel: BanUserInputModel) {}
 }
 
 @CommandHandler(BanUserCommand)
-//implements ICommandHandler<BanUserCommand>
-export class BanUserUseCase {
+export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
   constructor(
     private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
   ) {}
-  // banUser || execute
-  async banUser(userId: string, banStatus: boolean, banReason: string) {
-    const user = await this.usersQueryRepository.getUserById2(userId);
+
+  async execute(command: BanUserCommand) {
+    const user = await this.usersQueryRepository.getUserById2(command.userId);
     if (!user) return null;
 
-    user.banUser(banReason);
+    user.banUser(command.inputModel.banReason);
     await this.usersRepository.save(user);
   }
 }

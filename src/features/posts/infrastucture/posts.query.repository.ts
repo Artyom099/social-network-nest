@@ -9,10 +9,14 @@ import { LikeStatus } from '../../../infrastructure/utils/constants';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../posts.schema';
 import { Model } from 'mongoose';
+import { User, UserDocument } from '../../users/users.schema';
 
 @Injectable()
 export class PostsQueryRepository {
-  constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
 
   async getPost(
     id: string,
@@ -24,15 +28,25 @@ export class PostsQueryRepository {
     let likesCount = 0;
     let dislikesCount = 0;
     const newestLikes: NewestLikesViewModel[] = [];
-    post.extendedLikesInfo.forEach((p) => {
-      if (p.userId === currentUserId) myStatus = p.status;
-      if (p.status === LikeStatus.Dislike) dislikesCount++;
-      if (p.status === LikeStatus.Like) {
+    const bannedUsers = await this.userModel
+      .find({ 'banInfo.isBanned': true })
+      .lean()
+      .exec();
+    const idBannedUsers = bannedUsers.map((u) => {
+      return { id: u.id };
+    });
+    // если p.userId входит в массив забаненых пользователей, он не учавствует в подсчете реакций
+    //todo тут не учитывать лайки забненых юзеров
+    post.extendedLikesInfo.forEach((l) => {
+      if (l.userId === currentUserId) myStatus = l.status;
+      if (l.userId in idBannedUsers) return;
+      if (l.status === LikeStatus.Dislike) dislikesCount++;
+      if (l.status === LikeStatus.Like) {
         likesCount++;
         newestLikes.push({
-          addedAt: p.addedAt,
-          userId: p.userId,
-          login: p.login,
+          addedAt: l.addedAt,
+          userId: l.userId,
+          login: l.login,
         });
       }
     });
@@ -76,8 +90,10 @@ export class PostsQueryRepository {
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: NewestLikesViewModel[] = [];
+      //todo тут не учитывать лайки забненых юзеров
       p.extendedLikesInfo.forEach((s: ExtendedLikesInfoDBModel) => {
         if (s.userId === currentUserId) myStatus = s.status;
+
         if (s.status === LikeStatus.Dislike) dislikesCount++;
         if (s.status === LikeStatus.Like) {
           likesCount++;
@@ -133,11 +149,13 @@ export class PostsQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
+
     const items = sortedPosts.map((p) => {
       let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: any[] = [];
+      //todo тут не учитывать лайки забненых юзеров
       p.extendedLikesInfo.forEach((s: ExtendedLikesInfoDBModel) => {
         if (s.userId === currentUserId) myStatus = s.status;
         if (s.status === LikeStatus.Dislike) dislikesCount++;
@@ -169,6 +187,7 @@ export class PostsQueryRepository {
         },
       };
     });
+
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница

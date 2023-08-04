@@ -26,13 +26,12 @@ export class DevicesRepository {
     );
   }
 
-  async deleteOtherSessions(deviceId: string) {
-    await this.sessionModel.deleteMany({ $nor: [{ deviceId }] });
-  }
   async deleteCurrentSession(deviceId: string) {
     await this.sessionModel.deleteOne({ deviceId });
   }
-
+  async deleteOtherSessions(deviceId: string) {
+    await this.sessionModel.deleteMany({ $nor: [{ deviceId }] });
+  }
   async deleteAllSessions(userId: string) {
     return this.sessionModel.deleteMany({ userId });
   }

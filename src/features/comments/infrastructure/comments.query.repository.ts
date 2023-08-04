@@ -50,6 +50,11 @@ export class CommentsQueryRepository {
     sortBy: string,
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<CommentViewModel[]>> {
+    //todo исключить комменты забаненых пользователей - начать с этого
+    // , $nor: [{ 'banInfo.isBanned': true }]
+
+    //находим все userId забаненых пользователей
+    //затем исключаем , $nor: [{ 'commentatorInfo.userId': userId }]
     const filter = { postId };
     const totalCount = await this.commentModel.countDocuments(filter);
     const sortedComments = await this.commentModel
@@ -59,6 +64,7 @@ export class CommentsQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
+    //тут не учитывать лайки забненых юзеров
     const items = sortedComments.map((c) => {
       let myStatus = LikeStatus.None;
       let likesCount = 0;

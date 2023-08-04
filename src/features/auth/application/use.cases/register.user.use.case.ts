@@ -4,16 +4,23 @@ import {
   UserViewModel,
 } from '../../../users/api/users.models';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { Injectable } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-@Injectable()
-export class RegisterUserUseCase {
+export class RegisterUserCommand {
+  constructor(public InputModel: CreateUserInputModel) {}
+}
+
+@CommandHandler(RegisterUserCommand)
+export class RegisterUserUseCase
+  implements ICommandHandler<RegisterUserCommand>
+{
   constructor(
     private usersService: UsersService,
     private usersRepository: UsersRepository,
   ) {}
 
-  async createUser(InputModel: CreateUserInputModel): Promise<UserViewModel> {
+  async execute(command: RegisterUserCommand): Promise<UserViewModel> {
+    const { InputModel } = command;
     const { salt, hash } = await this.usersService.generateSaltAndHash(
       InputModel.password,
     );

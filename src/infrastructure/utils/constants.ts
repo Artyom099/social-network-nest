@@ -11,4 +11,11 @@ export enum SortDirection {
 export enum SortBy {
   default = 'createdAt',
   createdAt = 'createdAt',
+  login = 'login',
+  email = 'email',
+}
+export enum BanStatus {
+  all = 2,
+  banned = 1,
+  notBanned = 0,
 }

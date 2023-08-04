@@ -41,14 +41,14 @@ describe('AuthController (e2e)', () => {
   });
 
   // создаю 1го пользователя как админ
-  it('3 – POST:/users – create 1st user by admin', async () => {
+  it('3 – POST:/sa/users – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-1111',
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
     const firstCreateResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: firstUser.login,
@@ -63,10 +63,15 @@ describe('AuthController (e2e)', () => {
       login: firstUser.login,
       email: firstUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -235,7 +240,7 @@ describe('AuthController (e2e)', () => {
   });
 
   // получаю новую пру токенов
-  it('14 – POST:/auth/refresh-token – return 200, newRefreshToken & newAccessToken', async () => {
+  it('14 – POST:/auth/refresh-token – return 200, new pair of tokens', async () => {
     const { accessToken, firstRefreshToken } = expect.getState();
     await sleep(1.1);
     const goodRefreshTokenResponse = await request(server)

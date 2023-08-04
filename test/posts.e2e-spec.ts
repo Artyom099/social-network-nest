@@ -24,6 +24,7 @@ describe('PostsController (e2e)', () => {
     await request(server).delete('/testing/all-data');
   });
 
+  // создаю 5 пользователей
   it('1 – POST:/users – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-111111',
@@ -156,7 +157,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ fifthUser: fifthUser });
   });
-
+  // логиню первого пользователя
   it('6 – POST:/auth/login – return 200, 1st user login and refreshToken', async () => {
     const { firstUser } = expect.getState();
     const loginResponse = await request(server).post('/auth/login').send({
@@ -181,7 +182,7 @@ describe('PostsController (e2e)', () => {
       firstRefreshTokenWithName: refreshTokenWithName,
     });
   });
-
+  // создаю ему блог и пост
   it('7 – POST:/blogs – return 201 & create blog by 1st user', async () => {
     const firstBlog = {
       name: 'valid-blog',

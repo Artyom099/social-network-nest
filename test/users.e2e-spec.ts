@@ -292,19 +292,49 @@ describe('UsersController (e2e)', () => {
       items: [fourthCreatedUser, thirdCreatedUser, secondBannedUser],
     });
   });
-  it('10 – PUT:/sa/users/:id/ban – return 204 & unban 2nd user', async () => {
-    const {
-      banInputModel,
-      fourthCreatedUser,
-      thirdCreatedUser,
-      secondCreatedUser,
-    } = expect.getState();
-    const unbanInputModel = { isBanned: false };
+
+  it('10 – GET:/sa/users – return 200 & 2, 3, 4 users', async () => {
+    const { fourthCreatedUser, thirdCreatedUser, secondCreatedUser } =
+      expect.getState();
+
+    await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK, {
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 3,
+        items: [fourthCreatedUser, thirdCreatedUser, secondCreatedUser],
+      });
+  });
+  it('11 – GET:/sa/users – return 200 & 2 user', async () => {
+    const { secondCreatedUser } = expect.getState();
+
+    await request(server)
+      .get('/sa/users?banStatus=banned')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK, {
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [secondCreatedUser],
+      });
+  });
+
+  it('11 – PUT:/sa/users/:id/ban – return 204 & unban 2nd user', async () => {
+    const { fourthCreatedUser, thirdCreatedUser, secondCreatedUser } =
+      expect.getState();
+    const unbanInputModel = {
+      isBanned: false,
+      banReason: 'length_21-weqweqweqwq',
+    };
 
     await request(server)
       .put(`/sa/users/${secondCreatedUser.id}/ban`)
       .auth('admin', 'qwerty', { type: 'basic' })
-      .send({ isBanned: false })
+      .send(unbanInputModel)
       .expect(HttpStatus.NO_CONTENT);
 
     const secondBannedUser = {
@@ -314,8 +344,8 @@ describe('UsersController (e2e)', () => {
       createdAt: secondCreatedUser.createdAt,
       banInfo: {
         isBanned: unbanInputModel.isBanned,
-        banDate: expect.any(String),
-        banReason: banInputModel.banReason,
+        banDate: null,
+        banReason: null,
       },
     };
 

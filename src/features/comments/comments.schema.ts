@@ -21,7 +21,6 @@ class LikesInfo {
 const LikesInfoSchema = SchemaFactory.createForClass<LikesInfo>(LikesInfo);
 
 export type CommentDocument = HydratedDocument<Comment>;
-
 @Schema({ versionKey: false })
 export class Comment {
   @Prop({ required: true })

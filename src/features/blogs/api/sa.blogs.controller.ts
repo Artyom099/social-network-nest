@@ -42,7 +42,6 @@ export class SABlogsController {
   }
 
   @Put(':id/bind-with-user/:userId')
-  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async bindBlogWithUser(
     @Param('id') blogId: string,

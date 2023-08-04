@@ -27,6 +27,7 @@ export class UsersQueryRepository {
     }
   }
 
+  // todo перенести в обычный репо
   async getUserById2(id: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ id });
   }
@@ -92,23 +93,27 @@ export class UsersQueryRepository {
   }
 
   async getSortedUsersToSA(
-    searchEmailTerm: string | null,
-    searchLoginTerm: string | null,
+    loginTerm: string | null,
+    emailTerm: string | null,
     pageNumber: number,
     pageSize: number,
     sortBy: string,
     sortDirection: 'asc' | 'desc',
+    banStatus: boolean | null,
   ): Promise<PagingViewModel<SAUserViewModel[]>> {
     const filter = {
       $or: [
         {
-          'accountData.login': { $regex: searchLoginTerm ?? '', $options: 'i' },
+          'accountData.login': { $regex: loginTerm ?? '', $options: 'i' },
         },
         {
-          'accountData.email': { $regex: searchEmailTerm ?? '', $options: 'i' },
+          'accountData.email': { $regex: emailTerm ?? '', $options: 'i' },
         },
       ],
     };
+    if (banStatus !== null) {
+      filter['banInfo.isBanned'] = banStatus;
+    }
     const _sortBy = 'accountData.' + sortBy;
     const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel

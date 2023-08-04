@@ -12,6 +12,7 @@ export const appSettings = (app: INestApplication) => {
   app.use(cookieParser());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
+    //todo перенести пайп в отдельный файл
     new ValidationPipe({
       whitelist: true,
       transform: true,
