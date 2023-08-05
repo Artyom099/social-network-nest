@@ -58,8 +58,8 @@ export class UsersController {
         ? false
         : null;
     return this.usersQueryRepository.getSortedUsersToSA(
-      searchEmailTerm,
       searchLoginTerm,
+      searchEmailTerm,
       Number(pageNumber),
       Number(pageSize),
       sortBy,

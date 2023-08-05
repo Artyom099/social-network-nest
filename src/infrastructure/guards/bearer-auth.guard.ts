@@ -14,7 +14,7 @@ export class BearerAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    // todo - какой токен здесь ждать: refresh или access?
+    // todo - надо принимать accessToken, а не рефреш, переделать
     const refreshToken = this.extractTokenFromHeader(request);
     if (!refreshToken) throw new UnauthorizedException();
 

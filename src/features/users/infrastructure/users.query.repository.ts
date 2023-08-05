@@ -49,8 +49,8 @@ export class UsersQueryRepository {
   }
 
   async getSortedUsers(
-    searchEmailTerm: string | null,
     searchLoginTerm: string | null,
+    searchEmailTerm: string | null,
     pageNumber: number,
     pageSize: number,
     sortBy: string,
@@ -107,12 +107,13 @@ export class UsersQueryRepository {
           'accountData.login': { $regex: loginTerm ?? '', $options: 'i' },
         },
         {
-          'accountData.email': { $regex: emailTerm ?? '', $options: 'i' },
+          'accountData.email': { $regex: emailTerm ?? '', $options: 'i' }, // emailTerm ??
         },
       ],
     };
     if (banStatus !== null) filter['banInfo.isBanned'] = banStatus;
     const _sortBy = 'accountData.' + sortBy;
+
     const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel
       .find(filter)
@@ -121,6 +122,7 @@ export class UsersQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
+
     const items = sortedUsers.map((u) => {
       return {
         id: u.id,

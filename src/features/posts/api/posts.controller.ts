@@ -31,8 +31,8 @@ import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.rep
 @Controller('posts')
 export class PostsController {
   constructor(
-    private postsService: PostsService,
     private blogService: BlogsService,
+    private postsService: PostsService,
     private commentsService: CommentsService,
     private postsQueryRepository: PostsQueryRepository,
     private blogsQueryRepository: BlogsQueryRepository,

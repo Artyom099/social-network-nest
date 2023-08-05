@@ -7,7 +7,7 @@ export const settings = {
 };
 export const jwtConstants = {
   accessSecret: 'SECRET_KEY',
-  refreshSecret: 'REFRESH_TOKEN_SECRET_KEY',
+  refreshSecret: 'SECRET_KEY',
 };
 
 export const basicAuthConstants = {

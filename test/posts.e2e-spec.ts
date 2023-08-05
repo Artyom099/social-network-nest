@@ -25,14 +25,14 @@ describe('PostsController (e2e)', () => {
   });
 
   // создаю 5 пользователей
-  it('1 – POST:/users – create 1st user by admin', async () => {
+  it('1 – POST:/sa/users – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-111111',
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
     const firstCreateResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: firstUser.login,
@@ -47,10 +47,15 @@ describe('PostsController (e2e)', () => {
       login: firstUser.login,
       email: firstUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(app.getHttpServer())
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -62,7 +67,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ firstUser, firstCreateResponse, firstCreatedUser });
   });
-  it('2 – POST:/users – create 2nd user by admin', async () => {
+  it('2 – POST:/sa/users – create 2nd user by admin', async () => {
     const { firstCreatedUser } = expect.getState();
     const secondUser = {
       login: 'lg-222222',
@@ -70,7 +75,7 @@ describe('PostsController (e2e)', () => {
       email: 'artyomgolubev2@gmail.com',
     };
     const secondCreateResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: secondUser.login,
@@ -85,10 +90,15 @@ describe('PostsController (e2e)', () => {
       login: secondUser.login,
       email: secondUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -103,14 +113,14 @@ describe('PostsController (e2e)', () => {
       secondCreateResponse: secondCreateResponse,
     });
   });
-  it('3 – POST:/users – create 3rd user by admin', async () => {
+  it('3 – POST:/sa/users – create 3rd user by admin', async () => {
     const thirdUser = {
       login: 'lg-333333',
       password: 'qwerty3',
       email: 'artyomgolubev3@gmail.com',
     };
     await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: thirdUser.login,
@@ -121,14 +131,14 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ thirdUser: thirdUser });
   });
-  it('4 – POST:/users – create 4th user by admin', async () => {
+  it('4 – POST:/sa/users – create 4th user by admin', async () => {
     const fourthUser = {
       login: 'lg-444444',
       password: 'qwerty4',
       email: 'artyomgolubev4@gmail.com',
     };
     await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: fourthUser.login,
@@ -139,14 +149,14 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ fourthUser: fourthUser });
   });
-  it('5 – POST:/users – create 5th user by admin', async () => {
+  it('5 – POST:/sa/users – create 5th user by admin', async () => {
     const fifthUser = {
       login: 'lg-555555',
       password: 'qwerty5',
       email: 'artyomgolubev5@gmail.com',
     };
     await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: fifthUser.login,
@@ -157,7 +167,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ fifthUser: fifthUser });
   });
-  // логиню первого пользователя
+  // логиню первого блоггера
   it('6 – POST:/auth/login – return 200, 1st user login and refreshToken', async () => {
     const { firstUser } = expect.getState();
     const loginResponse = await request(server).post('/auth/login').send({
@@ -183,20 +193,23 @@ describe('PostsController (e2e)', () => {
     });
   });
   // создаю ему блог и пост
-  it('7 – POST:/blogs – return 201 & create blog by 1st user', async () => {
+  it('7 – POST:/blogger/blogs – return 201 & create blog by 1st user', async () => {
+    const { firstRefreshToken } = expect.getState();
     const firstBlog = {
       name: 'valid-blog',
       description: 'valid-description',
       websiteUrl: 'valid-websiteUrl.com',
     };
+
     const createBlogResponse = await request(server)
-      .post('/blogs')
-      .auth('admin', 'qwerty', { type: 'basic' })
+      .post('/blogger/blogs')
+      .auth(firstRefreshToken, { type: 'bearer' })
       .send({
         name: firstBlog.name,
         description: firstBlog.description,
         websiteUrl: firstBlog.websiteUrl,
       });
+
     expect(createBlogResponse).toBeDefined();
     expect(createBlogResponse.status).toEqual(HttpStatus.CREATED);
     expect(createBlogResponse.body).toEqual({
@@ -207,25 +220,26 @@ describe('PostsController (e2e)', () => {
       createdAt: expect.any(String),
       isMembership: false,
     });
-    console.log({ firstCreatedBlog: createBlogResponse.body });
+
     expect.setState({ firstCreatedBlog: createBlogResponse.body });
   });
-  it('8 – POST:/posts – return 201 & create post by 1st user', async () => {
-    const { firstCreatedBlog } = expect.getState();
+  it('8 – POST:/blogger/blogs/:id/posts – return 201 & create post by 1st user', async () => {
+    const { firstRefreshToken, firstCreatedBlog } = expect.getState();
     const firstPost = {
       title: 'valid-title',
       shortDescription: 'valid-shortDescription',
       content: 'valid-content',
     };
     const createPostResponse = await request(server)
-      .post('/posts')
-      .auth('admin', 'qwerty', { type: 'basic' })
+      .post(`/blogger/blogs/${firstCreatedBlog.id}/posts`)
+      .auth(firstRefreshToken, { type: 'bearer' })
       .send({
         title: firstPost.title,
         shortDescription: firstPost.shortDescription,
         content: firstPost.content,
         blogId: firstCreatedBlog.id,
       });
+
     expect(createPostResponse).toBeDefined();
     expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
     expect(createPostResponse.body).toEqual({
@@ -243,8 +257,8 @@ describe('PostsController (e2e)', () => {
         newestLikes: [],
       },
     });
+
     expect.setState({ firstPost: createPostResponse.body });
-    // console.log({ firstPost: createPostResponse.body });
   });
 
   it('9 – GET:/posts – return 200 and 1st post', async () => {
