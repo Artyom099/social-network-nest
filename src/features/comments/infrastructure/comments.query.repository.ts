@@ -5,11 +5,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment, CommentDocument } from '../comments.schema';
 import { LikeStatus } from '../../../infrastructure/utils/constants';
+import { User, UserDocument } from '../../users/users.schema';
 
 @Injectable()
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async getComment(
@@ -50,9 +52,10 @@ export class CommentsQueryRepository {
     sortBy: string,
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<CommentViewModel[]>> {
-    //todo исключить комменты забаненых пользователей - начать с этого
+    // todo исключить комменты забаненых пользователей - начать с этого
     // , $nor: [{ 'banInfo.isBanned': true }]
 
+    // const users = await this.userModel.find(filter);
     //находим все userId забаненых пользователей
     //затем исключаем , $nor: [{ 'commentatorInfo.userId': userId }]
     const filter = { postId };

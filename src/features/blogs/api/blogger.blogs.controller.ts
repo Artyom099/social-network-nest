@@ -20,10 +20,7 @@ import {
   GetItemsWithPagingAndSearch,
 } from '../../../infrastructure/utils/common.models';
 import { PostsService } from '../../posts/application/posts.service';
-import {
-  PostInputModel,
-  PostInputModelWithBlogId,
-} from '../../posts/api/posts.models';
+import { PostInputModel } from '../../posts/api/posts.models';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
@@ -149,8 +146,9 @@ export class BloggerBlogsController {
   @Put(':id/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(
-    @Param('id') postId: string,
-    @Body() inputModel: PostInputModelWithBlogId,
+    @Param('id') blogId: string,
+    @Param('postId') postId: string,
+    @Body() inputModel: PostInputModel,
   ) {
     const foundPost = await this.postsQueryRepository.getPost(postId);
     if (!foundPost) {
@@ -162,7 +160,10 @@ export class BloggerBlogsController {
 
   @Delete(':id/posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('postId') postId: string) {
+  async deletePost(
+    @Param('id') blogId: string,
+    @Param('postId') postId: string,
+  ) {
     const foundPost = await this.postsQueryRepository.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');

@@ -28,6 +28,7 @@ export class PostsQueryRepository {
     let likesCount = 0;
     let dislikesCount = 0;
     const newestLikes: NewestLikesViewModel[] = [];
+
     const bannedUsers = await this.userModel
       .find({ 'banInfo.isBanned': true })
       .lean()
@@ -37,6 +38,7 @@ export class PostsQueryRepository {
     });
     // если p.userId входит в массив забаненых пользователей, он не учавствует в подсчете реакций
     //todo тут не учитывать лайки забненых юзеров
+
     post.extendedLikesInfo.forEach((l) => {
       if (l.userId === currentUserId) myStatus = l.status;
       if (l.userId in idBannedUsers) return;

@@ -301,7 +301,6 @@ describe('PostsController (e2e)', () => {
       .auth(firstAccessToken, { type: 'bearer' })
       .expect(HttpStatus.NOT_FOUND);
   });
-
   it('11 – PUT:/posts/:id – return 404 with not existing postId', async () => {
     const { firstAccessToken } = expect.getState();
     const firstUpdatePost = {
@@ -320,15 +319,16 @@ describe('PostsController (e2e)', () => {
       .expect(HttpStatus.NOT_FOUND);
   });
 
-  it('12 – PUT:/posts/:id – return 204 & update post', async () => {
+  it('12 – PUT:/blogger/blogs/:id/posts/:id – return 204 & update post', async () => {
+    const { firstPost, firstCreatedBlog, firstAccessToken } = expect.getState();
     const firstUpdatePost = {
       title: 'valid-title-update',
       shortDescription: 'valid-shortDescription-update',
       content: 'valid-content-update',
     };
-    const { firstPost, firstAccessToken } = expect.getState();
+
     await request(server)
-      .put(`/posts/${firstPost.id}`)
+      .put(`/blogger/blogs/${firstCreatedBlog.id}/posts/${firstPost.id}`)
       .auth(firstAccessToken, { type: 'bearer' })
       .send({
         title: firstUpdatePost.title,
@@ -340,33 +340,34 @@ describe('PostsController (e2e)', () => {
     expect.setState({ firstUpdatePost: firstUpdatePost });
   });
 
-  it('13 – DELETE:/posts/:id – return 404 with not existing postId', async () => {
+  it('13 – DELETE:/blogger/blogs/:id/posts/:id – return 404 with not existing postId', async () => {
     const { firstAccessToken } = expect.getState();
     await request(server)
       .delete('/posts/123')
       .auth(firstAccessToken, { type: 'bearer' })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it('14 – DELETE:/posts/:id – return 204 & delete post', async () => {
-    const { firstPost, firstAccessToken } = expect.getState();
+  it('14 – DELETE:/blogger/blogs/:id/posts/:id – return 204 & delete post', async () => {
+    const { firstPost, firstCreatedBlog, firstAccessToken } = expect.getState();
     await request(server)
-      .delete(`/posts/${firstPost.id}`)
+      .delete(`/blogger/blogs/${firstCreatedBlog.id}/posts/${firstPost.id}`)
       .auth(firstAccessToken, { type: 'bearer' })
       .expect(HttpStatus.NO_CONTENT);
   });
 
   it('15 – POST:/posts – return 201 & create post by 1st user', async () => {
-    const { firstCreatedBlog, firstPost } = expect.getState();
+    const { firstCreatedBlog, firstPost, firstAccessToken } = expect.getState();
 
     const createPostResponse = await request(server)
-      .post('/posts')
-      .auth('admin', 'qwerty', { type: 'basic' })
+      .post(`/blogger/blogs/${firstCreatedBlog.id}/posts`)
+      .auth(firstAccessToken, { type: 'bearer' })
       .send({
         title: firstPost.title,
         shortDescription: firstPost.shortDescription,
         content: firstPost.content,
         blogId: firstCreatedBlog.id,
       });
+
     expect(createPostResponse).toBeDefined();
     expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
     expect(createPostResponse.body).toEqual({
@@ -384,8 +385,8 @@ describe('PostsController (e2e)', () => {
         newestLikes: [],
       },
     });
+
     expect.setState({ firstPost: createPostResponse.body });
-    // console.log({ firstPost: createPostResponse.body });
   });
 
   it('16 – PUT:/posts/:id/like-status – return 204 & set like', async () => {
