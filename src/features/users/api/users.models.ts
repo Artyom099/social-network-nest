@@ -67,13 +67,13 @@ export type UserDBModel = {
   recoveryCode: string;
 };
 export type GetUsersWithPagingAndSearch = {
+  sortDirection: SortDirection;
   banStatus: BanStatus;
   sortBy: SortBy;
-  sortDirection: SortDirection;
-  pageNumber: number;
-  pageSize: number;
   searchLoginTerm: string;
   searchEmailTerm: string;
+  pageNumber: number;
+  pageSize: number;
 };
 export type SaltHashModel = {
   salt: string;

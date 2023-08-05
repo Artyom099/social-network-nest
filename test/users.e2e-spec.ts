@@ -372,7 +372,7 @@ describe('UsersController (e2e)', () => {
     };
 
     const getUsers = await request(server)
-      .get('/sa/users')
+      .get('/sa/users?banStatus=notBanned')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK);
 

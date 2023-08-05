@@ -92,6 +92,7 @@ describe('AuthController (e2e)', () => {
     if (!firstCreateResponse.headers.authorization) return new Error();
     const accessToken =
       getRefreshTokenByResponseWithTokenName(firstCreateResponse);
+
     await request(server)
       .get('/auth/me')
       .auth('accessToken', { type: 'bearer' })
@@ -220,6 +221,7 @@ describe('AuthController (e2e)', () => {
       .expect(HttpStatus.UNAUTHORIZED);
   });
 
+  // логиню первого пользователя
   it('13 – POST:/auth/login – return 200 and login 1st user', async () => {
     const { firstUser } = expect.getState();
     const loginResponse = await request(server).post('/auth/login').send({

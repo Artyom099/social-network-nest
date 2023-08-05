@@ -111,9 +111,7 @@ export class UsersQueryRepository {
         },
       ],
     };
-    if (banStatus !== null) {
-      filter['banInfo.isBanned'] = banStatus;
-    }
+    if (banStatus !== null) filter['banInfo.isBanned'] = banStatus;
     const _sortBy = 'accountData.' + sortBy;
     const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel
