@@ -60,9 +60,7 @@ export class CommentsQueryRepository {
     sortBy: string,
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<CommentViewModel[]>> {
-    // todo исключить комменты забаненых пользователей - начать с этого
-    // , $nor: [{ 'banInfo.isBanned': true }]
-    //затем исключаем , $nor: [{ 'commentatorInfo.userId': userId }]
+    // todo исключить комменты забаненых пользователей
     const filter = { postId };
     const totalCount = await this.commentModel.countDocuments(filter);
     const sortedComments = await this.commentModel

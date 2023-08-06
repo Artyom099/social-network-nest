@@ -72,6 +72,7 @@ export class PostsController {
     }
   }
 
+  //TODO: change query validation
   @Get(':id/comments')
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)

@@ -35,8 +35,8 @@ export class BlogsQueryRepository {
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
-      pageSize, // количество пользователей на странице
-      totalCount, // общее количество пользователей
+      pageSize, // количество блогов на странице
+      totalCount, // общее количество блогов
       items,
     };
   }
@@ -67,8 +67,8 @@ export class BlogsQueryRepository {
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
-      pageSize, // количество пользователей на странице
-      totalCount, // общее количество пользователей
+      pageSize, // количество блогов на странице
+      totalCount, // общее количество блогов
       items,
     };
   }
@@ -97,8 +97,8 @@ export class BlogsQueryRepository {
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
-      pageSize, // количество пользователей на странице
-      totalCount, // общее количество пользователей
+      pageSize, // количество блогов на странице
+      totalCount, // общее количество блогов
       items,
     };
   }

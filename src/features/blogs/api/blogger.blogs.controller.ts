@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -78,12 +79,16 @@ export class BloggerBlogsController {
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
+    @Req() req,
     @Param('id') blogId: string,
     @Body() inputModel: BlogInputModel,
   ) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
+    const foundBlog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
+    }
+    if (req.userId !== foundBlog.blogOwnerInfo.userId) {
+      throw new ForbiddenException();
     } else {
       return this.blogsService.updateBlog(blogId, inputModel);
     }

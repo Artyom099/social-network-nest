@@ -21,12 +21,14 @@ import {
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { CommentsQueryRepository } from '../infrastructure/comments.query.repository';
+import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
-    protected commentsService: CommentsService,
-    protected commentsQueryRepository: CommentsQueryRepository,
+    private commentsService: CommentsService,
+    private commentsQueryRepository: CommentsQueryRepository,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
   @Get(':id')
@@ -36,11 +38,17 @@ export class CommentsController {
     @Req() req,
     @Param('id') commentId: string,
   ): Promise<CommentViewModel | null> {
+    // если юзер забанен, мы не можем получить его коммент
     const foundComment = await this.commentsQueryRepository.getComment(
       commentId,
       req.userId,
     );
-    if (!foundComment) {
+    if (!foundComment) throw new NotFoundException();
+
+    const user = await this.usersQueryRepository.getUserById2(
+      foundComment.commentatorInfo.userId,
+    );
+    if (user?.banInfo.isBanned) {
       throw new NotFoundException();
     } else {
       return foundComment;
@@ -57,6 +65,7 @@ export class CommentsController {
   ) {
     const foundComment = await this.commentsQueryRepository.getComment(
       commentId,
+      req.userId,
     );
     if (!foundComment) {
       throw new NotFoundException();
@@ -95,7 +104,6 @@ export class CommentsController {
     const foundComment = await this.commentsQueryRepository.getComment(
       commentId,
     );
-    console.log({ foundComment: foundComment });
     if (!foundComment) {
       throw new NotFoundException();
     } else {

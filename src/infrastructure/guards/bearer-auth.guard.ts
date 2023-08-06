@@ -14,13 +14,12 @@ export class BearerAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    // todo - надо принимать accessToken, а не рефреш, переделать
-    const refreshToken = this.extractTokenFromHeader(request);
-    if (!refreshToken) throw new UnauthorizedException();
+    const accessToken = this.extractTokenFromHeader(request);
+    if (!accessToken) throw new UnauthorizedException();
 
     try {
-      const payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: jwtConstants.refreshSecret,
+      const payload = await this.jwtService.verifyAsync(accessToken, {
+        secret: jwtConstants.accessSecret,
       });
       request.userId = payload.userId;
     } catch (e) {

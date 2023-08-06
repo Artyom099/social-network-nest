@@ -247,6 +247,7 @@ describe('PostsController (e2e)', () => {
       shortDescription: 'valid-shortDescription',
       content: 'valid-content',
     };
+
     const createPostResponse = await request(server)
       .post(`/blogger/blogs/${firstCreatedBlog.id}/posts`)
       .auth(firstAccessToken, { type: 'bearer' })
@@ -374,7 +375,7 @@ describe('PostsController (e2e)', () => {
       .expect(HttpStatus.NO_CONTENT);
   });
 
-  it('15 – POST:/posts – return 201 & create post by 1st user', async () => {
+  it('15 – POST:/blogger/blogs/:id/posts – return 201 & create 1st post by 1st user', async () => {
     const { firstCreatedBlog, firstPost, firstAccessToken } = expect.getState();
 
     const createPostResponse = await request(server)
@@ -384,7 +385,6 @@ describe('PostsController (e2e)', () => {
         title: firstPost.title,
         shortDescription: firstPost.shortDescription,
         content: firstPost.content,
-        blogId: firstCreatedBlog.id,
       });
 
     expect(createPostResponse).toBeDefined();
@@ -406,6 +406,38 @@ describe('PostsController (e2e)', () => {
     });
 
     expect.setState({ firstPost: createPostResponse.body });
+  });
+  it('16 – POST:/blogger/blogs/:id/posts – return 201 & create 2nd post by 1st user', async () => {
+    const { firstCreatedBlog, firstPost, firstAccessToken } = expect.getState();
+
+    const createPostResponse = await request(server)
+      .post(`/blogger/blogs/${firstCreatedBlog.id}/posts`)
+      .auth(firstAccessToken, { type: 'bearer' })
+      .send({
+        title: firstPost.title,
+        shortDescription: firstPost.shortDescription,
+        content: firstPost.content,
+      });
+
+    expect(createPostResponse).toBeDefined();
+    expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
+    expect(createPostResponse.body).toEqual({
+      id: expect.any(String),
+      title: firstPost.title,
+      shortDescription: firstPost.shortDescription,
+      content: firstPost.content,
+      blogId: firstCreatedBlog.id,
+      blogName: firstCreatedBlog.name,
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: LikeStatus.None,
+        newestLikes: [],
+      },
+    });
+
+    expect.setState({ secondPost: createPostResponse.body });
   });
 
   // лайк -> дизлайк -> удаление дизлайка
@@ -739,6 +771,7 @@ describe('PostsController (e2e)', () => {
     const {
       firstAccessToken,
       firstPost,
+      secondPost,
       thirdUserInputModel,
       fourthUserInputModel,
       fifthUserInputModel,
@@ -754,8 +787,23 @@ describe('PostsController (e2e)', () => {
       pagesCount: 1,
       page: 1,
       pageSize: 10,
-      totalCount: 1,
+      totalCount: 2,
       items: [
+        {
+          id: secondPost.id,
+          title: secondPost.title,
+          shortDescription: secondPost.shortDescription,
+          content: secondPost.content,
+          blogId: secondPost.blogId,
+          blogName: secondPost.blogName,
+          createdAt: secondPost.createdAt,
+          extendedLikesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: secondPost.extendedLikesInfo.myStatus,
+            newestLikes: [],
+          },
+        },
         {
           id: firstPost.id,
           title: firstPost.title,

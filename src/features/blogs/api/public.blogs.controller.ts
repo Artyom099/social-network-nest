@@ -20,7 +20,7 @@ import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.gu
 import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 
 @Controller('/blogs')
-export class BlogsController {
+export class PublicBlogsController {
   constructor(
     private bindBlogUseCase: BindBlogUseCase,
     private blogsQueryRepository: BlogsQueryRepository,
