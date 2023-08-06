@@ -25,8 +25,10 @@ import { PostInputModel } from '../../posts/api/posts.models';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
-import { CreateBlogUseCase } from '../application/use.cases/create.blog.use.case';
+import { CreateBlogCommand } from '../application/blogger.use.cases/create.blog.use.case';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreatePostCommand } from '../application/blogger.use.cases/create.post.use.case';
 
 @Controller('blogger/blogs')
 @UseGuards(BearerAuthGuard)
@@ -37,7 +39,7 @@ export class BloggerBlogsController {
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
 
-    private createBlogUseCase: CreateBlogUseCase,
+    private commandBus: CommandBus,
   ) {}
 
   // логика блогов блоггера
@@ -62,19 +64,10 @@ export class BloggerBlogsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createBlog(@Req() req, @Body() inputModel: BlogInputModel) {
-    return this.createBlogUseCase.createBlog(inputModel, req.userId);
+    return this.commandBus.execute(
+      new CreateBlogCommand(req.userId, inputModel),
+    );
   }
-
-  // @Get(':id')
-  // @HttpCode(HttpStatus.OK)
-  // async getBlog(@Param('id') blogId: string) {
-  //   const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-  //   if (!foundBlog) {
-  //     throw new NotFoundException('blog not found');
-  //   } else {
-  //     return foundBlog;
-  //   }
-  // }
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -149,7 +142,9 @@ export class BloggerBlogsController {
     if (req.userId !== foundBlog.blogOwnerInfo.userId) {
       throw new ForbiddenException();
     } else {
-      return this.postsService.createPost(foundBlog, inputModel);
+      return this.commandBus.execute(
+        new CreatePostCommand(foundBlog, inputModel),
+      );
     }
   }
 

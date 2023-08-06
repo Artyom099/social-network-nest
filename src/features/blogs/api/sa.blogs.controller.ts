@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 
-import { BindBlogUseCase } from '../application/use.cases/bind.blog.use.case';
+import { BindBlogUseCase } from '../application/sa.use.cases/bind.blog.use.case';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { GetItemsWithPagingAndSearch } from '../../../infrastructure/utils/common.models';
 import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';

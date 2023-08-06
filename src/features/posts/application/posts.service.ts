@@ -22,6 +22,7 @@ export class PostsService {
     const createdPost = Post.create(bLog, InputModel);
     return this.postsRepository.createPost(createdPost);
   }
+
   async updatePost(postId: string, InputModel: PostInputModel) {
     return this.postsRepository.updatePost(postId, InputModel);
   }

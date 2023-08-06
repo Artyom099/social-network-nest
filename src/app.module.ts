@@ -27,8 +27,8 @@ import { BlogExistsConstraint } from './features/posts/api/posts.models';
 import { Request, RequestSchema } from './infrastructure/services/ip.schema';
 import { Device, DeviceSchema } from './features/devices/devices.schema';
 import { CqrsModule } from '@nestjs/cqrs';
-import { BindBlogUseCase } from './features/blogs/application/use.cases/bind.blog.use.case';
-import { CreateBlogUseCase } from './features/blogs/application/use.cases/create.blog.use.case';
+import { BindBlogUseCase } from './features/blogs/application/sa.use.cases/bind.blog.use.case';
+import { CreateBlogUseCase } from './features/blogs/application/blogger.use.cases/create.blog.use.case';
 import { PublicBlogsController } from './features/blogs/api/public.blogs.controller';
 import { SABlogsController } from './features/blogs/api/sa.blogs.controller';
 
