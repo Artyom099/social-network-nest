@@ -9,7 +9,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BindBlogUseCase } from '../application/use.cases/bind.blog.use.case';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 import {
   GetItemsWithPaging,
@@ -19,10 +18,9 @@ import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 
-@Controller('/blogs')
+@Controller('blogs')
 export class PublicBlogsController {
   constructor(
-    private bindBlogUseCase: BindBlogUseCase,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
   ) {}
@@ -49,7 +47,6 @@ export class PublicBlogsController {
   @HttpCode(HttpStatus.OK)
   async getBlog(@Param('id') blogId: string) {
     const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    console.log({ 'GET:/blogs/:id': foundBlog });
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {

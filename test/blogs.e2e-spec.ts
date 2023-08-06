@@ -238,12 +238,12 @@ describe('BlogsController (e2e)', () => {
 
   it('9 – POST:/blogger/blogs – return 201 & create first blog', async () => {
     const { firstRefreshToken } = expect.getState();
-
     const firstBlog = {
       name: 'valid-blog',
       description: 'valid-description',
       websiteUrl: 'valid-websiteUrl.com',
     };
+
     const createResponse = await request(server)
       .post('/blogger/blogs')
       .auth(firstRefreshToken, { type: 'bearer' })
@@ -450,6 +450,7 @@ describe('BlogsController (e2e)', () => {
   it('16 – GET:/blogger/blogs/:id/posts – return 200 & get posts current blog', async () => {
     const { firstRefreshToken, firstCreatedBlog, createdPost } =
       expect.getState();
+
     const getPostsRequest = await request(server)
       .get(`/blogger/blogs/${firstCreatedBlog.id}/posts`)
       .auth(firstRefreshToken, { type: 'bearer' });
@@ -465,7 +466,27 @@ describe('BlogsController (e2e)', () => {
     });
   });
 
-  it('17 – DELETE:/blogger/blogs/:id – delete both blogs', async () => {
+  it('17 – GET:/blogs/:id – return 200 & get posts current blog', async () => {
+    const { firstRefreshToken, firstCreatedBlog, firstUpdateBlog } =
+      expect.getState();
+
+    const getPostsRequest = await request(server)
+      .get(`/blogs/${firstCreatedBlog.id}`)
+      .auth(firstRefreshToken, { type: 'bearer' });
+
+    expect(getPostsRequest).toBeDefined();
+    expect(getPostsRequest.status).toBe(HttpStatus.OK);
+    expect(getPostsRequest.body).toEqual({
+      id: firstCreatedBlog.id,
+      name: firstUpdateBlog.name,
+      description: firstUpdateBlog.description,
+      websiteUrl: firstUpdateBlog.websiteUrl,
+      createdAt: firstCreatedBlog.createdAt,
+      isMembership: firstCreatedBlog.isMembership,
+    });
+  });
+
+  it('18 – DELETE:/blogger/blogs/:id – delete both blogs', async () => {
     const { firstRefreshToken, firstCreatedBlog, secondCreatedBlog } =
       expect.getState();
     await request(server)
