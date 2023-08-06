@@ -33,15 +33,13 @@ export class PostsQueryRepository {
       .find({ 'banInfo.isBanned': true })
       .lean()
       .exec();
-    const idBannedUsers = bannedUsers.map((u) => {
-      return { id: u.id };
-    });
+    const idBannedUsers = bannedUsers.map((u) => u.id);
     // если p.userId входит в массив забаненых пользователей, он не учавствует в подсчете реакций
     //todo тут не учитывать лайки забненых юзеров
 
     post.extendedLikesInfo.forEach((l) => {
       if (l.userId === currentUserId) myStatus = l.status;
-      if (l.userId in idBannedUsers) return;
+      if (idBannedUsers.includes(l.userId)) return;
       if (l.status === LikeStatus.Dislike) dislikesCount++;
       if (l.status === LikeStatus.Like) {
         likesCount++;
@@ -87,22 +85,29 @@ export class PostsQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
+
+    const bannedUsers = await this.userModel
+      .find({ 'banInfo.isBanned': true })
+      .lean()
+      .exec();
+    const idBannedUsers = bannedUsers.map((u) => u.id);
+
     const items = sortedPosts.map((p) => {
       let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: NewestLikesViewModel[] = [];
       //todo тут не учитывать лайки забненых юзеров
-      p.extendedLikesInfo.forEach((s: ExtendedLikesInfoDBModel) => {
-        if (s.userId === currentUserId) myStatus = s.status;
-
-        if (s.status === LikeStatus.Dislike) dislikesCount++;
-        if (s.status === LikeStatus.Like) {
+      p.extendedLikesInfo.forEach((l: ExtendedLikesInfoDBModel) => {
+        if (l.userId === currentUserId) myStatus = l.status;
+        if (idBannedUsers.includes(l.userId)) return;
+        if (l.status === LikeStatus.Dislike) dislikesCount++;
+        if (l.status === LikeStatus.Like) {
           likesCount++;
           newestLikes.push({
-            addedAt: s.addedAt,
-            userId: s.userId,
-            login: s.login,
+            addedAt: l.addedAt,
+            userId: l.userId,
+            login: l.login,
           });
         }
       });
@@ -152,21 +157,28 @@ export class PostsQueryRepository {
       .lean()
       .exec();
 
+    const bannedUsers = await this.userModel
+      .find({ 'banInfo.isBanned': true })
+      .lean()
+      .exec();
+    const idBannedUsers = bannedUsers.map((u) => u.id);
+
     const items = sortedPosts.map((p) => {
       let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: any[] = [];
       //todo тут не учитывать лайки забненых юзеров
-      p.extendedLikesInfo.forEach((s: ExtendedLikesInfoDBModel) => {
-        if (s.userId === currentUserId) myStatus = s.status;
-        if (s.status === LikeStatus.Dislike) dislikesCount++;
-        if (s.status === LikeStatus.Like) {
+      p.extendedLikesInfo.forEach((l: ExtendedLikesInfoDBModel) => {
+        if (l.userId === currentUserId) myStatus = l.status;
+        if (idBannedUsers.includes(l.userId)) return;
+        if (l.status === LikeStatus.Dislike) dislikesCount++;
+        if (l.status === LikeStatus.Like) {
           likesCount++;
           newestLikes.push({
-            addedAt: s.addedAt,
-            userId: s.userId,
-            login: s.login,
+            addedAt: l.addedAt,
+            userId: l.userId,
+            login: l.login,
           });
         }
       });

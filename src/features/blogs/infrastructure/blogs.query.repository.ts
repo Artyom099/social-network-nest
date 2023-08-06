@@ -31,6 +31,7 @@ export class BlogsQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
+
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
@@ -62,6 +63,7 @@ export class BlogsQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
+
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница
@@ -91,6 +93,7 @@ export class BlogsQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
+
     return {
       pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
       page: pageNumber, // текущая страница

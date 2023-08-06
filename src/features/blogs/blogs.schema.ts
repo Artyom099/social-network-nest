@@ -18,11 +18,11 @@ export type BlogDocument = HydratedDocument<Blog>;
 export class Blog {
   @Prop({ required: true, unique: true, index: true })
   id: string;
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   name: string;
   @Prop({ required: true })
   description: string;
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   websiteUrl: string;
   @Prop({ required: true })
   createdAt: string;

@@ -17,6 +17,7 @@ export class CreateBlogUseCase {
   ): Promise<BlogViewModel | null> {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) return null;
+
     const createdBlog = Blog.create(InputModel, user);
     return this.blogsRepository.createBlog(createdBlog);
   }

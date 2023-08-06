@@ -23,10 +23,18 @@ export class CommentsQueryRepository {
     let myStatus = LikeStatus.None;
     let likesCount = 0;
     let dislikesCount = 0;
-    comment.likesInfo.forEach((s) => {
-      if (s.userId === currentUserId) myStatus = s.status;
-      if (s.status === LikeStatus.Like) likesCount++;
-      if (s.status === LikeStatus.Dislike) dislikesCount++;
+
+    const bannedUsers = await this.userModel
+      .find({ 'banInfo.isBanned': true })
+      .lean()
+      .exec();
+    const idBannedUsers = bannedUsers.map((u) => u.id);
+
+    comment.likesInfo.forEach((l) => {
+      if (l.userId === currentUserId) myStatus = l.status;
+      if (idBannedUsers.includes(l.userId)) return;
+      if (l.status === LikeStatus.Like) likesCount++;
+      if (l.status === LikeStatus.Dislike) dislikesCount++;
     });
     return {
       id: comment.id,
@@ -54,9 +62,6 @@ export class CommentsQueryRepository {
   ): Promise<PagingViewModel<CommentViewModel[]>> {
     // todo исключить комменты забаненых пользователей - начать с этого
     // , $nor: [{ 'banInfo.isBanned': true }]
-
-    // const users = await this.userModel.find(filter);
-    //находим все userId забаненых пользователей
     //затем исключаем , $nor: [{ 'commentatorInfo.userId': userId }]
     const filter = { postId };
     const totalCount = await this.commentModel.countDocuments(filter);
@@ -67,15 +72,22 @@ export class CommentsQueryRepository {
       .limit(pageSize)
       .lean()
       .exec();
-    //тут не учитывать лайки забненых юзеров
+
+    const bannedUsers = await this.userModel
+      .find({ 'banInfo.isBanned': true })
+      .lean()
+      .exec();
+    const idBannedUsers = bannedUsers.map((u) => u.id);
+
     const items = sortedComments.map((c) => {
       let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
-      c.likesInfo.forEach((s) => {
-        if (s.userId === currentUserId) myStatus = s.status;
-        if (s.status === LikeStatus.Like) likesCount++;
-        if (s.status === LikeStatus.Dislike) dislikesCount++;
+      c.likesInfo.forEach((l) => {
+        if (l.userId === currentUserId) myStatus = l.status;
+        if (idBannedUsers.includes(l.userId)) return;
+        if (l.status === LikeStatus.Like) likesCount++;
+        if (l.status === LikeStatus.Dislike) dislikesCount++;
       });
       return {
         id: c.id,
