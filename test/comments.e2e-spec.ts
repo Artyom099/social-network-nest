@@ -9,7 +9,7 @@ import {
   getRefreshTokenByResponseWithTokenName,
 } from '../src/infrastructure/utils/utils';
 
-describe('/feedback', () => {
+describe('CommentsController (e2e)', () => {
   let app: INestApplication;
   let server: any;
   beforeAll(async () => {
@@ -21,17 +21,19 @@ describe('/feedback', () => {
     appSettings(app);
     await app.init();
     server = app.getHttpServer();
+
     await request(server).delete('/testing/all-data');
   });
 
-  it('1 – POST:/users – create 1st user by admin', async () => {
+  it('1 – POST:/sa/users – create 1st user by admin', async () => {
     const firstUser = {
       login: 'lg-111111',
       password: 'qwerty1',
       email: 'artyomgolubev1@gmail.com',
     };
+
     const firstCreateResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: firstUser.login,
@@ -46,10 +48,15 @@ describe('/feedback', () => {
       login: firstUser.login,
       email: firstUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -61,15 +68,16 @@ describe('/feedback', () => {
 
     expect.setState({ firstUser, firstCreateResponse, firstCreatedUser });
   });
-  it('2 – POST:/users – create 2nd user by admin', async () => {
+  it('2 – POST:/sa/users – create 2nd user by admin', async () => {
     const { firstCreatedUser } = expect.getState();
     const secondUser = {
       login: 'lg-222222',
       password: 'qwerty2',
       email: 'artyomgolubev2@gmail.com',
     };
+
     const secondCreateResponse = await request(server)
-      .post('/users')
+      .post('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .send({
         login: secondUser.login,
@@ -84,10 +92,15 @@ describe('/feedback', () => {
       login: secondUser.login,
       email: secondUser.email,
       createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
     });
 
     await request(server)
-      .get('/users')
+      .get('/sa/users')
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK, {
         pagesCount: 1,
@@ -97,10 +110,7 @@ describe('/feedback', () => {
         items: [secondCreatedUser, firstCreatedUser],
       });
 
-    expect.setState({
-      secondUser: secondUser,
-      secondCreateResponse: secondCreateResponse,
-    });
+    expect.setState({ secondUser, secondCreateResponse });
   });
   it('3 – POST:/auth/login – return 200, 1st login and refreshToken', async () => {
     const { firstUser } = expect.getState();
@@ -126,39 +136,44 @@ describe('/feedback', () => {
       firstRefreshTokenWithName: refreshTokenWithName,
     });
   });
-  it('4 – POST:/blogs – return 201 & create blog', async () => {
+  it('4 – POST:/blogger/blogs – return 201 & create blog', async () => {
+    const { firstAccessToken } = expect.getState();
+
     const createBlogResponse = await request(server)
-      .post('/blogs')
-      .auth('admin', 'qwerty', { type: 'basic' })
+      .post('/blogger/blogs')
+      .auth(firstAccessToken, { type: 'bearer' })
       .send({
         name: 'valid-blog',
         description: 'valid-description',
         websiteUrl: 'valid-websiteUrl.com',
       });
+
     expect(createBlogResponse).toBeDefined();
     expect(createBlogResponse.status).toEqual(HttpStatus.CREATED);
     expect.setState({ blogId: createBlogResponse.body.id });
   });
-  it('5 – POST:/posts – return 201 & create post', async () => {
-    const { blogId } = expect.getState();
+  it('5 – POST:/blogger/blogs/:id/posts – return 201 & create post', async () => {
+    const { firstAccessToken, blogId } = expect.getState();
+
     const createPostResponse = await request(server)
-      .post('/posts')
-      .auth('admin', 'qwerty', { type: 'basic' })
+      .post(`/blogger/blogs/${blogId}/posts`)
+      .auth(firstAccessToken, { type: 'bearer' })
       .send({
         title: 'valid-title',
         shortDescription: 'valid-shortDescription',
         content: 'valid-content',
-        blogId,
       });
+
     expect(createPostResponse).toBeDefined();
     expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
     expect.setState({ postId: createPostResponse.body.id });
   });
   it('6 – POST:/posts/:postId/comments – return 201 & create comment', async () => {
-    const { postId, firstRefreshToken, firstUser } = expect.getState();
+    const { postId, firstAccessToken, firstUser } = expect.getState();
+
     const createCommentResponse = await request(server)
       .post(`/posts/${postId}/comments`)
-      .auth(firstRefreshToken, { type: 'bearer' })
+      .auth(firstAccessToken, { type: 'bearer' })
       .send({ content: 'valid-super-long-content' });
 
     expect(createCommentResponse).toBeDefined();
@@ -177,11 +192,13 @@ describe('/feedback', () => {
         myStatus: LikeStatus.None,
       },
     });
+
     expect.setState({ commentId: createCommentResponse.body.id });
   });
 
   it('7 – PUT:/comments/:commentId/like-status – return 404 – non exist comment', async () => {
     const { firstAccessToken } = expect.getState();
+
     const setLike = await request(server)
       .put(`/comments/${123}/like-status`)
       .auth(firstAccessToken, { type: 'bearer' })
