@@ -24,6 +24,7 @@ export class SABlogsController {
     private blogsQueryRepository: BlogsQueryRepository,
   ) {}
 
+  // todo - этот эндпоинт падает с 404 ошибкой
   @Get()
   @HttpCode(HttpStatus.OK)
   async getBlogs(@Query() query: GetItemsWithPagingAndSearch) {

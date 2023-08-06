@@ -183,6 +183,7 @@ describe('PostsController (e2e)', () => {
 
     expect.setState({ fifthUserInputModel, fifthCreatedUser });
   });
+
   // логиню первого блоггера
   it('6 – POST:/auth/login – return 200, 1st user login and refreshToken', async () => {
     const { firstUserInputModel } = expect.getState();
@@ -209,6 +210,7 @@ describe('PostsController (e2e)', () => {
       firstRefreshTokenWithName: refreshTokenWithName,
     });
   });
+
   // создаю ему блог и пост
   it('7 – POST:/blogger/blogs – return 201 & create blog by 1st user', async () => {
     const { firstAccessToken } = expect.getState();

@@ -96,10 +96,12 @@ export class BloggerBlogsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteBlog(@Param('id') blogId: string) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
-      throw new NotFoundException('blog not found');
+  async deleteBlog(@Req() req, @Param('id') blogId: string) {
+    const foundBlog = await this.blogsQueryRepository.getBlogSA(blogId);
+    if (!foundBlog) throw new NotFoundException('blog not found');
+
+    if (req.userId !== foundBlog.blogOwnerInfo.userId) {
+      throw new ForbiddenException();
     } else {
       return this.blogsService.deleteBlog(blogId);
     }
