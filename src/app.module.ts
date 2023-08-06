@@ -58,6 +58,7 @@ const useCases = [CreateBlogUseCase, BindBlogUseCase];
     PublicBlogsController,
     BloggerBlogsController,
     SABlogsController,
+
     PostsController,
     CommentsController,
   ],

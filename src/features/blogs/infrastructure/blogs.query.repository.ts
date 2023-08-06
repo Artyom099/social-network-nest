@@ -83,7 +83,10 @@ export class BlogsQueryRepository {
     sortDirection: 'asc' | 'desc',
   ): Promise<PagingViewModel<BlogViewModel[]>> {
     const filter = searchNameTerm
-      ? { id, name: { $regex: searchNameTerm, $options: 'i' } }
+      ? {
+          'blogOwnerInfo.userId': id,
+          name: { $regex: searchNameTerm, $options: 'i' },
+        }
       : {};
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel

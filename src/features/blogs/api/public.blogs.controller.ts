@@ -42,7 +42,6 @@ export class PublicBlogsController {
     );
   }
 
-  // todo - этот эндпоинт падает с 404 ошибкой
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async getBlog(@Param('id') blogId: string) {
