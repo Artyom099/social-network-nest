@@ -139,12 +139,15 @@ export class BloggerBlogsController {
   @Post(':id/posts')
   @HttpCode(HttpStatus.CREATED)
   async createPostCurrentBlog(
+    @Req() req,
     @Param('id') blogId: string,
     @Body() inputModel: PostInputModel,
   ) {
-    const foundBlog = await this.blogsQueryRepository.getBlog(blogId);
-    if (!foundBlog) {
-      throw new NotFoundException('blog not found');
+    const foundBlog = await this.blogsQueryRepository.getBlogSA(blogId);
+    if (!foundBlog) throw new NotFoundException('blog not found');
+
+    if (req.userId !== foundBlog.blogOwnerInfo.userId) {
+      throw new ForbiddenException();
     } else {
       return this.postsService.createPost(foundBlog, inputModel);
     }
