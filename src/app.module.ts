@@ -31,10 +31,11 @@ import { BindBlogUseCase } from './features/blogs/application/sa.use.cases/bind.
 import { CreateBlogUseCase } from './features/blogs/application/blogger.use.cases/create.blog.use.case';
 import { PublicBlogsController } from './features/blogs/api/public.blogs.controller';
 import { SABlogsController } from './features/blogs/api/sa.blogs.controller';
+import { CreatePostUseCase } from './features/blogs/application/blogger.use.cases/create.post.use.case';
 
 config();
 
-const useCases = [CreateBlogUseCase, BindBlogUseCase];
+const useCases = [CreateBlogUseCase, BindBlogUseCase, CreatePostUseCase];
 
 @Module({
   imports: [

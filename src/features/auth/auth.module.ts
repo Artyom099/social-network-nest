@@ -18,11 +18,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { DevicesController } from '../devices/api/devices.controller';
 import { UsersService } from '../users/application/users.service';
 import { UsersController } from '../users/api/users.controller';
-import { CreateUserByAdminUseCase } from './application/use.cases/create.user.use.case';
+import { CreateUserByAdminUseCase } from '../users/application/sa.users.use.cases/create.user.use.case';
 import { RegisterUserUseCase } from './application/use.cases/register.user.use.case';
-import { BanUserUseCase } from './application/use.cases/ban.user.use.case';
+import { BanUserUseCase } from '../users/application/sa.users.use.cases/ban.user.use.case';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UnbanUserUseCase } from './application/use.cases/unban.user.use.case';
+import { UnbanUserUseCase } from '../users/application/sa.users.use.cases/unban.user.use.case';
 
 const useCases = [
   CreateUserByAdminUseCase,

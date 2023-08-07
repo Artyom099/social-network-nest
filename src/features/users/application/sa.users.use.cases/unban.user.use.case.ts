@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersQueryRepository } from '../../infrastructure/users.query.repository';
 
 export class UnbanUserCommand {
   constructor(public userId: string) {}

@@ -1,9 +1,6 @@
-import {
-  CreateUserInputModel,
-  SAUserViewModel,
-} from '../../../users/api/users.models';
-import { UsersService } from '../../../users/application/users.service';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
+import { CreateUserInputModel, SAUserViewModel } from '../../api/users.models';
+import { UsersService } from '../users.service';
+import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class CreateUserByAdminCommand {

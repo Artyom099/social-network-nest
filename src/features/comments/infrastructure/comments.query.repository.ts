@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CommentViewModel } from '../api/comments.models';
-import { PagingViewModel } from '../../../infrastructure/utils/common.models';
+import {
+  DefaultPaginationInput,
+  PagingViewModel,
+} from '../../../infrastructure/utils/common.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment, CommentDocument } from '../comments.schema';
@@ -55,19 +58,15 @@ export class CommentsQueryRepository {
   async getCommentsCurrentPost(
     currentUserId: string | null,
     postId: string,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    query: DefaultPaginationInput,
   ): Promise<PagingViewModel<CommentViewModel[]>> {
-    // todo исключить комменты забаненых пользователей
     const filter = { postId };
     const totalCount = await this.commentModel.countDocuments(filter);
     const sortedComments = await this.commentModel
       .find(filter)
-      .sort({ [sortBy]: sortDirection })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
+      .sort(query.sort())
+      .skip(query.skip())
+      .limit(query.pageSize)
       .lean()
       .exec();
 
@@ -103,9 +102,9 @@ export class CommentsQueryRepository {
       };
     });
     return {
-      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
-      page: pageNumber, // текущая страница
-      pageSize: pageSize, // количество пользователей на странице
+      pagesCount: query.pagesCount(totalCount), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
       items,
     };

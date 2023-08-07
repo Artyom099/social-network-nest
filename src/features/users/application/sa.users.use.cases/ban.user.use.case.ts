@@ -1,7 +1,7 @@
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
-import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersQueryRepository } from '../../infrastructure/users.query.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { BanUserInputModel } from '../../../users/api/users.models';
+import { BanUserInputModel } from '../../api/users.models';
 
 export class BanUserCommand {
   constructor(public userId: string, public inputModel: BanUserInputModel) {}

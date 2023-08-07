@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PagingViewModel } from '../../../infrastructure/utils/common.models';
+import {
+  DefaultPaginationInput,
+  PagingViewModel,
+} from '../../../infrastructure/utils/common.models';
 import {
   ExtendedLikesInfoDBModel,
   NewestLikesViewModel,
@@ -34,8 +37,6 @@ export class PostsQueryRepository {
       .lean()
       .exec();
     const idBannedUsers = bannedUsers.map((u) => u.id);
-    // если p.userId входит в массив забаненых пользователей, он не учавствует в подсчете реакций
-    //todo тут не учитывать лайки забненых юзеров
 
     post.extendedLikesInfo.forEach((l) => {
       if (l.userId === currentUserId) myStatus = l.status;
@@ -71,18 +72,15 @@ export class PostsQueryRepository {
   }
 
   async getSortedPosts(
-    currentUserId: string | null,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    currentUserId: string,
+    query: DefaultPaginationInput,
   ): Promise<PagingViewModel<PostViewModel[]>> {
     const totalCount = await this.postModel.countDocuments();
     const sortedPosts = await this.postModel
       .find()
-      .sort({ [sortBy]: sortDirection })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
+      .sort(query.sort())
+      .skip(query.skip())
+      .limit(query.pageSize)
       .lean()
       .exec();
 
@@ -131,9 +129,9 @@ export class PostsQueryRepository {
       };
     });
     return {
-      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
-      page: pageNumber, // текущая страница
-      pageSize: pageSize, // количество пользователей на странице
+      pagesCount: query.pagesCount(totalCount), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
       items,
     };
@@ -142,18 +140,15 @@ export class PostsQueryRepository {
   async getSortedPostsCurrentBlog(
     currentUserId: string | null,
     blogId: string,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    query: DefaultPaginationInput,
   ): Promise<PagingViewModel<PostViewModel[]>> {
     const filter = { blogId };
     const totalCount = await this.postModel.countDocuments(filter);
     const sortedPosts = await this.postModel
       .find(filter)
-      .sort({ [sortBy]: sortDirection })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
+      .sort(query.sort())
+      .skip(query.skip())
+      .limit(query.pageSize)
       .lean()
       .exec();
 
@@ -168,7 +163,6 @@ export class PostsQueryRepository {
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: any[] = [];
-      //todo тут не учитывать лайки забненых юзеров
       p.extendedLikesInfo.forEach((l: ExtendedLikesInfoDBModel) => {
         if (l.userId === currentUserId) myStatus = l.status;
         if (idBannedUsers.includes(l.userId)) return;
@@ -203,9 +197,9 @@ export class PostsQueryRepository {
     });
 
     return {
-      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
-      page: pageNumber, // текущая страница
-      pageSize: pageSize, // количество пользователей на странице
+      pagesCount: query.pagesCount(totalCount), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество пользователей на странице
       totalCount, // общее количество пользователей
       items,
     };

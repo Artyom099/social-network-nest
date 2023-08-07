@@ -13,11 +13,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
-import { GetItemsWithPaging } from '../../../infrastructure/utils/common.models';
+import { DefaultPaginationInput } from '../../../infrastructure/utils/common.models';
 import { BlogsService } from '../../blogs/application/blogs.service';
 import { PostsQueryRepository } from '../infrastucture/posts.query.repository';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments.query.repository';
-import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import {
   CommentInputModel,
@@ -43,18 +42,8 @@ export class PostsController {
   @Get()
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
-  async getPosts(@Req() req, @Query() query: GetItemsWithPaging) {
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 10;
-    const sortBy = query.sortBy ?? SortBy.default;
-    const sortDirection = query.sortDirection ?? SortDirection.default;
-    return this.postsQueryRepository.getSortedPosts(
-      req.userId,
-      Number(pageNumber),
-      Number(pageSize),
-      sortBy,
-      sortDirection,
-    );
+  async getPosts(@Req() req, @Query() query: DefaultPaginationInput) {
+    return this.postsQueryRepository.getSortedPosts(req.userId, query);
   }
 
   @Get(':id')
@@ -72,30 +61,22 @@ export class PostsController {
     }
   }
 
-  //TODO: change query validation
   @Get(':id/comments')
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getCommentsCurrentPost(
     @Req() req,
     @Param('id') postId: string,
-    @Query() query: GetItemsWithPaging,
+    @Query() query: DefaultPaginationInput,
   ) {
     const foundPost = await this.postsQueryRepository.getPost(postId);
     if (!foundPost) {
       throw new NotFoundException('post not found');
     } else {
-      const pageNumber = query.pageNumber ?? 1;
-      const pageSize = query.pageSize ?? 10;
-      const sortBy = query.sortBy ?? SortBy.default;
-      const sortDirection = query.sortDirection ?? SortDirection.default;
       return this.commentsQueryRepository.getCommentsCurrentPost(
         req.userId,
         postId,
-        Number(pageNumber),
-        Number(pageSize),
-        sortBy,
-        sortDirection,
+        query,
       );
     }
   }

@@ -13,8 +13,7 @@ import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 
 import { BindBlogUseCase } from '../application/sa.use.cases/bind.blog.use.case';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
-import { GetItemsWithPagingAndSearch } from '../../../infrastructure/utils/common.models';
-import { SortBy, SortDirection } from '../../../infrastructure/utils/constants';
+import { BlogsPaginationInput } from '../../../infrastructure/utils/common.models';
 
 @Controller('sa/blogs')
 @UseGuards(BasicAuthGuard)
@@ -26,19 +25,8 @@ export class SABlogsController {
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async getBlogs(@Query() query: GetItemsWithPagingAndSearch) {
-    const searchNameTerm = query.searchNameTerm ?? null;
-    const pageNumber = query.pageNumber ?? 1;
-    const pageSize = query.pageSize ?? 10;
-    const sortBy = query.sortBy ?? SortBy.default;
-    const sortDirection = query.sortDirection ?? SortDirection.default;
-    return this.blogsQueryRepository.getSortedBlogsSA(
-      searchNameTerm,
-      Number(pageNumber),
-      Number(pageSize),
-      sortBy,
-      sortDirection,
-    );
+  async getBlogs(@Query() query: BlogsPaginationInput) {
+    return this.blogsQueryRepository.getSortedBlogsSA(query);
   }
 
   @Put(':id/bind-with-user/:userId')

@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PagingViewModel } from '../../../infrastructure/utils/common.models';
+import {
+  BlogsPaginationInput,
+  PagingViewModel,
+} from '../../../infrastructure/utils/common.models';
 import { BlogViewModel, SABlogViewModel } from '../api/blogs.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../blogs.schema';
@@ -14,28 +17,24 @@ export class BlogsQueryRepository {
     return this.blogModel.findOne({ id }, { _id: 0 });
   }
   async getSortedBlogsSA(
-    searchNameTerm: string | null,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    query: BlogsPaginationInput,
   ): Promise<PagingViewModel<SABlogViewModel[]>> {
-    const filter = searchNameTerm
-      ? { name: { $regex: searchNameTerm, $options: 'i' } }
-      : {};
+    const filter = {
+      name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
+    };
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel
       .find(filter, { _id: 0 })
-      .sort({ [sortBy]: sortDirection })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
+      .sort(query.sort())
+      .skip(query.skip())
+      .limit(query.pageSize)
       .lean()
       .exec();
 
     return {
-      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
-      page: pageNumber, // текущая страница
-      pageSize, // количество блогов на странице
+      pagesCount: query.pagesCount(totalCount), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество блогов на странице
       totalCount, // общее количество блогов
       items,
     };
@@ -46,28 +45,24 @@ export class BlogsQueryRepository {
     return this.blogModel.findOne({ id }, { _id: 0, blogOwnerInfo: 0 });
   }
   async getSortedBlogs(
-    searchNameTerm: string | null,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    query: BlogsPaginationInput,
   ): Promise<PagingViewModel<BlogViewModel[]>> {
-    const filter = searchNameTerm
-      ? { name: { $regex: searchNameTerm, $options: 'i' } }
-      : {};
+    const filter = {
+      name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
+    };
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel
       .find(filter, { _id: 0, blogOwnerInfo: 0 })
-      .sort({ [sortBy]: sortDirection })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
+      .sort(query.sort())
+      .skip(query.skip())
+      .limit(query.pageSize)
       .lean()
       .exec();
 
     return {
-      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
-      page: pageNumber, // текущая страница
-      pageSize, // количество блогов на странице
+      pagesCount: query.pagesCount(totalCount), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество блогов на странице
       totalCount, // общее количество блогов
       items,
     };
@@ -75,30 +70,26 @@ export class BlogsQueryRepository {
 
   // blogger
   async getSortedBlogsCurrentBlogger(
-    id: string,
-    searchNameTerm: string | null,
-    pageNumber: number,
-    pageSize: number,
-    sortBy: string,
-    sortDirection: 'asc' | 'desc',
+    userId: string,
+    query: BlogsPaginationInput,
   ): Promise<PagingViewModel<BlogViewModel[]>> {
     const filter = {
-      'blogOwnerInfo.userId': id,
-      name: { $regex: searchNameTerm ?? '', $options: 'i' },
+      'blogOwnerInfo.userId': userId,
+      name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
     };
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel
       .find(filter, { _id: 0, blogOwnerInfo: 0 })
-      .sort({ [sortBy]: sortDirection })
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
+      .sort(query.sort())
+      .skip(query.skip())
+      .limit(query.pageSize)
       .lean()
       .exec();
 
     return {
-      pagesCount: Math.ceil(totalCount / pageSize), // общее количество страниц
-      page: pageNumber, // текущая страница
-      pageSize, // количество блогов на странице
+      pagesCount: query.pagesCount(totalCount), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество блогов на странице
       totalCount, // общее количество блогов
       items,
     };
