@@ -46,7 +46,7 @@ export class CommentsQueryRepository {
         userId: comment.commentatorInfo.userId,
         userLogin: comment.commentatorInfo.userLogin,
       },
-      createdAt: comment.createdAt,
+      createdAt: comment.createdAt.toISOString(),
       likesInfo: {
         likesCount,
         dislikesCount,
@@ -93,7 +93,7 @@ export class CommentsQueryRepository {
           userId: c.commentatorInfo.userId,
           userLogin: c.commentatorInfo.userLogin,
         },
-        createdAt: c.createdAt,
+        createdAt: c.createdAt.toISOString(),
         likesInfo: {
           likesCount,
           dislikesCount,

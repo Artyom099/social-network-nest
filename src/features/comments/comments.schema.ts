@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { LikeStatus } from '../../infrastructure/utils/constants';
 import { HydratedDocument } from 'mongoose';
+import { randomUUID } from 'crypto';
+import { CreateCommentModel } from './api/comments.models';
 
 @Schema({ _id: false, versionKey: false })
 class CommentatorInfo {
@@ -32,8 +34,22 @@ export class Comment {
   @Prop({ type: CommentatorInfoSchema, required: true })
   commentatorInfo: CommentatorInfo;
   @Prop({ required: true })
-  createdAt: string;
+  createdAt: Date;
   @Prop({ type: [LikesInfoSchema], required: true })
   likesInfo: LikesInfo[];
+
+  static create(inputModel: CreateCommentModel) {
+    const comment = new Comment();
+    comment.id = randomUUID();
+    comment.postId = inputModel.postId;
+    comment.content = inputModel.content;
+    comment.commentatorInfo = {
+      userId: inputModel.userId,
+      userLogin: inputModel.userLogin,
+    };
+    comment.createdAt = new Date();
+    comment.likesInfo = [];
+    return comment;
+  }
 }
 export const CommentSchema = SchemaFactory.createForClass(Comment);

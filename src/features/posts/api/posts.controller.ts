@@ -22,21 +22,23 @@ import {
   CommentInputModel,
   LikeStatusInputModel,
 } from '../../comments/api/comments.models';
-import { CommentsService } from '../../comments/application/comments.service';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateCommentCommand } from '../../comments/application/use.cases/create.comment.use.case';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private blogService: BlogsService,
     private postsService: PostsService,
-    private commentsService: CommentsService,
     private postsQueryRepository: PostsQueryRepository,
     private blogsQueryRepository: BlogsQueryRepository,
     private usersQueryRepository: UsersQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
+
+    private commandBus: CommandBus,
   ) {}
 
   @Get()
@@ -97,12 +99,13 @@ export class PostsController {
     if (!user) {
       throw new NotFoundException('user not found');
     } else {
-      return this.commentsService.createComment(
+      const model = {
         postId,
-        inputModel.content,
-        user.id,
-        user.login,
-      );
+        content: inputModel.content,
+        userId: user.id,
+        userLogin: user.login,
+      };
+      return this.commandBus.execute(new CreateCommentCommand(model));
     }
   }
 
@@ -125,45 +128,4 @@ export class PostsController {
       );
     }
   }
-
-  // @Post()
-  // @UseGuards(BasicAuthGuard)
-  // @HttpCode(HttpStatus.CREATED)
-  // async createPost(@Body() inputModel: PostInputModelWithBlogId) {
-  //   const foundBLog = await this.blogsQueryRepository.getBlog(
-  //     inputModel.blogId,
-  //   );
-  //   if (!foundBLog) {
-  //     throw new NotFoundException('blog not found');
-  //   } else {
-  //     return this.postsService.createPost(foundBLog, inputModel);
-  //   }
-  // }
-  //
-  // @Put(':id')
-  // @UseGuards(BasicAuthGuard)
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async updatePost(
-  //   @Param('id') postId: string,
-  //   @Body() inputModel: PostInputModelWithBlogId,
-  // ) {
-  //   const foundPost = await this.postsQueryRepository.getPost(postId);
-  //   if (!foundPost) {
-  //     throw new NotFoundException('post not found');
-  //   } else {
-  //     return this.postsService.updatePost(postId, inputModel);
-  //   }
-  // }
-  //
-  // @Delete(':id')
-  // @UseGuards(BasicAuthGuard)
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // async deletePost(@Param('id') postId: string) {
-  //   const foundPost = await this.postsQueryRepository.getPost(postId);
-  //   if (!foundPost) {
-  //     throw new NotFoundException('post not found');
-  //   } else {
-  //     return this.postsService.deletePost(postId);
-  //   }
-  // }
 }

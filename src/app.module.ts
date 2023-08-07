@@ -32,10 +32,16 @@ import { CreateBlogUseCase } from './features/blogs/application/blogger.use.case
 import { PublicBlogsController } from './features/blogs/api/public.blogs.controller';
 import { SABlogsController } from './features/blogs/api/sa.blogs.controller';
 import { CreatePostUseCase } from './features/blogs/application/blogger.use.cases/create.post.use.case';
+import { CreateCommentUseCase } from './features/comments/application/use.cases/create.comment.use.case';
 
 config();
 
-const useCases = [CreateBlogUseCase, BindBlogUseCase, CreatePostUseCase];
+const useCases = [
+  CreateBlogUseCase,
+  BindBlogUseCase,
+  CreatePostUseCase,
+  CreateCommentUseCase,
+];
 
 @Module({
   imports: [
