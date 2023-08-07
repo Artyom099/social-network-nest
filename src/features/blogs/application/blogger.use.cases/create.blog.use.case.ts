@@ -1,6 +1,6 @@
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { Blog } from '../../blogs.schema';
-import { BlogInputModel, BlogViewModel } from '../../api/blogs.models';
+import { BlogInputModel, BlogViewModel } from '../../api/models/blogs.models';
 import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 

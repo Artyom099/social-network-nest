@@ -14,7 +14,7 @@ import {
 import { AuthService } from '../application/auth.service';
 import { DevicesService } from '../../devices/application/devices.service';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
-import { CreateUserInputModel } from '../../users/api/users.models';
+import { CreateUserInputModel } from '../../users/api/models/users.models';
 import {
   AuthInputModel,
   EmailInputModel,

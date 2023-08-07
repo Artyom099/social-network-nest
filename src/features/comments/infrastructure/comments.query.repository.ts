@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CommentViewModel } from '../api/comments.models';
+import { CommentViewModel } from '../api/models/comments.models';
 import {
   DefaultPaginationInput,
   PagingViewModel,

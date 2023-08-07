@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../../infrastructure/utils/constants';
+import { LikeStatus } from '../../../../infrastructure/utils/constants';
 import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform } from 'class-transformer';
 
@@ -17,20 +17,6 @@ export class LikeStatusInputModel {
   likeStatus: LikeStatus;
 }
 
-export type CommentDBModel = {
-  id: string;
-  postId: string;
-  content: string;
-  commentatorInfo: {
-    userId: string;
-    userLogin: string;
-  };
-  createdAt: string;
-  likesInfo: {
-    userId: string;
-    status: LikeStatus;
-  }[];
-};
 export type CommentViewModel = {
   id: string;
   content: string;

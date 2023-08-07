@@ -2,7 +2,7 @@ import { UsersService } from '../../../users/application/users.service';
 import {
   CreateUserInputModel,
   UserViewModel,
-} from '../../../users/api/users.models';
+} from '../../../users/api/models/users.models';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 

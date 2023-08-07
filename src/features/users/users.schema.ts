@@ -5,7 +5,7 @@ import {
   CreateUserInputModel,
   SAUserViewModel,
   UserViewModel,
-} from './api/users.models';
+} from './api/models/users.models';
 import add from 'date-fns/add';
 
 @Schema({ _id: false, versionKey: false })
@@ -84,7 +84,7 @@ export class User {
         expirationDate: add(new Date(), { minutes: 10 }),
         isConfirmed: true,
       },
-      recoveryCode: '1',
+      recoveryCode: randomUUID(),
     };
     return new UserModel(data);
   }
@@ -114,7 +114,7 @@ export class User {
         expirationDate: add(new Date(), { minutes: 10 }),
         isConfirmed: false,
       },
-      recoveryCode: '2',
+      recoveryCode: randomUUID(),
     };
     return new UserModel(data);
   }

@@ -14,14 +14,14 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BlogInputModel } from './blogs.models';
+import { BlogInputModel } from './models/blogs.models';
 import { BlogsService } from '../application/blogs.service';
 import {
   BlogsPaginationInput,
   DefaultPaginationInput,
 } from '../../../infrastructure/utils/common.models';
 import { PostsService } from '../../posts/application/posts.service';
-import { PostInputModel } from '../../posts/api/posts.models';
+import { PostInputModel } from '../../posts/api/models/posts.models';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
 import { CreateBlogCommand } from '../application/blogger.use.cases/create.blog.use.case';

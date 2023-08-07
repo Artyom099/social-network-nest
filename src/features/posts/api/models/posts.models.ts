@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../../infrastructure/utils/constants';
+import { LikeStatus } from '../../../../infrastructure/utils/constants';
 import {
   IsNotEmpty,
   IsString,
@@ -8,7 +8,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
+import { BlogsQueryRepository } from '../../../blogs/infrastructure/blogs.query.repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()

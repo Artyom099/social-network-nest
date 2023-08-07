@@ -1,4 +1,7 @@
-import { CreateUserInputModel, SAUserViewModel } from '../../api/users.models';
+import {
+  CreateUserInputModel,
+  SAUserViewModel,
+} from '../../api/models/users.models';
 import { UsersService } from '../users.service';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';

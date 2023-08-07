@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from '../application/users.service';
-import { BanUserInputModel, CreateUserInputModel } from './users.models';
+import { BanUserInputModel, CreateUserInputModel } from './models/users.models';
 import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { CreateUserByAdminCommand } from '../application/sa.users.use.cases/create.user.use.case';

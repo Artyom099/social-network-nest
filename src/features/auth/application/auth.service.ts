@@ -7,7 +7,7 @@ import { UsersRepository } from '../../users/infrastructure/users.repository';
 import {
   CreateUserInputModel,
   UserViewModel,
-} from '../../users/api/users.models';
+} from '../../users/api/models/users.models';
 import { emailManager } from '../../../infrastructure/services/email.manager';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { jwtConstants } from '../../../infrastructure/utils/settings';

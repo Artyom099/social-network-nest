@@ -3,7 +3,7 @@ import {
   PagingViewModel,
   UsersPaginationInput,
 } from '../../../infrastructure/utils/common.models';
-import { SAUserViewModel, UserViewModel } from '../api/users.models';
+import { SAUserViewModel, UserViewModel } from '../api/models/users.models';
 import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';

@@ -3,7 +3,7 @@ import {
   BlogsPaginationInput,
   PagingViewModel,
 } from '../../../infrastructure/utils/common.models';
-import { BlogViewModel, SABlogViewModel } from '../api/blogs.models';
+import { BlogViewModel, SABlogViewModel } from '../api/models/blogs.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../blogs.schema';
 import { Model } from 'mongoose';

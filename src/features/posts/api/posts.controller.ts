@@ -21,7 +21,7 @@ import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guar
 import {
   CommentInputModel,
   LikeStatusInputModel,
-} from '../../comments/api/comments.models';
+} from '../../comments/api/models/comments.models';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';

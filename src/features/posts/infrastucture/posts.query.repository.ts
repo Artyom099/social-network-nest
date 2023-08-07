@@ -7,7 +7,7 @@ import {
   ExtendedLikesInfoDBModel,
   NewestLikesViewModel,
   PostViewModel,
-} from '../api/posts.models';
+} from '../api/models/posts.models';
 import { LikeStatus } from '../../../infrastructure/utils/constants';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../posts.schema';

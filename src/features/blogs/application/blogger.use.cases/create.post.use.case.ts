@@ -1,5 +1,8 @@
-import { SABlogViewModel } from '../../api/blogs.models';
-import { PostInputModel, PostViewModel } from '../../../posts/api/posts.models';
+import { SABlogViewModel } from '../../api/models/blogs.models';
+import {
+  PostInputModel,
+  PostViewModel,
+} from '../../../posts/api/models/posts.models';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../../../posts/infrastucture/posts.repository';
 import { Post } from '../../../posts/posts.schema';

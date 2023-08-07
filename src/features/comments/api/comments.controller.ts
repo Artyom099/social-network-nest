@@ -17,7 +17,7 @@ import {
   CommentInputModel,
   CommentViewModel,
   LikeStatusInputModel,
-} from './comments.models';
+} from './models/comments.models';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { CommentsQueryRepository } from '../infrastructure/comments.query.repository';

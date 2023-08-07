@@ -2,7 +2,7 @@ import {
   BanStatus,
   SortBy,
   SortDirection,
-} from '../../../infrastructure/utils/constants';
+} from '../../../../infrastructure/utils/constants';
 import {
   IsBoolean,
   IsEmail,

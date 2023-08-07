@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../infrastructure/users.repository';
-import { SaltHashModel } from '../api/users.models';
+import { SaltHashModel } from '../api/models/users.models';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

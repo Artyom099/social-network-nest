@@ -1,5 +1,5 @@
 import { LikeStatus } from '../../../infrastructure/utils/constants';
-import { CommentViewModel } from '../api/comments.models';
+import { CommentViewModel } from '../api/models/comments.models';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment, CommentDocument } from '../comments.schema';

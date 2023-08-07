@@ -3,7 +3,7 @@ import { CommentsRepository } from '../../infrastructure/comments.repository';
 import {
   CommentViewModel,
   CreateCommentModel,
-} from '../../api/comments.models';
+} from '../../api/models/comments.models';
 import { Comment } from '../../comments.schema';
 
 export class CreateCommentCommand {

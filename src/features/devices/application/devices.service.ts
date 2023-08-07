@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DevicesRepository } from '../infrastructure/devices.repository';
 import { Device } from '../devices.schema';
-import { DeviceViewModel } from '../api/devices.models';
+import { DeviceViewModel } from '../api/models/devices.models';
 
 @Injectable()
 export class DevicesService {
