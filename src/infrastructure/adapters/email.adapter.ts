@@ -1,8 +1,26 @@
 import nodemailer from 'nodemailer';
 import { settings } from '../utils/settings';
 
-export const gmailAdapter = {
-  async sendEmail(to: string, subject: string, message: string) {
+export class EmailAdapter {
+  async sendEmail(email: string, subject: string, message: string) {
+    const transporter = await nodemailer.createTransport({
+      host: 'smtp.mail.ru',
+      port: 465,
+      secure: true,
+      auth: {
+        user: settings.MAIL_LOGIN,
+        pass: settings.MAIL_PASSWORD,
+      },
+    });
+    return await transporter.sendMail({
+      from: `"Fred Foo 👻" <${settings.MAIL_LOGIN}>`, // sender address
+      to: email, // list of receivers
+      subject: subject, // Subject line
+      html: message, // html body
+    });
+  }
+
+  async sendGmail(to: string, subject: string, message: string) {
     try {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -24,25 +42,5 @@ export const gmailAdapter = {
       console.error('Mail sending failed');
       console.error(e);
     }
-  },
-};
-
-export const emailAdapter = {
-  async sendEmail(email: string, subject: string, message: string) {
-    const transporter = await nodemailer.createTransport({
-      host: 'smtp.mail.ru',
-      port: 465,
-      secure: true,
-      auth: {
-        user: settings.MAIL_LOGIN,
-        pass: settings.MAIL_PASSWORD,
-      },
-    });
-    return await transporter.sendMail({
-      from: `"Fred Foo 👻" <${settings.MAIL_LOGIN}>`, // sender address
-      to: email, // list of receivers
-      subject: subject, // Subject line
-      html: message, // html body
-    });
-  },
-};
+  }
+}

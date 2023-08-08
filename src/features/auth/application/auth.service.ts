@@ -8,7 +8,7 @@ import {
   CreateUserInputModel,
   UserViewModel,
 } from '../../users/api/models/users.models';
-import { emailManager } from '../../../infrastructure/services/email.manager';
+import { EmailManager } from '../../../infrastructure/services/email.manager';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { jwtConstants } from '../../../infrastructure/utils/settings';
 
@@ -16,6 +16,7 @@ import { jwtConstants } from '../../../infrastructure/utils/settings';
 export class AuthService {
   constructor(
     private jwtService: JwtService,
+    private emailManager: EmailManager,
     private usersService: UsersService,
     private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
@@ -40,7 +41,7 @@ export class AuthService {
 
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
-      await emailManager.sendEmailConfirmationMessage(
+      await this.emailManager.sendEmailConfirmationMessage(
         user.accountData.email,
         user.emailConfirmation.confirmationCode,
       );
@@ -129,7 +130,7 @@ export class AuthService {
 
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
-      await emailManager.sendEmailConfirmationMessage(
+      await this.emailManager.sendEmailConfirmationMessage(
         email,
         newConfirmationCode,
       );
@@ -146,7 +147,7 @@ export class AuthService {
     await this.usersRepository.save(user);
     try {
       //await
-      await emailManager.sendEmailRecoveryCode(email, recoveryCode);
+      await this.emailManager.sendEmailRecoveryCode(email, recoveryCode);
     } catch (error) {
       return null;
     }

@@ -23,6 +23,8 @@ import { RegisterUserUseCase } from './application/use.cases/register.user.use.c
 import { BanUserUseCase } from '../users/application/sa.users.use.cases/ban.user.use.case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UnbanUserUseCase } from '../users/application/sa.users.use.cases/unban.user.use.case';
+import { EmailAdapter } from '../../infrastructure/adapters/email.adapter';
+import { EmailManager } from '../../infrastructure/services/email.manager';
 
 const useCases = [
   CreateUserByAdminUseCase,
@@ -48,8 +50,10 @@ const useCases = [
     ...useCases,
 
     IpService,
-
     AuthService,
+
+    EmailAdapter,
+    EmailManager,
 
     UsersService,
     UsersRepository,
