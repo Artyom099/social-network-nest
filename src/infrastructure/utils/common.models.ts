@@ -3,19 +3,6 @@ import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { isNil } from '@nestjs/common/utils/shared.utils';
 
-export type GetItemsWithPaging = {
-  sortBy: SortBy;
-  sortDirection: SortDirection;
-  pageNumber: number;
-  pageSize: number;
-};
-export type GetItemsWithPagingAndSearch = {
-  searchNameTerm: string;
-  pageNumber: number;
-  pageSize: number;
-  sortBy: SortBy;
-  sortDirection: SortDirection;
-};
 export type PagingViewModel<T> = {
   pagesCount: number;
   page: number;

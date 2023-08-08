@@ -50,31 +50,6 @@ export type SAUserViewModel = {
 };
 export type UserViewModel = Omit<SAUserViewModel, 'banInfo'>;
 
-export type UserDBModel = {
-  id: string;
-  accountData: {
-    login: string;
-    email: string;
-    passwordSalt: string;
-    passwordHash: string;
-    createdAt: Date;
-  };
-  emailConfirmation: {
-    confirmationCode: string;
-    expirationDate: Date;
-    isConfirmed: boolean;
-  };
-  recoveryCode: string;
-};
-export type GetUsersWithPagingAndSearch = {
-  sortDirection: SortDirection;
-  banStatus: BanStatus;
-  sortBy: SortBy;
-  searchLoginTerm: string;
-  searchEmailTerm: string;
-  pageNumber: number;
-  pageSize: number;
-};
 export type SaltHashModel = {
   salt: string;
   hash: string;

@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsString,
   Length,
-  Validate,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
@@ -24,28 +23,6 @@ export class BlogExistsConstraint implements ValidatorConstraintInterface {
   }
 }
 
-export class PostInputModelWithBlogId {
-  @IsString()
-  @IsNotEmpty()
-  @Length(3, 30)
-  @Transform(({ value }) => value?.trim())
-  title: string;
-  @IsString()
-  @IsNotEmpty()
-  @Length(3, 100)
-  @Transform(({ value }) => value?.trim())
-  shortDescription: string;
-  @IsString()
-  @IsNotEmpty()
-  @Length(3, 1000)
-  @Transform(({ value }) => value?.trim())
-  content: string;
-  @IsString()
-  @IsNotEmpty()
-  @Transform(({ value }) => value?.trim())
-  @Validate(BlogExistsConstraint)
-  blogId: string;
-}
 export class PostInputModel {
   @IsString()
   @IsNotEmpty()
