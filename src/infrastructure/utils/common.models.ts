@@ -1,5 +1,5 @@
 import { BanStatus, SortBy, SortDirection } from './constants';
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { isNil } from '@nestjs/common/utils/shared.utils';
 
@@ -57,6 +57,7 @@ export class BlogsPaginationInput extends DefaultPaginationInput {
 
 export class UsersPaginationInput extends DefaultPaginationInput {
   @IsOptional()
+  @IsBoolean()
   @Transform(({ value }) => {
     return value === BanStatus.banned
       ? true
@@ -64,7 +65,7 @@ export class UsersPaginationInput extends DefaultPaginationInput {
       ? false
       : null;
   })
-  banStatus: string | null;
+  banStatus: boolean | null;
   @IsOptional()
   @Transform(({ value }) => {
     return !isNil(value) ? value : '';

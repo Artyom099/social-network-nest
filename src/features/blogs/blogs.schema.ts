@@ -17,7 +17,7 @@ const BlogOwnerInfoSchema = SchemaFactory.createForClass(BlogOwnerInfo);
 class BanInfo {
   @Prop({ type: Boolean, required: true })
   isBanned: boolean;
-  @Prop({ type: String || null, required: true })
+  @Prop({ type: String || null, required: false })
   banDate: string | null;
 }
 const BanInfoSchema = SchemaFactory.createForClass(BanInfo);

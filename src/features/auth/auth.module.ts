@@ -25,12 +25,14 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UnbanUserUseCase } from '../users/application/sa.users.use.cases/unban.user.use.case';
 import { EmailAdapter } from '../../infrastructure/adapters/email.adapter';
 import { EmailManager } from '../../infrastructure/services/email.manager';
+import { DeleteUserUseCase } from '../users/application/sa.users.use.cases/delete.user.use.case';
 
 const useCases = [
   CreateUserByAdminUseCase,
   RegisterUserUseCase,
   BanUserUseCase,
   UnbanUserUseCase,
+  DeleteUserUseCase,
 ];
 
 @Module({

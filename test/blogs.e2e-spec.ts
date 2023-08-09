@@ -320,7 +320,7 @@ describe('BlogsController (e2e)', () => {
     expect.setState({ secondCreatedBlog: secondCreatedBlog });
   });
 
-  it("11 – PUT:/blogger/blogs/:id – shouldn't update blog that not exist", async () => {
+  it("11 – PUT:/blogger/blogs/:id – return 404 shouldn't update blog that not exist", async () => {
     const { firstRefreshToken } = expect.getState();
 
     await request(server)
@@ -333,7 +333,7 @@ describe('BlogsController (e2e)', () => {
       })
       .expect(HttpStatus.NOT_FOUND);
   });
-  it("12 – PUT:/blogger/blogs/:id – shouldn't update blog with long name", async () => {
+  it("12 – PUT:/blogger/blogs/:id – return 400 shouldn't update blog with long name", async () => {
     const { firstRefreshToken, firstCreatedBlog, secondCreatedBlog } =
       expect.getState();
 
@@ -359,7 +359,7 @@ describe('BlogsController (e2e)', () => {
       });
   });
 
-  it('13 – PUT:/blogger/blogs/:id – return 202 & update blog', async () => {
+  it('13 – PUT:/blogger/blogs/:id – return 204 & update blog', async () => {
     const { firstRefreshToken, firstCreatedBlog, secondCreatedBlog } =
       expect.getState();
     const firstUpdateBlog = {

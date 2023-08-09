@@ -12,25 +12,19 @@ import {
 } from '@nestjs/common';
 import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
 
-import {
-  BindBlogCommand,
-  BindBlogUseCase,
-} from '../application/sa.use.cases/bind.blog.use.case';
+import { BindBlogCommand } from '../application/sa.use.cases/bind.blog.use.case';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { BlogsPaginationInput } from '../../../infrastructure/utils/common.models';
 import { BanBloggerInputModel } from '../../users/api/models/users.models';
-import { BanBlogUseCase } from '../application/sa.use.cases/ban.blog.use.case';
+import { BanBlogCommand } from '../application/sa.use.cases/ban.blog.use.case';
 import { CommandBus } from '@nestjs/cqrs';
 
 @Controller('sa/blogs')
 @UseGuards(BasicAuthGuard)
 export class SABlogsController {
   constructor(
-    private bindBlogUseCase: BindBlogUseCase,
-    private banBlogUseCase: BanBlogUseCase,
-    private blogsQueryRepository: BlogsQueryRepository,
-
     private commandBus: CommandBus,
+    private blogsQueryRepository: BlogsQueryRepository,
   ) {}
 
   @Get()
@@ -63,7 +57,9 @@ export class SABlogsController {
     if (!blog) {
       throw new NotFoundException('blog not found');
     } else {
-      return this.banBlogUseCase.banBlog(blogId, inputModel.isBanned);
+      return this.commandBus.execute(
+        new BanBlogCommand(blogId, inputModel.isBanned),
+      );
     }
   }
 }

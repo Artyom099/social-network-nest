@@ -34,7 +34,7 @@ export class BlogsRepository {
     await this.blogModel.deleteOne({ id });
   }
 
-  async updateBlogsUser(id: string, userId: string, login: string) {
+  async updateBlogOwner(id: string, userId: string, login: string) {
     await this.blogModel.updateOne(
       { id },
       { 'blogOwnerInfo.userId': userId, 'blogOwnerInfo.userLogin': login },

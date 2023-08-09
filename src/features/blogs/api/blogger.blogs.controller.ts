@@ -28,6 +28,7 @@ import { CreateBlogCommand } from '../application/blogger.use.cases/create.blog.
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreatePostCommand } from '../application/blogger.use.cases/create.post.use.case';
+import { UpdateBlogCommand } from '../application/blogger.use.cases/update.blog.use.case';
 
 @Controller('blogger/blogs')
 @UseGuards(BearerAuthGuard)
@@ -73,7 +74,7 @@ export class BloggerBlogsController {
     if (req.userId !== foundBlog.blogOwnerInfo.userId) {
       throw new ForbiddenException();
     } else {
-      return this.blogsService.updateBlog(blogId, inputModel);
+      return this.commandBus.execute(new UpdateBlogCommand(blogId, inputModel));
     }
   }
 
@@ -104,7 +105,7 @@ export class BloggerBlogsController {
     if (!foundBlog) {
       throw new NotFoundException('blog not found');
     } else {
-      return this.postsQueryRepository.getSortedPostsCurrentBlog(
+      return this.postsQueryRepository.getSortedPostsCurrentBlogForBlogger(
         req.userId,
         blogId,
         query,

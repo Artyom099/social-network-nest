@@ -34,6 +34,7 @@ import { SABlogsController } from './features/blogs/api/sa.blogs.controller';
 import { CreatePostUseCase } from './features/blogs/application/blogger.use.cases/create.post.use.case';
 import { CreateCommentUseCase } from './features/comments/application/use.cases/create.comment.use.case';
 import { BanBlogUseCase } from './features/blogs/application/sa.use.cases/ban.blog.use.case';
+import { UpdateBlogUseCase } from './features/blogs/application/blogger.use.cases/update.blog.use.case';
 
 config();
 
@@ -43,6 +44,7 @@ const useCases = [
   BanBlogUseCase,
   CreatePostUseCase,
   CreateCommentUseCase,
+  UpdateBlogUseCase,
 ];
 
 @Module({

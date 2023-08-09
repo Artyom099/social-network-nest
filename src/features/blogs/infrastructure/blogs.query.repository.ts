@@ -42,7 +42,10 @@ export class BlogsQueryRepository {
 
   //regular user
   async getBlog(id: string): Promise<BlogViewModel | null> {
-    return this.blogModel.findOne({ id }, { _id: 0, blogOwnerInfo: 0 });
+    return this.blogModel.findOne(
+      { id },
+      { _id: 0, blogOwnerInfo: 0, banInfo: 0 },
+    );
   }
   async getSortedBlogs(
     query: BlogsPaginationInput,
@@ -52,7 +55,7 @@ export class BlogsQueryRepository {
     };
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel
-      .find(filter, { _id: 0, blogOwnerInfo: 0 })
+      .find(filter, { _id: 0, blogOwnerInfo: 0, banInfo: 0 })
       .sort(query.sort())
       .skip(query.skip())
       .limit(query.pageSize)
@@ -79,7 +82,7 @@ export class BlogsQueryRepository {
     };
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel
-      .find(filter, { _id: 0, blogOwnerInfo: 0 })
+      .find(filter, { _id: 0, blogOwnerInfo: 0, banInfo: 0 })
       .sort(query.sort())
       .skip(query.skip())
       .limit(query.pageSize)

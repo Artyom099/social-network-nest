@@ -12,7 +12,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from '../application/users.service';
 import { BanUserInputModel, CreateUserInputModel } from './models/users.models';
 import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
@@ -22,12 +21,12 @@ import { CommandBus } from '@nestjs/cqrs';
 import { UnbanUserCommand } from '../application/sa.users.use.cases/unban.user.use.case';
 import { DevicesService } from '../../devices/application/devices.service';
 import { UsersPaginationInput } from '../../../infrastructure/utils/common.models';
+import { DeleteUserCommand } from '../application/sa.users.use.cases/delete.user.use.case';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa/users')
 export class UsersController {
   constructor(
-    private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
     private devicesService: DevicesService,
 
@@ -37,18 +36,6 @@ export class UsersController {
   @Get()
   @HttpCode(HttpStatus.OK)
   async getUsers(@Query() query: UsersPaginationInput) {
-    // const searchEmailTerm = query.searchEmailTerm ?? null;
-    // const searchLoginTerm = query.searchLoginTerm ?? null;
-    // const pageNumber = query.pageNumber ?? 1;
-    // const pageSize = query.pageSize ?? 10;
-    // const sortBy = query.sortBy ?? SortBy.default;
-    // const sortDirection = query.sortDirection ?? SortDirection.default;
-    // const banStatus =
-    //   query.banStatus === BanStatus.banned
-    //     ? true
-    //     : query.banStatus === BanStatus.notBanned
-    //     ? false
-    //     : null;
     return this.usersQueryRepository.getSortedUsersToSA(query);
   }
 
@@ -68,7 +55,7 @@ export class UsersController {
     if (!foundUser) {
       throw new NotFoundException('User not found');
     } else {
-      return this.usersService.deleteUser(userId);
+      return this.commandBus.execute(new DeleteUserCommand(userId));
     }
   }
 

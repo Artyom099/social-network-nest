@@ -40,6 +40,8 @@ export class Post {
   @Prop({ type: [ExtendedLikesInfoSchema], required: true })
   extendedLikesInfo: ExtendedLikesInfo[];
 
+  //todo - заменить createdAt на Date
+
   static create(
     bLog: SABlogViewModel,
     InputModel: PostInputModel,

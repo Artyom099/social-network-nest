@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-@Injectable()
-export class BanBlogUseCase {
+export class BanBlogCommand {
+  constructor(public blogId: string, public banStatus: boolean) {}
+}
+
+@CommandHandler(BanBlogCommand)
+export class BanBlogUseCase implements ICommandHandler<BanBlogCommand> {
   constructor(private blogsRepository: BlogsRepository) {}
 
-  async banBlog(blogId: string, banStatus: boolean) {
-    await this.blogsRepository.banBlog(blogId, banStatus);
+  async execute(command: BanBlogCommand) {
+    await this.blogsRepository.banBlog(command.blogId, command.banStatus);
   }
 }

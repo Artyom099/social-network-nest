@@ -25,7 +25,10 @@ export class PostsQueryRepository {
     id: string,
     currentUserId?: string | null,
   ): Promise<PostViewModel | null> {
-    const post = await this.postModel.findOne({ id }).exec();
+    const post = await this.postModel
+      .findOne({ id, 'banInfo.isBanned': false })
+      .exec();
+
     if (!post) return null;
     let myStatus = LikeStatus.None;
     let likesCount = 0;
@@ -75,9 +78,11 @@ export class PostsQueryRepository {
     currentUserId: string,
     query: DefaultPaginationInput,
   ): Promise<PagingViewModel<PostViewModel[]>> {
-    const totalCount = await this.postModel.countDocuments();
+    const filter = { 'banInfo.isBanned': false };
+
+    const totalCount = await this.postModel.countDocuments(filter);
     const sortedPosts = await this.postModel
-      .find()
+      .find(filter)
       .sort(query.sort())
       .skip(query.skip())
       .limit(query.pageSize)
@@ -141,7 +146,77 @@ export class PostsQueryRepository {
     blogId: string,
     query: DefaultPaginationInput,
   ): Promise<PagingViewModel<PostViewModel[]>> {
+    const filter = { blogId, 'banInfo.isBanned': true };
+
+    const totalCount = await this.postModel.countDocuments(filter);
+    const sortedPosts = await this.postModel
+      .find(filter)
+      .sort(query.sort())
+      .skip(query.skip())
+      .limit(query.pageSize)
+      .lean()
+      .exec();
+
+    const bannedUsers = await this.userModel
+      .find({ 'banInfo.isBanned': true })
+      .lean()
+      .exec();
+    const idBannedUsers = bannedUsers.map((u) => u.id);
+
+    const items = sortedPosts.map((p) => {
+      let myStatus = LikeStatus.None;
+      let likesCount = 0;
+      let dislikesCount = 0;
+      const newestLikes: any[] = [];
+      p.extendedLikesInfo.forEach((l: ExtendedLikesInfoDBModel) => {
+        if (l.userId === currentUserId) myStatus = l.status;
+        if (idBannedUsers.includes(l.userId)) return;
+        if (l.status === LikeStatus.Dislike) dislikesCount++;
+        if (l.status === LikeStatus.Like) {
+          likesCount++;
+          newestLikes.push({
+            addedAt: l.addedAt,
+            userId: l.userId,
+            login: l.login,
+          });
+        }
+      });
+      return {
+        id: p.id,
+        title: p.title,
+        shortDescription: p.shortDescription,
+        content: p.content,
+        blogId: p.blogId,
+        blogName: p.blogName,
+        createdAt: p.createdAt,
+        extendedLikesInfo: {
+          likesCount,
+          dislikesCount,
+          myStatus,
+          newestLikes: newestLikes
+            .sort((a, b) => parseInt(a.addedAt) - parseInt(b.addedAt))
+            .slice(-3)
+            .reverse(),
+        },
+      };
+    });
+
+    return {
+      pagesCount: query.pagesCount(totalCount), // общее количество страниц
+      page: query.pageNumber, // текущая страница
+      pageSize: query.pageSize, // количество пользователей на странице
+      totalCount, // общее количество пользователей
+      items,
+    };
+  }
+
+  async getSortedPostsCurrentBlogForBlogger(
+    currentUserId: string | null,
+    blogId: string,
+    query: DefaultPaginationInput,
+  ): Promise<PagingViewModel<PostViewModel[]>> {
     const filter = { blogId };
+
     const totalCount = await this.postModel.countDocuments(filter);
     const sortedPosts = await this.postModel
       .find(filter)
