@@ -95,7 +95,6 @@ export class PostsQueryRepository {
       let likesCount = 0;
       let dislikesCount = 0;
       const newestLikes: NewestLikesViewModel[] = [];
-      //todo тут не учитывать лайки забненых юзеров
       p.extendedLikesInfo.forEach((l: ExtendedLikesInfoDBModel) => {
         if (l.userId === currentUserId) myStatus = l.status;
         if (idBannedUsers.includes(l.userId)) return;

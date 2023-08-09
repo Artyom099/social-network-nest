@@ -11,8 +11,9 @@ import { HttpExceptionFilter } from '../exception-filters/exception.filter';
 export const appSettings = (app: INestApplication) => {
   app.use(cookieParser());
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
+  //todo - не получается перенести пайп в отдельный файл
   app.useGlobalPipes(
-    //todo перенести пайп в отдельный файл
     new ValidationPipe({
       whitelist: true,
       transform: true,
@@ -37,6 +38,7 @@ export const appSettings = (app: INestApplication) => {
       },
     }),
   );
+
   app.enableCors();
   app.useGlobalFilters(new HttpExceptionFilter());
 };

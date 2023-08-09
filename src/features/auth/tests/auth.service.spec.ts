@@ -20,10 +20,12 @@ describe('AuthService – integration test', () => {
     await mongoServer.stop();
   });
 
+  //todo - не понимаю, что сюда надо инжектить
   const usersRepository = new UsersRepository();
   const usersQueryRepository = new UsersQueryRepository();
 
   // const emailAdapter = new EmailAdapter();
+
   const emailAdapterMock: jest.Mocked<EmailAdapter> = {
     sendEmail: jest.fn(),
   };

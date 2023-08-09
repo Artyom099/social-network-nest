@@ -124,6 +124,7 @@ export class UsersQueryRepository {
 
     // todo - из-за этой строки падает весь поиск - будто не работает @Transform
     // и сюда прилетает undefined вместо null
+
     // if (query.banStatus !== null) filter['banInfo.isBanned'] = query.banStatus;
     console.log({ banStatus: query.banStatus });
 

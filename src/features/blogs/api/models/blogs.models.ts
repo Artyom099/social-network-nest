@@ -30,8 +30,19 @@ export type SABlogViewModel = {
     userId: string;
     userLogin: string;
   };
+  banInfo: {
+    isBanned: boolean;
+    banDate: string | null;
+  };
 };
 
-export type BlogViewModel = Omit<SABlogViewModel, 'blogOwnerInfo'>;
+export type BlogViewModel = {
+  id: string;
+  name: string;
+  description: string;
+  websiteUrl: string;
+  createdAt: string;
+  isMembership: boolean;
+};
 
 export type BlogCreateDTO = Omit<BlogViewModel, 'id'>;

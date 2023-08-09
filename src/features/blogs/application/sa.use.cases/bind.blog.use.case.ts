@@ -1,17 +1,25 @@
-import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-@Injectable()
-export class BindBlogUseCase {
+export class BindBlogCommand {
+  constructor(public blogId: string, public userId: string) {}
+}
+
+@CommandHandler(BindBlogCommand)
+export class BindBlogUseCase implements ICommandHandler<BindBlogCommand> {
   constructor(
     private blogsRepository: BlogsRepository,
     private userQueryRepository: UsersQueryRepository,
   ) {}
 
-  async bindBlog(blogId: string, userId: string) {
-    const user = await this.userQueryRepository.getUserById(userId);
+  async execute(command: BindBlogCommand) {
+    const user = await this.userQueryRepository.getUserById(command.userId);
     if (!user) return null;
-    await this.blogsRepository.updateBlogsUser(blogId, userId, user.login);
+    await this.blogsRepository.updateBlogsUser(
+      command.blogId,
+      command.userId,
+      user.login,
+    );
   }
 }

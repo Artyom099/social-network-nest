@@ -704,7 +704,6 @@ describe('PostsController (e2e)', () => {
       .auth('admin', 'qwerty', { type: 'basic' })
       .expect(HttpStatus.OK);
 
-    // todo (совет) если у body большая вложенность, использовть такой expect
     expect(getUsers.body).toEqual({
       pagesCount: 1,
       page: 1,

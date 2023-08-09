@@ -1,9 +1,4 @@
 import {
-  BanStatus,
-  SortBy,
-  SortDirection,
-} from '../../../../infrastructure/utils/constants';
-import {
   IsBoolean,
   IsEmail,
   IsNotEmpty,
@@ -36,6 +31,11 @@ export class BanUserInputModel {
   @Length(20)
   @Transform(({ value }) => value?.trim())
   banReason: string;
+}
+export class BanBloggerInputModel {
+  @IsBoolean()
+  @IsNotEmpty()
+  isBanned: boolean;
 }
 export type SAUserViewModel = {
   id: string;

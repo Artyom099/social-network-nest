@@ -49,7 +49,6 @@ export class UsersController {
     //     : query.banStatus === BanStatus.notBanned
     //     ? false
     //     : null;
-
     return this.usersQueryRepository.getSortedUsersToSA(query);
   }
 

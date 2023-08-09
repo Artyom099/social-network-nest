@@ -9,7 +9,7 @@ export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
   async createBlog(blog: BlogViewModel): Promise<BlogViewModel> {
-    const newBLog = await this.blogModel.create(blog);
+    await this.blogModel.create(blog);
     return {
       id: blog.id,
       // id: newBLog._id.toString(),
@@ -39,5 +39,9 @@ export class BlogsRepository {
       { id },
       { 'blogOwnerInfo.userId': userId, 'blogOwnerInfo.userLogin': login },
     );
+  }
+
+  async banBlog(id: string, banStatus: boolean) {
+    await this.blogModel.updateOne({ id }, { 'banInfo.isBanned': banStatus });
   }
 }

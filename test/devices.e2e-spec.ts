@@ -72,7 +72,8 @@ describe('DevicesController (e2e)', () => {
 
     expect(loginResponse).toBeDefined();
     expect(loginResponse.status).toBe(HttpStatus.OK);
-    // console.log(loginResponse.headers)   //todo - почему в headers нет 'user-agent'?
+    // почему в headers нет 'user-agent'?
+    // console.log(loginResponse.headers)
     // expect(loginResponse.headers['user-agent']).toEqual('device-1')
     const { accessToken } = loginResponse.body;
     expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
