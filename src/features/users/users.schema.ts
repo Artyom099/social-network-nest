@@ -1,12 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { randomUUID } from 'crypto';
-import {
-  CreateUserInputModel,
-  SAUserViewModel,
-  UserViewModel,
-} from './api/models/users.models';
 import add from 'date-fns/add';
+import { CreateUserInputModel } from './api/models/create.user.input.model';
+import { SAUserViewModel } from './api/models/sa.user.view.model';
+import { UserViewModel } from './api/models/user.view.model';
 
 @Schema({ _id: false, versionKey: false })
 class AccountData {

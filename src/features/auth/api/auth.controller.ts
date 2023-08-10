@@ -14,7 +14,6 @@ import {
 import { AuthService } from '../application/auth.service';
 import { DevicesService } from '../../devices/application/devices.service';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
-import { CreateUserInputModel } from '../../users/api/models/users.models';
 import {
   AuthInputModel,
   EmailInputModel,
@@ -25,6 +24,9 @@ import { JwtService } from '@nestjs/jwt';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { RegisterUserCommand } from '../application/use.cases/register.user.use.case';
 import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserInputModel } from '../../users/api/models/create.user.input.model';
+import { ConfirmEmailCommand } from '../application/use.cases/confirm.email.use.case';
+import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.code.use.case';
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +35,7 @@ export class AuthController {
     private authService: AuthService,
     private securityService: DevicesService,
     private usersQueryRepository: UsersQueryRepository,
+
     private commandBus: CommandBus,
   ) {}
 
@@ -148,7 +151,9 @@ export class AuthController {
   //todo -> для моих тестов статус OK, по документации NO_CONTENT
   async passwordRecovery(@Body() InputModel: EmailInputModel) {
     return {
-      recoveryCode: await this.authService.sendRecoveryCode(InputModel.email),
+      recoveryCode: await this.commandBus.execute(
+        new SendRecoveryCodeCommand(InputModel.email),
+      ),
     };
   }
 
@@ -174,7 +179,9 @@ export class AuthController {
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async sendConfirmationEmail(@Body() body: { code: string }) {
-    const confirmEmail = await this.authService.confirmEmail(body.code);
+    const confirmEmail = await this.commandBus.execute(
+      new ConfirmEmailCommand(body.code),
+    );
     if (!confirmEmail) {
       throw new BadRequestException(
         'code is incorrect, expired or already applied=>code',
@@ -194,7 +201,7 @@ export class AuthController {
     if (!existUser || existUser.emailConfirmation.isConfirmed) {
       throw new BadRequestException('email not exist or confirm=>email');
     } else {
-      return this.authService.updateConfirmationCode(body.email);
+      return this.commandBus.execute(new ConfirmEmailCommand(body.email));
     }
   }
 }

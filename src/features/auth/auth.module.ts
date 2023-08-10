@@ -26,13 +26,19 @@ import { UnbanUserUseCase } from '../users/application/sa.users.use.cases/unban.
 import { EmailAdapter } from '../../infrastructure/adapters/email.adapter';
 import { EmailManager } from '../../infrastructure/services/email.manager';
 import { DeleteUserUseCase } from '../users/application/sa.users.use.cases/delete.user.use.case';
+import { ConfirmEmailUseCase } from './application/use.cases/confirm.email.use.case';
+import { UpdateConfirmationCodeUseCase } from './application/use.cases/update.confirmation.code.use.case';
+import { SendRecoveryCodeUseCase } from './application/use.cases/send.recovery.code.use.case';
 
 const useCases = [
-  CreateUserByAdminUseCase,
-  RegisterUserUseCase,
   BanUserUseCase,
   UnbanUserUseCase,
   DeleteUserUseCase,
+  ConfirmEmailUseCase,
+  RegisterUserUseCase,
+  SendRecoveryCodeUseCase,
+  CreateUserByAdminUseCase,
+  UpdateConfirmationCodeUseCase,
 ];
 
 @Module({

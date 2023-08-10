@@ -3,10 +3,11 @@ import {
   PagingViewModel,
   UsersPaginationInput,
 } from '../../../infrastructure/utils/common.models';
-import { SAUserViewModel, UserViewModel } from '../api/models/users.models';
 import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { SAUserViewModel } from '../api/models/sa.user.view.model';
+import { UserViewModel } from '../api/models/user.view.model';
 
 @Injectable()
 export class UsersQueryRepository {

@@ -12,7 +12,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BanUserInputModel, CreateUserInputModel } from './models/users.models';
 import { UsersQueryRepository } from '../infrastructure/users.query.repository';
 import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
 import { CreateUserByAdminCommand } from '../application/sa.users.use.cases/create.user.use.case';
@@ -22,6 +21,8 @@ import { UnbanUserCommand } from '../application/sa.users.use.cases/unban.user.u
 import { DevicesService } from '../../devices/application/devices.service';
 import { UsersPaginationInput } from '../../../infrastructure/utils/common.models';
 import { DeleteUserCommand } from '../application/sa.users.use.cases/delete.user.use.case';
+import { BanUserInputModel } from './models/ban.user.input.model';
+import { CreateUserInputModel } from './models/create.user.input.model';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa/users')

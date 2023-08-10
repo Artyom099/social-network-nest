@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { BlogInputModel } from './api/models/blogs.models';
 import { randomUUID } from 'crypto';
-import { UserViewModel } from '../users/api/models/users.models';
+import { UserViewModel } from '../users/api/models/user.view.model';
 
 @Schema({ _id: false, versionKey: false })
 class BlogOwnerInfo {

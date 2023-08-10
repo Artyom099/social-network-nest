@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import { settings } from '../utils/settings';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class EmailAdapter {
   async sendEmail(email: string, subject: string, message: string) {
     const transporter = await nodemailer.createTransport({
@@ -12,7 +14,7 @@ export class EmailAdapter {
         pass: settings.MAIL_PASSWORD,
       },
     });
-    return await transporter.sendMail({
+    return transporter.sendMail({
       from: `"Fred Foo 👻" <${settings.MAIL_LOGIN}>`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line

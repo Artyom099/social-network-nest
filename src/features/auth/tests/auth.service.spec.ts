@@ -1,38 +1,49 @@
 import { AuthService } from '../application/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../../users/application/users.service';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
-import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 import { EmailManager } from '../../../infrastructure/services/email.manager';
 import { EmailAdapter } from '../../../infrastructure/adapters/email.adapter';
+import { Test } from '@nestjs/testing';
+import { AppModule } from '../../../app.module';
 
 describe('AuthService – integration test', () => {
   let mongoServer: MongoMemoryServer;
+  let app;
+  const emailAdapterMock: jest.Mocked<EmailAdapter> = {
+    sendEmail: jest.fn(),
+    sendGmail: jest.fn(),
+  };
+  let authService;
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
+    process.env['MONGO_URL'] = mongoUri;
+
+    const module = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(EmailAdapter)
+      .useValue(emailAdapterMock)
+      .compile();
+
+    authService = app.get(AuthService);
+    // await mongoose.connect(mongoUri);
   });
   afterAll(async () => {
     await mongoose.disconnect();
     await mongoServer.stop();
   });
 
-  //todo - не понимаю, что сюда надо инжектить
-  const usersRepository = new UsersRepository();
-  const usersQueryRepository = new UsersQueryRepository();
+  // const usersRepository = new UsersRepository();
+  // const usersQueryRepository = new UsersQueryRepository();
 
   // const emailAdapter = new EmailAdapter();
 
-  const emailAdapterMock: jest.Mocked<EmailAdapter> = {
-    sendEmail: jest.fn(),
-  };
-
   const jwtService = new JwtService();
   const emailManager = new EmailManager(emailAdapterMock);
-  const usersService = new UsersService(usersRepository);
+  const usersService = new UsersService();
   const authService = new AuthService(
     jwtService,
     emailManager,

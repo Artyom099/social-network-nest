@@ -4,13 +4,12 @@ import { UsersService } from '../../users/application/users.service';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { UsersRepository } from '../../users/infrastructure/users.repository';
-import {
-  CreateUserInputModel,
-  UserViewModel,
-} from '../../users/api/models/users.models';
 import { EmailManager } from '../../../infrastructure/services/email.manager';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { jwtConstants } from '../../../infrastructure/utils/settings';
+import { CreateUserInputModel } from '../../users/api/models/create.user.input.model';
+import { UserViewModel } from '../../users/api/models/user.view.model';
+import { SaltHashModel } from '../../users/api/models/salt.hash.model';
 
 @Injectable()
 export class AuthService {
@@ -119,7 +118,6 @@ export class AuthService {
       return true;
     }
   }
-
   async updateConfirmationCode(email: string): Promise<string | null> {
     const user = await this.usersQueryRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
@@ -139,7 +137,6 @@ export class AuthService {
     }
     return newConfirmationCode;
   }
-
   async sendRecoveryCode(email: string): Promise<string | null> {
     const user = await this.usersQueryRepository.getUserByLoginOrEmail(email);
     if (!user) return null;
@@ -148,24 +145,24 @@ export class AuthService {
     try {
       //await
       await this.emailManager.sendEmailRecoveryCode(email, recoveryCode);
-    } catch (error) {
+    } catch (e) {
       return null;
     }
     return recoveryCode;
   }
 
   async updatePassword(code: string, password: string) {
-    const passwordSalt = await bcrypt.genSalt(10);
-    const passwordHash = await this.generateHash(password, passwordSalt);
-
     const user = await this.usersQueryRepository.getUserByRecoveryCode(code);
     if (!user) return null;
 
-    user.updateSaltAndHash(passwordSalt, passwordHash);
+    const { salt, hash } = await this.generateSaltAndHash(password);
+    user.updateSaltAndHash(salt, hash);
     await this.usersRepository.save(user);
   }
 
-  private async generateHash(password: string, salt: string) {
-    return bcrypt.hash(password, salt);
+  async generateSaltAndHash(password: string): Promise<SaltHashModel> {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    return { salt, hash };
   }
 }

@@ -14,6 +14,7 @@ const sleep = (seconds: number) =>
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
   let server: any;
+  //let repo;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -22,6 +23,7 @@ describe('AuthController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     appSettings(app);
     await app.init();
+    // repo = app.get()
 
     server = app.getHttpServer();
     await request(server).delete('/testing/all-data');
@@ -105,6 +107,7 @@ describe('AuthController (e2e)', () => {
     expect.setState({ firstAccessToken: accessToken });
   });
 
+  // негативные тесты
   it("5 – POST:/auth/registration-email-resending – return 400 if email doesn't exist", async () => {
     await request(server)
       .post('/auth/registration-email-resending')
@@ -302,6 +305,7 @@ describe('AuthController (e2e)', () => {
   });
   it('18 – POST:/auth/password-recovery – return 204 & send recovery code to email', async () => {
     const { firstUser, secondRefreshToken } = expect.getState();
+
     const recoveryResponse = await request(server)
       .post('/auth/password-recovery')
       .set('cookie', secondRefreshToken)
@@ -311,8 +315,10 @@ describe('AuthController (e2e)', () => {
     //для тестов здесть OK, поставить такой же статус в контроллере
     expect(recoveryResponse.status).toBe(HttpStatus.OK);
     expect.setState({ recoveryCode: recoveryResponse.body.recoveryCode });
+
     // console.log({ recoveryCode_body: recoveryResponse.body });
   });
+
   it('19 – POST:/auth/new-password – return 400 with incorrect recoveryCode', async () => {
     const newPasswordResponse = await request(server)
       .post('/auth/new-password')
@@ -326,6 +332,9 @@ describe('AuthController (e2e)', () => {
   });
   it('20 – POST:/auth/new-password – return 204 & update password', async () => {
     const { recoveryCode } = expect.getState();
+    //todo - достаю recoveryCode прямо из базы по userId
+    // const code = userModel.findOne();
+
     const newPasswordResponse = await request(server)
       .post('/auth/new-password')
       .send({
@@ -441,8 +450,9 @@ describe('AuthController (e2e)', () => {
     expect(goodRefreshTokenResponse.status).toBe(HttpStatus.UNAUTHORIZED);
   });
 
-  it('24 – POST:/auth/login – return 200 and login 1st user', async () => {
+  it('25 – POST:/auth/login – return 200 and login 1st user', async () => {
     const { firstUser } = expect.getState();
+
     const loginResponse = await request(server).post('/auth/login').send({
       loginOrEmail: firstUser.login,
       password: 'newPassword',
@@ -459,7 +469,7 @@ describe('AuthController (e2e)', () => {
 
     expect.setState({ accessToken, thirdRefreshToken: refreshToken });
   });
-  it('25 – POST:/auth/refresh-token – return 401 with old token', async () => {
+  it('26 – POST:/auth/refresh-token – return 401 with old token', async () => {
     const { thirdRefreshToken } = expect.getState();
     await sleep(21.1);
 

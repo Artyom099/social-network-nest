@@ -1,10 +1,8 @@
 import { UsersService } from '../../../users/application/users.service';
-import {
-  CreateUserInputModel,
-  UserViewModel,
-} from '../../../users/api/models/users.models';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CreateUserInputModel } from '../../../users/api/models/create.user.input.model';
+import { UserViewModel } from '../../../users/api/models/user.view.model';
 
 export class RegisterUserCommand {
   constructor(public InputModel: CreateUserInputModel) {}
