@@ -27,6 +27,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserInputModel } from '../../users/api/models/create.user.input.model';
 import { ConfirmEmailCommand } from '../application/use.cases/confirm.email.use.case';
 import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.code.use.case';
+import { UpdatePasswordCommand } from '../application/use.cases/update.password.use.case';
 
 @Controller('auth')
 export class AuthController {
@@ -138,9 +139,11 @@ export class AuthController {
     if (!isUserConfirm) {
       throw new BadRequestException();
     } else {
-      await this.authService.updatePassword(
-        InputModel.recoveryCode,
-        InputModel.newPassword,
+      await this.commandBus.execute(
+        new UpdatePasswordCommand(
+          InputModel.recoveryCode,
+          InputModel.newPassword,
+        ),
       );
     }
   }

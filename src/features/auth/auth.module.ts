@@ -29,6 +29,7 @@ import { DeleteUserUseCase } from '../users/application/sa.users.use.cases/delet
 import { ConfirmEmailUseCase } from './application/use.cases/confirm.email.use.case';
 import { UpdateConfirmationCodeUseCase } from './application/use.cases/update.confirmation.code.use.case';
 import { SendRecoveryCodeUseCase } from './application/use.cases/send.recovery.code.use.case';
+import { UpdatePasswordUseCase } from './application/use.cases/update.password.use.case';
 
 const useCases = [
   BanUserUseCase,
@@ -36,6 +37,7 @@ const useCases = [
   DeleteUserUseCase,
   ConfirmEmailUseCase,
   RegisterUserUseCase,
+  UpdatePasswordUseCase,
   SendRecoveryCodeUseCase,
   CreateUserByAdminUseCase,
   UpdateConfirmationCodeUseCase,

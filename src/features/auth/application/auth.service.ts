@@ -9,7 +9,6 @@ import { UsersQueryRepository } from '../../users/infrastructure/users.query.rep
 import { jwtConstants } from '../../../infrastructure/utils/settings';
 import { CreateUserInputModel } from '../../users/api/models/create.user.input.model';
 import { UserViewModel } from '../../users/api/models/user.view.model';
-import { SaltHashModel } from '../../users/api/models/salt.hash.model';
 
 @Injectable()
 export class AuthService {
@@ -103,66 +102,18 @@ export class AuthService {
     }
   }
 
-  async confirmEmail(code: string): Promise<boolean> {
-    const user = await this.usersQueryRepository.getUserByConfirmationCode(
-      code,
-    );
-    if (!user) {
-      return false;
-    }
-    if (!user.confirmEmail(code)) {
-      return false;
-    } else {
-      await this.usersRepository.save(user);
-      await this.usersQueryRepository.getUserByConfirmationCode(code);
-      return true;
-    }
-  }
-  async updateConfirmationCode(email: string): Promise<string | null> {
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(email);
-    if (!user) return null;
-    //обновили у него ConfirmationCode
-    const newConfirmationCode = user.updateConfirmationCode();
-    //записали это обновление в БД
-    await this.usersRepository.save(user);
-
-    try {
-      // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
-      await this.emailManager.sendEmailConfirmationMessage(
-        email,
-        newConfirmationCode,
-      );
-    } catch (error) {
-      return null;
-    }
-    return newConfirmationCode;
-  }
-  async sendRecoveryCode(email: string): Promise<string | null> {
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(email);
-    if (!user) return null;
-    const recoveryCode = user.updateRecoveryCode();
-    await this.usersRepository.save(user);
-    try {
-      //await
-      await this.emailManager.sendEmailRecoveryCode(email, recoveryCode);
-    } catch (e) {
-      return null;
-    }
-    return recoveryCode;
-  }
-
   async updatePassword(code: string, password: string) {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await this.generateHash(password, salt);
+
     const user = await this.usersQueryRepository.getUserByRecoveryCode(code);
     if (!user) return null;
 
-    const { salt, hash } = await this.generateSaltAndHash(password);
     user.updateSaltAndHash(salt, hash);
     await this.usersRepository.save(user);
   }
 
-  async generateSaltAndHash(password: string): Promise<SaltHashModel> {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
-    return { salt, hash };
+  async generateHash(password: string, salt: string) {
+    return bcrypt.hash(password, salt);
   }
 }

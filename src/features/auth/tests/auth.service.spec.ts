@@ -59,6 +59,7 @@ describe('AuthService – integration test', () => {
         email: 'first-email@.com',
         password: 'qwerty',
       };
+      //todo - как здесь тестить,  когда вместо сервиса use case
       const result = await authService.createUser(inputModel);
 
       expect(emailAdapterMock.sendEmail).toBeCalled();
