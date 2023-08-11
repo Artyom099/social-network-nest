@@ -1,6 +1,6 @@
-import { BlogInputModel } from '../../api/models/blogs.models';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
+import { BlogInputModel } from '../../api/models/blog.input.model';
 
 export class UpdateBlogCommand {
   constructor(public blogId: string, public inputModel: BlogInputModel) {}

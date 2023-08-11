@@ -91,8 +91,8 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: CommentInputModel,
   ) {
-    const foundPost = await this.postsQueryRepository.getPost(postId);
-    if (!foundPost) {
+    const post = await this.postsQueryRepository.getPost(postId);
+    if (!post) {
       throw new NotFoundException('post not found');
     }
     const user = await this.usersQueryRepository.getUserById(req.userId);
@@ -104,6 +104,9 @@ export class PostsController {
         content: inputModel.content,
         userId: user.id,
         userLogin: user.login,
+        title: post.title,
+        blogId: post.blogId,
+        blogName: post.blogName,
       };
       return this.commandBus.execute(new CreateCommentCommand(model));
     }

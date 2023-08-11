@@ -17,7 +17,7 @@ import {
 import { JwtModule } from '@nestjs/jwt';
 import { DevicesController } from '../devices/api/devices.controller';
 import { UsersService } from '../users/application/users.service';
-import { UsersController } from '../users/api/users.controller';
+import { SaUsersController } from '../users/api/controllers/sa.users.controller';
 import { CreateUserByAdminUseCase } from '../users/application/sa.users.use.cases/create.user.use.case';
 import { RegisterUserUseCase } from './application/use.cases/register.user.use.case';
 import { BanUserUseCase } from '../users/application/sa.users.use.cases/ban.user.use.case';
@@ -30,6 +30,7 @@ import { ConfirmEmailUseCase } from './application/use.cases/confirm.email.use.c
 import { UpdateConfirmationCodeUseCase } from './application/use.cases/update.confirmation.code.use.case';
 import { SendRecoveryCodeUseCase } from './application/use.cases/send.recovery.code.use.case';
 import { UpdatePasswordUseCase } from './application/use.cases/update.password.use.case';
+import { BloggerUsersController } from '../users/api/controllers/blogger.users.controller';
 
 const useCases = [
   BanUserUseCase,
@@ -55,7 +56,14 @@ const useCases = [
       { name: Request.name, schema: RequestSchema },
     ]),
   ],
-  controllers: [AuthController, UsersController, DevicesController],
+  controllers: [
+    AuthController,
+
+    SaUsersController,
+    BloggerUsersController,
+
+    DevicesController,
+  ],
   providers: [
     ...useCases,
 

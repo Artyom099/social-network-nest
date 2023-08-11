@@ -9,13 +9,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
+import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
 import {
   BlogsPaginationInput,
   DefaultPaginationInput,
-} from '../../../infrastructure/utils/common.models';
-import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
-import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
+} from '../../../../infrastructure/utils/common.models';
+import { CheckUserIdGuard } from '../../../../infrastructure/guards/check-userId.guard';
+import { PostsQueryRepository } from '../../../posts/infrastucture/posts.query.repository';
 
 @Controller('blogs')
 export class PublicBlogsController {

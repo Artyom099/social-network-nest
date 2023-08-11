@@ -20,15 +20,21 @@ export class LikeStatusInputModel {
 export type CommentViewModel = {
   id: string;
   content: string;
+  createdAt: string;
   commentatorInfo: {
     userId: string;
     userLogin: string;
   };
-  createdAt: string;
   likesInfo: {
     likesCount: number;
     dislikesCount: number;
     myStatus: LikeStatus;
+  };
+  postInfo: {
+    id: string;
+    title: string;
+    blogId: string;
+    blogName: string;
   };
 };
 
@@ -37,4 +43,7 @@ export type CreateCommentModel = {
   content: string;
   userId: string;
   userLogin: string;
+  title: string;
+  blogId: string;
+  blogName: string;
 };

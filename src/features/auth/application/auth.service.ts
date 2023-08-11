@@ -102,17 +102,6 @@ export class AuthService {
     }
   }
 
-  async updatePassword(code: string, password: string) {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await this.generateHash(password, salt);
-
-    const user = await this.usersQueryRepository.getUserByRecoveryCode(code);
-    if (!user) return null;
-
-    user.updateSaltAndHash(salt, hash);
-    await this.usersRepository.save(user);
-  }
-
   async generateHash(password: string, salt: string) {
     return bcrypt.hash(password, salt);
   }

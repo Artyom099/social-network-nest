@@ -26,6 +26,12 @@ export class CommentsRepository {
         dislikesCount: 0,
         myStatus: LikeStatus.None,
       },
+      postInfo: {
+        id: comment.postInfo.id,
+        title: comment.postInfo.title,
+        blogId: comment.postInfo.blogId,
+        blogName: comment.postInfo.blogName,
+      },
     };
   }
 

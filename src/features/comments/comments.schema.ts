@@ -22,33 +22,52 @@ class LikesInfo {
 }
 const LikesInfoSchema = SchemaFactory.createForClass<LikesInfo>(LikesInfo);
 
+@Schema({ _id: false, versionKey: false })
+class PostInfo {
+  @Prop({ required: true })
+  id: string;
+  @Prop({ required: true })
+  title: string;
+  @Prop({ required: true })
+  blogId: string;
+  @Prop({ required: true })
+  blogName: string;
+}
+const PostInfoSchema = SchemaFactory.createForClass(PostInfo);
+
 export type CommentDocument = HydratedDocument<Comment>;
 @Schema({ versionKey: false })
 export class Comment {
   @Prop({ required: true })
   id: string;
   @Prop({ required: true })
-  postId: string;
-  @Prop({ required: true })
   content: string;
-  @Prop({ type: CommentatorInfoSchema, required: true })
-  commentatorInfo: CommentatorInfo;
   @Prop({ required: true })
   createdAt: Date;
-  @Prop({ type: [LikesInfoSchema], required: true })
+
+  @Prop({ required: true, type: CommentatorInfoSchema })
+  commentatorInfo: CommentatorInfo;
+  @Prop({ required: true, type: [LikesInfoSchema] })
   likesInfo: LikesInfo[];
+  @Prop({ required: true, type: PostInfoSchema })
+  postInfo: PostInfo;
 
   static create(inputModel: CreateCommentModel) {
     const comment = new Comment();
     comment.id = randomUUID();
-    comment.postId = inputModel.postId;
     comment.content = inputModel.content;
+    comment.createdAt = new Date();
     comment.commentatorInfo = {
       userId: inputModel.userId,
       userLogin: inputModel.userLogin,
     };
-    comment.createdAt = new Date();
     comment.likesInfo = [];
+    comment.postInfo = {
+      id: inputModel.postId,
+      title: inputModel.title,
+      blogId: inputModel.blogId,
+      blogName: inputModel.blogName,
+    };
     return comment;
   }
 }

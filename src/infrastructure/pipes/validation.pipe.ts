@@ -1,3 +1,4 @@
 import { ValidationPipe } from '@nestjs/common';
 
-// export class HttpExceptionPipe implements ValidationPipe {}
+export class HttpExceptionPipe extends ValidationPipe {}
+//todo ф-я без класса

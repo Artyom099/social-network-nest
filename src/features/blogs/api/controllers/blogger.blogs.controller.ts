@@ -14,21 +14,22 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BlogInputModel } from './models/blogs.models';
-import { BlogsService } from '../application/blogs.service';
+import { BlogInputModel } from '../models/blog.input.model';
+import { BlogsService } from '../../application/blogs.service';
 import {
   BlogsPaginationInput,
   DefaultPaginationInput,
-} from '../../../infrastructure/utils/common.models';
-import { PostsService } from '../../posts/application/posts.service';
-import { PostInputModel } from '../../posts/api/models/posts.models';
-import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
-import { PostsQueryRepository } from '../../posts/infrastucture/posts.query.repository';
-import { CreateBlogCommand } from '../application/blogger.use.cases/create.blog.use.case';
-import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
+} from '../../../../infrastructure/utils/common.models';
+import { PostsService } from '../../../posts/application/posts.service';
+import { PostInputModel } from '../../../posts/api/models/posts.models';
+import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
+import { PostsQueryRepository } from '../../../posts/infrastucture/posts.query.repository';
+import { CreateBlogCommand } from '../../application/blogger.use.cases/create.blog.use.case';
+import { BearerAuthGuard } from '../../../../infrastructure/guards/bearer-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
-import { CreatePostCommand } from '../application/blogger.use.cases/create.post.use.case';
-import { UpdateBlogCommand } from '../application/blogger.use.cases/update.blog.use.case';
+import { CreatePostCommand } from '../../application/blogger.use.cases/create.post.use.case';
+import { UpdateBlogCommand } from '../../application/blogger.use.cases/update.blog.use.case';
+import { CommentsQueryRepository } from '../../../comments/infrastructure/comments.query.repository';
 
 @Controller('blogger/blogs')
 @UseGuards(BearerAuthGuard)
@@ -38,6 +39,7 @@ export class BloggerBlogsController {
     private postsService: PostsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
 
     private commandBus: CommandBus,
   ) {}
@@ -173,5 +175,20 @@ export class BloggerBlogsController {
     } else {
       return this.postsService.deletePost(postId);
     }
+  }
+
+  //
+  // логика комментов блоггера под своими постами
+
+  @Get('comments')
+  @HttpCode(HttpStatus.OK)
+  async getCommentsCurrentBlog(
+    @Req() req,
+    @Query() query: DefaultPaginationInput,
+  ) {
+    return this.commentsQueryRepository.getCommentsCurrentBlogger(
+      req.userId,
+      query,
+    );
   }
 }

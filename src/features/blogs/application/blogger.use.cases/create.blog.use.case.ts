@@ -1,8 +1,9 @@
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { Blog } from '../../blogs.schema';
-import { BlogInputModel, BlogViewModel } from '../../api/models/blogs.models';
+import { BlogInputModel } from '../../api/models/blog.input.model';
 import { UsersQueryRepository } from '../../../users/infrastructure/users.query.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { BlogViewModel } from '../../api/models/blog.view.model';
 
 export class CreateBlogCommand {
   constructor(public userId: string, public inputModel: BlogInputModel) {}

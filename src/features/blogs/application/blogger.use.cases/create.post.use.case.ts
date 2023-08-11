@@ -1,4 +1,3 @@
-import { SABlogViewModel } from '../../api/models/blogs.models';
 import {
   PostInputModel,
   PostViewModel,
@@ -6,6 +5,7 @@ import {
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../../../posts/infrastucture/posts.repository';
 import { Post } from '../../../posts/posts.schema';
+import { SABlogViewModel } from '../../api/models/sa.blog.view.model';
 
 export class CreatePostCommand {
   constructor(

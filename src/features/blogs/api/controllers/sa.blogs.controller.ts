@@ -10,14 +10,14 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsQueryRepository } from '../infrastructure/blogs.query.repository';
+import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';
 
-import { BindBlogCommand } from '../application/sa.use.cases/bind.blog.use.case';
-import { BasicAuthGuard } from '../../../infrastructure/guards/basic-auth.guard';
-import { BlogsPaginationInput } from '../../../infrastructure/utils/common.models';
-import { BanBlogCommand } from '../application/sa.use.cases/ban.blog.use.case';
+import { BindBlogCommand } from '../../application/sa.use.cases/bind.blog.use.case';
+import { BasicAuthGuard } from '../../../../infrastructure/guards/basic-auth.guard';
+import { BlogsPaginationInput } from '../../../../infrastructure/utils/common.models';
+import { BanBlogCommand } from '../../application/sa.use.cases/ban.blog.use.case';
 import { CommandBus } from '@nestjs/cqrs';
-import { BanBlogInputModel } from '../../users/api/models/ban.blog.input.model';
+import { BanBlogInputModel } from '../../../users/api/models/ban.blog.input.model';
 
 @Controller('sa/blogs')
 @UseGuards(BasicAuthGuard)
