@@ -14,27 +14,21 @@ import {
 } from '@nestjs/common';
 import { PostsService } from '../application/posts.service';
 import { DefaultPaginationInput } from '../../../infrastructure/utils/common.models';
-import { BlogsService } from '../../blogs/application/blogs.service';
 import { PostsQueryRepository } from '../infrastucture/posts.query.repository';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments.query.repository';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
-import {
-  CommentInputModel,
-  LikeStatusInputModel,
-} from '../../comments/api/models/comments.models';
+import { CommentInputModel } from '../../comments/api/models/comment.input.model';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
-import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentCommand } from '../../comments/application/use.cases/create.comment.use.case';
+import { LikeStatusInputModel } from '../../comments/api/models/like.status.input.model';
 
 @Controller('posts')
 export class PostsController {
   constructor(
-    private blogService: BlogsService,
     private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
-    private blogsQueryRepository: BlogsQueryRepository,
     private usersQueryRepository: UsersQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
 
@@ -91,13 +85,11 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: CommentInputModel,
   ) {
+    //todo - добавить проверку не забанен ли пользователем в текущем блоге
     const post = await this.postsQueryRepository.getPost(postId);
-    if (!post) {
-      throw new NotFoundException('post not found');
-    }
     const user = await this.usersQueryRepository.getUserById(req.userId);
-    if (!user) {
-      throw new NotFoundException('user not found');
+    if (!post || !user) {
+      throw new NotFoundException('user or post not found');
     } else {
       const model = {
         postId,

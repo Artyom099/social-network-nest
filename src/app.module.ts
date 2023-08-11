@@ -23,7 +23,6 @@ import { Comment, CommentSchema } from './features/comments/comments.schema';
 import { config } from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './features/auth/auth.module';
-import { BlogExistsConstraint } from './features/posts/api/models/posts.models';
 import { Request, RequestSchema } from './infrastructure/services/ip.schema';
 import { Device, DeviceSchema } from './features/devices/devices.schema';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -31,10 +30,11 @@ import { BindBlogUseCase } from './features/blogs/application/sa.use.cases/bind.
 import { CreateBlogUseCase } from './features/blogs/application/blogger.use.cases/create.blog.use.case';
 import { PublicBlogsController } from './features/blogs/api/controllers/public.blogs.controller';
 import { SABlogsController } from './features/blogs/api/controllers/sa.blogs.controller';
-import { CreatePostUseCase } from './features/blogs/application/blogger.use.cases/create.post.use.case';
+import { CreatePostUseCase } from './features/posts/application/blogger.use.cases/create.post.use.case';
 import { CreateCommentUseCase } from './features/comments/application/use.cases/create.comment.use.case';
 import { BanBlogUseCase } from './features/blogs/application/sa.use.cases/ban.blog.use.case';
 import { UpdateBlogUseCase } from './features/blogs/application/blogger.use.cases/update.blog.use.case';
+import { BlogExistsConstraint } from './features/users/api/models/ban.user.current.blog.input.model';
 
 config();
 

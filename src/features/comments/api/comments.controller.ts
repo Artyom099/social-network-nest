@@ -13,22 +13,20 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import {
-  CommentInputModel,
-  CommentViewModel,
-  LikeStatusInputModel,
-} from './models/comments.models';
+import { CommentInputModel } from './models/comment.input.model';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { CommentsQueryRepository } from '../infrastructure/comments.query.repository';
-import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { CommentViewModel } from './models/comment.view.model';
+import { LikeStatusInputModel } from './models/like.status.input.model';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private commentsService: CommentsService,
     private commentsQueryRepository: CommentsQueryRepository,
-    private usersQueryRepository: UsersQueryRepository,
+    private usersRepository: UsersRepository,
   ) {}
 
   @Get(':id')
@@ -45,7 +43,7 @@ export class CommentsController {
     );
     if (!foundComment) throw new NotFoundException();
 
-    const user = await this.usersQueryRepository.getUserById2(
+    const user = await this.usersRepository.getUserDocumentById(
       foundComment.commentatorInfo.userId,
     );
     if (user?.banInfo.isBanned) {

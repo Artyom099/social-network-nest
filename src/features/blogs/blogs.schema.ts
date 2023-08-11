@@ -6,18 +6,18 @@ import { BlogInputModel } from './api/models/blog.input.model';
 
 @Schema({ _id: false, versionKey: false })
 class BlogOwnerInfo {
-  @Prop({ type: String, required: false })
+  @Prop({ required: false, type: String })
   userId: string;
-  @Prop({ type: String, required: false })
+  @Prop({ required: false, type: String })
   userLogin: string;
 }
 const BlogOwnerInfoSchema = SchemaFactory.createForClass(BlogOwnerInfo);
 
 @Schema({ _id: false, versionKey: false })
 class BanInfo {
-  @Prop({ type: Boolean, required: true })
+  @Prop({ required: true, type: Boolean })
   isBanned: boolean;
-  @Prop({ type: String || null, required: false })
+  @Prop({ required: false, type: String || null })
   banDate: string | null;
 }
 const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
@@ -25,21 +25,21 @@ const BanInfoSchema = SchemaFactory.createForClass(BanInfo);
 export type BlogDocument = HydratedDocument<Blog>;
 @Schema({ versionKey: false })
 export class Blog {
-  @Prop({ type: String, required: true, unique: true, index: true })
+  @Prop({ required: true, type: String, unique: true, index: true })
   id: string;
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   name: string;
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   description: string;
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   websiteUrl: string;
   @Prop({ required: true })
   createdAt: string;
-  @Prop({ type: Boolean, required: true, default: false })
+  @Prop({ required: true, type: Boolean, default: false })
   isMembership: boolean;
-  @Prop({ type: BlogOwnerInfoSchema, required: false })
+  @Prop({ required: false, type: BlogOwnerInfoSchema })
   blogOwnerInfo: BlogOwnerInfo;
-  @Prop({ type: BanInfoSchema, required: true })
+  @Prop({ required: true, type: BanInfoSchema })
   banInfo: BanInfo;
 
   static create(InputModel: BlogInputModel, user: UserViewModel) {

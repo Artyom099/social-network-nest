@@ -5,6 +5,7 @@ import add from 'date-fns/add';
 import { CreateUserInputModel } from './api/models/create.user.input.model';
 import { SAUserViewModel } from './api/models/sa.user.view.model';
 import { UserViewModel } from './api/models/user.view.model';
+import { BanUserCurrentBlogInputModel } from './api/models/ban.user.current.blog.input.model';
 
 @Schema({ _id: false, versionKey: false })
 class AccountData {
@@ -177,6 +178,7 @@ export class User {
     this.banInfo.banReason = null;
     this.banInfo.banDate = null;
   }
+  banUserForCurrentBlog(inputModel: BanUserCurrentBlogInputModel) {}
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 

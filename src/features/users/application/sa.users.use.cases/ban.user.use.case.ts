@@ -1,5 +1,4 @@
 import { UsersRepository } from '../../infrastructure/users.repository';
-import { UsersQueryRepository } from '../../infrastructure/users.query.repository';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { BanUserInputModel } from '../../api/models/ban.user.input.model';
 
@@ -9,13 +8,10 @@ export class BanUserCommand {
 
 @CommandHandler(BanUserCommand)
 export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
-  constructor(
-    private usersRepository: UsersRepository,
-    private usersQueryRepository: UsersQueryRepository,
-  ) {}
+  constructor(private usersRepository: UsersRepository) {}
 
   async execute(command: BanUserCommand) {
-    const user = await this.usersQueryRepository.getUserById2(command.userId);
+    const user = await this.usersRepository.getUserDocumentById(command.userId);
     if (!user) return null;
 
     user.banUser(command.inputModel.banReason);

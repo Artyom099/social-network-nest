@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import {
-  PostDBModel,
-  PostInputModel,
-  PostViewModel,
-} from '../api/models/posts.models';
+import { PostInputModel } from '../api/models/post.input.model';
 import { LikeStatus } from '../../../infrastructure/utils/constants';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../posts.schema';
 import { Model } from 'mongoose';
+import { PostViewModel } from '../api/models/post.view.model';
+import { PostDBModel } from '../api/models/post.db.model';
 
 @Injectable()
 export class PostsRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
 
   async createPost(post: PostDBModel): Promise<PostViewModel> {
-    const newPost = await this.postModel.create(post);
+    await this.postModel.create(post);
     return {
       // id: newPost._id.toString(),
       id: post.id,

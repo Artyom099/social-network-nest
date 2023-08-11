@@ -1,10 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
-import {
-  CommentViewModel,
-  CreateCommentModel,
-} from '../../api/models/comments.models';
 import { Comment } from '../../comments.schema';
+import { CreateCommentModel } from '../../api/models/create.comment.model';
+import { CommentViewModel } from '../../api/models/comment.view.model';
 
 export class CreateCommentCommand {
   constructor(public inputModel: CreateCommentModel) {}

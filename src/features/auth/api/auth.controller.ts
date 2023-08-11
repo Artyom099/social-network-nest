@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { DevicesService } from '../../devices/application/devices.service';
-import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import {
   AuthInputModel,
   EmailInputModel,
@@ -28,6 +27,8 @@ import { CreateUserInputModel } from '../../users/api/models/create.user.input.m
 import { ConfirmEmailCommand } from '../application/use.cases/confirm.email.use.case';
 import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.code.use.case';
 import { UpdatePasswordCommand } from '../application/use.cases/update.password.use.case';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 
 @Controller('auth')
 export class AuthController {
@@ -35,6 +36,7 @@ export class AuthController {
     private jwtService: JwtService,
     private authService: AuthService,
     private securityService: DevicesService,
+    private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
 
     private commandBus: CommandBus,
@@ -67,7 +69,7 @@ export class AuthController {
     );
     if (!token) throw new UnauthorizedException();
     const payload = await this.authService.getTokenPayload(token.refreshToken);
-    const user = await this.usersQueryRepository.getUserById2(payload.userId);
+    const user = await this.usersRepository.getUserDocumentById(payload.userId);
 
     if (user?.banInfo.isBanned) {
       throw new UnauthorizedException();
@@ -133,9 +135,10 @@ export class AuthController {
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async setNewPassword(@Body() InputModel: SetNewPasswordInputModel) {
-    const isUserConfirm = await this.usersQueryRepository.getUserByRecoveryCode(
-      InputModel.recoveryCode,
-    );
+    const isUserConfirm =
+      await this.usersRepository.getUserDocumentByRecoveryCode(
+        InputModel.recoveryCode,
+      );
     if (!isUserConfirm) {
       throw new BadRequestException();
     } else {
@@ -165,12 +168,16 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() inputModel: CreateUserInputModel) {
     const existUserEmail =
-      await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.email);
+      await this.usersRepository.getUserDocumentByLoginOrEmail(
+        inputModel.email,
+      );
     if (existUserEmail) {
       throw new BadRequestException('email exist=>email');
     }
     const existUserLogin =
-      await this.usersQueryRepository.getUserByLoginOrEmail(inputModel.login);
+      await this.usersRepository.getUserDocumentByLoginOrEmail(
+        inputModel.login,
+      );
     if (existUserLogin) {
       throw new BadRequestException('login exist=>login');
     } else {
@@ -198,7 +205,7 @@ export class AuthController {
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: { email: string }) {
-    const existUser = await this.usersQueryRepository.getUserByLoginOrEmail(
+    const existUser = await this.usersRepository.getUserDocumentByLoginOrEmail(
       body.email,
     );
     if (!existUser || existUser.emailConfirmation.isConfirmed) {

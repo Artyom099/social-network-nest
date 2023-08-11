@@ -23,6 +23,7 @@ import { UsersPaginationInput } from '../../../../infrastructure/utils/common.mo
 import { DeleteUserCommand } from '../../application/sa.users.use.cases/delete.user.use.case';
 import { BanUserInputModel } from '../models/ban.user.input.model';
 import { CreateUserInputModel } from '../models/create.user.input.model';
+import { UsersRepository } from '../../infrastructure/users.repository';
 
 @UseGuards(BasicAuthGuard)
 @Controller('sa/users')
@@ -30,6 +31,7 @@ export class SaUsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
     private devicesService: DevicesService,
+    private usersRepository: UsersRepository,
 
     private commandBus: CommandBus,
   ) {}
@@ -44,9 +46,6 @@ export class SaUsersController {
   @HttpCode(HttpStatus.CREATED)
   async createUser(@Body() inputModel: CreateUserInputModel) {
     return this.commandBus.execute(new CreateUserByAdminCommand(inputModel));
-
-    // старый вариант
-    // return this.createUserByAdminUseCase.createUser(inputModel);
   }
 
   @Delete(':id')
@@ -66,7 +65,7 @@ export class SaUsersController {
     @Param('id') userId: string,
     @Body() inputModel: BanUserInputModel,
   ) {
-    const foundUser = await this.usersQueryRepository.getUserById2(userId);
+    const foundUser = await this.usersRepository.getUserDocumentById(userId);
     if (!foundUser) throw new NotFoundException('User not found');
 
     if (inputModel.isBanned) {

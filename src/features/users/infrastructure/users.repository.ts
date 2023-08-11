@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserModelType } from '../users.schema';
+import { User, UserDocument, UserModelType } from '../users.schema';
 import { CreateUserInputModel } from '../api/models/create.user.input.model';
 
 @Injectable()
@@ -28,5 +28,31 @@ export class UsersRepository {
   }
   async deleteUser(id: string) {
     await this.userModel.deleteOne({ id });
+  }
+
+  async getUserDocumentById(id: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ id });
+  }
+  async getUserDocumentByLoginOrEmail(
+    logOrMail: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      $or: [
+        { 'accountData.email': logOrMail },
+        { 'accountData.login': logOrMail },
+      ],
+    });
+  }
+  async getUserDocumentByRecoveryCode(
+    code: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne({ recoveryCode: code });
+  }
+  async getUserDocumentByConfirmationCode(
+    code: string,
+  ): Promise<UserDocument | null> {
+    return this.userModel.findOne({
+      'emailConfirmation.confirmationCode': code,
+    });
   }
 }

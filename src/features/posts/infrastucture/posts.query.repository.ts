@@ -3,16 +3,16 @@ import {
   DefaultPaginationInput,
   PagingViewModel,
 } from '../../../infrastructure/utils/common.models';
-import {
-  ExtendedLikesInfoDBModel,
-  NewestLikesViewModel,
-  PostViewModel,
-} from '../api/models/posts.models';
 import { LikeStatus } from '../../../infrastructure/utils/constants';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../posts.schema';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../../users/users.schema';
+import {
+  NewestLikesViewModel,
+  PostViewModel,
+} from '../api/models/post.view.model';
+import { ExtendedLikesInfoDBModel } from '../api/models/post.db.model';
 
 @Injectable()
 export class PostsQueryRepository {

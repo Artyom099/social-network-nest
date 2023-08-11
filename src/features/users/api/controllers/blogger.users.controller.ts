@@ -1,8 +1,10 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Put,
   Query,
@@ -10,6 +12,8 @@ import {
 import { CommandBus } from '@nestjs/cqrs';
 import { UsersPaginationInput } from '../../../../infrastructure/utils/common.models';
 import { UsersQueryRepository } from '../../infrastructure/users.query.repository';
+import { BanUserCurrentBlogInputModel } from '../models/ban.user.current.blog.input.model';
+import { BanUserForCurrentBlogCommand } from '../../application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
 
 @Controller('blogger/users')
 export class BloggerUsersController {
@@ -29,5 +33,17 @@ export class BloggerUsersController {
 
   @Put(':id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updateUserBanStatus(@Param('id') blogId: string) {}
+  async updateUserBanStatus(
+    @Param('id') userId: string,
+    @Body() inputModel: BanUserCurrentBlogInputModel,
+  ) {
+    const user = await this.usersQueryRepository.getUserById(userId);
+    if (!user) {
+      throw new NotFoundException();
+    } else {
+      return this.commandBus.execute(
+        new BanUserForCurrentBlogCommand(userId, inputModel),
+      );
+    }
+  }
 }

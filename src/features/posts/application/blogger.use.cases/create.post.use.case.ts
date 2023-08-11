@@ -1,11 +1,9 @@
-import {
-  PostInputModel,
-  PostViewModel,
-} from '../../../posts/api/models/posts.models';
+import { PostInputModel } from '../../api/models/post.input.model';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { PostsRepository } from '../../../posts/infrastucture/posts.repository';
-import { Post } from '../../../posts/posts.schema';
-import { SABlogViewModel } from '../../api/models/sa.blog.view.model';
+import { PostsRepository } from '../../infrastucture/posts.repository';
+import { Post } from '../../posts.schema';
+import { SABlogViewModel } from '../../../blogs/api/models/sa.blog.view.model';
+import { PostViewModel } from '../../api/models/post.view.model';
 
 export class CreatePostCommand {
   constructor(

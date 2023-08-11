@@ -30,10 +30,17 @@ export class UsersQueryRepository {
   ): Promise<PagingViewModel<BloggerUserViewModel[]>> {
     const filter = {};
 
+    //забаненый юзер хочет написать коммент для блога, в котором он забанен
+    //1. лезем в блог, чтобы достать масси забаненых юзеров
+    //2. лезем в юзера, чтобы достать массив блогов, где он забанен
+    //3. лезем в отдельную коллекцию
+    // в юзера мы уже и так лезем, значит будем хранить массив blogId в юзере
+
     //у каждого блога есть забаненые юзеры - варианты хранения:
-    //1. массив забаненных юзеров в сущности блога
-    //2. масси блогов, где забанен юзер в сущности юзера
-    //3. коллекция: ключ - блог, значение - массив забаненыъ юзеров
+    //1. массив забаненных userId в сущности блога
+    //2. массив blogId, где забанен юзер в сущности юзера
+    // + 3. коллекция: ключ - блог, значение - массив забаненых юзеров
+    // todo
 
     const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel
@@ -126,26 +133,5 @@ export class UsersQueryRepository {
       totalCount, // общее количество пользователей
       items,
     };
-  }
-
-  // todo перенести в обычный репо
-  async getUserById2(id: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ id });
-  }
-  async getUserByLoginOrEmail(logOrMail: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({
-      $or: [
-        { 'accountData.email': logOrMail },
-        { 'accountData.login': logOrMail },
-      ],
-    });
-  }
-  async getUserByRecoveryCode(code: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ recoveryCode: code });
-  }
-  async getUserByConfirmationCode(code: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({
-      'emailConfirmation.confirmationCode': code,
-    });
   }
 }

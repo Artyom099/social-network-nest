@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { EmailManager } from '../../../infrastructure/services/email.manager';
-import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { jwtConstants } from '../../../infrastructure/utils/settings';
 import { CreateUserInputModel } from '../../users/api/models/create.user.input.model';
 import { UserViewModel } from '../../users/api/models/user.view.model';
@@ -17,7 +16,6 @@ export class AuthService {
     private emailManager: EmailManager,
     private usersService: UsersService,
     private usersRepository: UsersRepository,
-    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
   async createUser(
@@ -54,7 +52,7 @@ export class AuthService {
     loginOrEmail,
     password,
   ): Promise<{ accessToken: string; refreshToken: string } | null> {
-    const user = await this.usersQueryRepository.getUserByLoginOrEmail(
+    const user = await this.usersRepository.getUserDocumentByLoginOrEmail(
       loginOrEmail,
     );
     if (!user) return null;

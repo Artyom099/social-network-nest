@@ -49,7 +49,7 @@ export class SABlogsController {
 
   @Put(':id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async banBlogger(
+  async updateBlogBanStatus(
     @Param('id') blogId: string,
     @Body() inputModel: BanBlogInputModel,
   ) {
