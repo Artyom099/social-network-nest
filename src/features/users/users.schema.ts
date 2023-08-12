@@ -44,19 +44,33 @@ class EmailConfirmation {
 }
 const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
 
+@Schema({ _id: false, versionKey: false })
+class BlogsWhereBanned {
+  @Prop({ required: true, type: Boolean })
+  isBanned: boolean;
+  @Prop({ required: true, type: String })
+  banReason: string;
+  @Prop({ required: true, type: String })
+  blogId: string;
+}
+const BlogsWhereBannedSchema = SchemaFactory.createForClass(BlogsWhereBanned);
+
 export type UserDocument = HydratedDocument<User>;
 @Schema({ versionKey: false })
 export class User {
   @Prop({ required: true, type: String, unique: true, index: true })
   id: string;
-  @Prop({ type: AccountDataSchema, required: true })
-  accountData: AccountData;
-  @Prop({ type: BanInfoSchema, required: true })
-  banInfo: BanInfo;
-  @Prop({ type: EmailConfirmationSchema, required: true })
-  emailConfirmation: EmailConfirmation;
-  @Prop({ type: String, required: true })
+  @Prop({ required: true, type: String })
   recoveryCode: string;
+
+  @Prop({ required: true, type: AccountDataSchema })
+  accountData: AccountData;
+  @Prop({ required: true, type: BanInfoSchema })
+  banInfo: BanInfo;
+  @Prop({ required: true, type: EmailConfirmationSchema })
+  emailConfirmation: EmailConfirmation;
+  @Prop({ required: false, type: [BlogsWhereBannedSchema] })
+  blogsWhereBanned: BlogsWhereBanned[];
 
   static createUserByAdmin(
     InputModel: CreateUserInputModel,
@@ -168,6 +182,7 @@ export class User {
     this.emailConfirmation.confirmationCode = newCode;
     return newCode;
   }
+
   banUser(reason: string) {
     this.banInfo.isBanned = true;
     this.banInfo.banReason = reason;
@@ -178,7 +193,14 @@ export class User {
     this.banInfo.banReason = null;
     this.banInfo.banDate = null;
   }
-  banUserForCurrentBlog(inputModel: BanUserCurrentBlogInputModel) {}
+
+  banUserForCurrentBlog(inputModel: BanUserCurrentBlogInputModel) {
+    this.blogsWhereBanned.push(inputModel);
+  }
+  unbanUserForCurrentBlog(inputModel: BanUserCurrentBlogInputModel) {
+    const i = this.blogsWhereBanned.indexOf(inputModel);
+    this.blogsWhereBanned.splice(i, 1);
+  }
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 

@@ -31,6 +31,7 @@ import { UpdateConfirmationCodeUseCase } from './application/use.cases/update.co
 import { SendRecoveryCodeUseCase } from './application/use.cases/send.recovery.code.use.case';
 import { UpdatePasswordUseCase } from './application/use.cases/update.password.use.case';
 import { BloggerUsersController } from '../users/api/controllers/blogger.users.controller';
+import { BanUserCurrentBlogInputModel } from '../users/api/models/ban.user.current.blog.input.model';
 
 const useCases = [
   BanUserUseCase,
@@ -41,6 +42,7 @@ const useCases = [
   UpdatePasswordUseCase,
   SendRecoveryCodeUseCase,
   CreateUserByAdminUseCase,
+  BanUserCurrentBlogInputModel,
   UpdateConfirmationCodeUseCase,
 ];
 

@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsString,
   Length,
+  Validate,
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
@@ -32,8 +33,7 @@ export class BanUserCurrentBlogInputModel {
   @Transform(({ value }) => value?.trim())
   banReason: string;
   @IsString()
-  @IsNotEmpty()
+  @Validate(BlogExistsConstraint)
   @Transform(({ value }) => value?.trim())
-  // todo - как здесь использовать BlogExistsConstraint?
   blogId: string;
 }

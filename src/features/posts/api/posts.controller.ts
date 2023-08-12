@@ -85,7 +85,6 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: CommentInputModel,
   ) {
-    //todo - добавить проверку не забанен ли пользователем в текущем блоге
     const post = await this.postsQueryRepository.getPost(postId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
     if (!post || !user) {

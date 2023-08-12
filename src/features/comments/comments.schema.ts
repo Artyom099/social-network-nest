@@ -38,11 +38,11 @@ const PostInfoSchema = SchemaFactory.createForClass(PostInfo);
 export type CommentDocument = HydratedDocument<Comment>;
 @Schema({ versionKey: false })
 export class Comment {
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   id: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   content: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: Date })
   createdAt: Date;
 
   @Prop({ required: true, type: CommentatorInfoSchema })

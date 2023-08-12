@@ -1,8 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  DefaultPaginationInput,
-  PagingViewModel,
-} from '../../../infrastructure/utils/common.models';
+import { DefaultPaginationInput } from '../../../infrastructure/utils/common.models';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Comment, CommentDocument } from '../comments.schema';
@@ -10,6 +7,7 @@ import { LikeStatus } from '../../../infrastructure/utils/constants';
 import { User, UserDocument } from '../../users/users.schema';
 import { Blog, BlogDocument } from '../../blogs/blogs.schema';
 import { CommentViewModel } from '../api/models/comment.view.model';
+import { PagingViewModel } from '../../../infrastructure/types/paging.view.model';
 
 @Injectable()
 export class CommentsQueryRepository {

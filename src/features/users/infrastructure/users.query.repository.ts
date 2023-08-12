@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import {
-  PagingViewModel,
-  UsersPaginationInput,
-} from '../../../infrastructure/utils/common.models';
+import { UsersPaginationInput } from '../../../infrastructure/utils/common.models';
 import { User, UserDocument } from '../users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { SAUserViewModel } from '../api/models/sa.user.view.model';
 import { UserViewModel } from '../api/models/user.view.model';
 import { BloggerUserViewModel } from '../api/models/blogger.user.view.model';
+import { PagingViewModel } from '../../../infrastructure/types/paging.view.model';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -28,6 +26,7 @@ export class UsersQueryRepository {
     blogId: string,
     query: UsersPaginationInput,
   ): Promise<PagingViewModel<BloggerUserViewModel[]>> {
+    // todo - blogId должен быть в массиве blogsWhereBanned
     const filter = {};
 
     //забаненый юзер хочет написать коммент для блога, в котором он забанен
@@ -40,7 +39,6 @@ export class UsersQueryRepository {
     //1. массив забаненных userId в сущности блога
     //2. массив blogId, где забанен юзер в сущности юзера
     // + 3. коллекция: ключ - блог, значение - массив забаненых юзеров
-    // todo
 
     const totalCount = await this.userModel.countDocuments(filter);
     const sortedUsers = await this.userModel

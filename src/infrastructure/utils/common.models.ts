@@ -1,15 +1,7 @@
 import { BanStatus, SortBy, SortDirection } from './constants';
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { isNil } from '@nestjs/common/utils/shared.utils';
-
-export type PagingViewModel<T> = {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: T;
-};
 
 export class DefaultPaginationInput {
   @IsString()
@@ -23,13 +15,13 @@ export class DefaultPaginationInput {
     return value === SortDirection.asc ? SortDirection.asc : SortDirection.desc;
   })
   sortDirection: 'asc' | 'desc' = 'desc';
-  @IsInt()
+  // @IsInt()
   @IsOptional()
   @Transform(({ value }) => {
     return value < 1 || value % 1 !== 0 ? 1 : value;
   })
   pageNumber = 1;
-  @IsInt()
+  // @IsInt()
   @IsOptional()
   @Transform(({ value }) => {
     return value < 1 || value % 1 !== 0 ? 10 : value;

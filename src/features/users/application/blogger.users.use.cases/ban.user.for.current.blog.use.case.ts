@@ -19,7 +19,11 @@ export class BanUserForCurrentBlogUseCase
     const user = await this.usersRepository.getUserDocumentById(command.userId);
     if (!user) return null;
 
-    user.banUserForCurrentBlog(command.inputModel);
+    if (command.inputModel.isBanned) {
+      user.banUserForCurrentBlog(command.inputModel);
+    } else {
+      user.unbanUserForCurrentBlog(command.inputModel);
+    }
     await this.usersRepository.save(user);
   }
 }
