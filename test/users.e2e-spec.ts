@@ -699,3 +699,209 @@ describe('UsersController (e2e)', () => {
     await app.close();
   });
 });
+
+describe('Ban users for different blogs', () => {
+  let app: INestApplication;
+  let server: any;
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    appSettings(app);
+    await app.init();
+    server = app.getHttpServer();
+    await request(server).delete('/testing/all-data');
+  });
+
+  it('1 – POST:/sa/users – return 201 & create 1st user', async () => {
+    const firstUser = {
+      login: 'lg-111111',
+      password: 'qwerty1',
+      email: 'valid-email@mail1.ru',
+    };
+
+    const createResponse = await request(server)
+      .post('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({
+        login: firstUser.login,
+        password: firstUser.password,
+        email: firstUser.email,
+      });
+
+    expect(createResponse).toBeDefined();
+    expect(createResponse.status).toEqual(HttpStatus.CREATED);
+    const firstCreatedUser = createResponse.body;
+    expect(firstCreatedUser).toEqual({
+      id: expect.any(String),
+      login: firstUser.login,
+      email: firstUser.email,
+      createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
+    });
+
+    await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK, {
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 1,
+        items: [firstCreatedUser],
+      });
+
+    expect.setState({ firstCreatedUser: firstCreatedUser });
+  });
+  it('2 – POST:/sa/users – return 201 & create 2nd user', async () => {
+    const { firstCreatedUser } = expect.getState();
+    const secondUser = {
+      login: 'lg-222222',
+      password: 'qwerty2',
+      email: 'valid-email@mail2.ru',
+    };
+
+    const createResponse = await request(server)
+      .post('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({
+        login: secondUser.login,
+        password: secondUser.password,
+        email: secondUser.email,
+      });
+
+    expect(createResponse).toBeDefined();
+    expect(createResponse.status).toEqual(HttpStatus.CREATED);
+    const secondCreatedUser = createResponse.body;
+    expect(secondCreatedUser).toEqual({
+      id: expect.any(String),
+      login: secondUser.login,
+      email: secondUser.email,
+      createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
+    });
+
+    await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK, {
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 2,
+        items: [secondCreatedUser, firstCreatedUser],
+      });
+
+    expect.setState({ secondCreatedUser: secondCreatedUser });
+  });
+  it('3 – POST:/sa/users – return 201 & create 3rd user', async () => {
+    const { firstCreatedUser, secondCreatedUser } = expect.getState();
+    const thirdUser = {
+      login: 'lg-333333',
+      password: 'qwerty3',
+      email: 'valid-email@mail3.ru',
+    };
+
+    const createResponse = await request(server)
+      .post('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({
+        login: thirdUser.login,
+        password: thirdUser.password,
+        email: thirdUser.email,
+      });
+
+    expect(createResponse).toBeDefined();
+    expect(createResponse.status).toEqual(HttpStatus.CREATED);
+    const thirdCreatedUser = createResponse.body;
+    expect(thirdCreatedUser).toEqual({
+      id: expect.any(String),
+      login: thirdUser.login,
+      email: thirdUser.email,
+      createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
+    });
+
+    await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK, {
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 3,
+        items: [thirdCreatedUser, secondCreatedUser, firstCreatedUser],
+      });
+
+    expect.setState({ thirdCreatedUser: thirdCreatedUser });
+  });
+  it('4 – POST:/sa/users – return 201 & create 4th user', async () => {
+    const { firstCreatedUser, secondCreatedUser, thirdCreatedUser } =
+      expect.getState();
+    const fourthUser = {
+      login: 'lg-444444',
+      password: 'qwerty4',
+      email: 'valid-email@mail4.ru',
+    };
+
+    const createResponse = await request(server)
+      .post('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({
+        login: fourthUser.login,
+        password: fourthUser.password,
+        email: fourthUser.email,
+      });
+
+    expect(createResponse).toBeDefined();
+    expect(createResponse.status).toEqual(HttpStatus.CREATED);
+    const fourthCreatedUser = createResponse.body;
+    expect(fourthCreatedUser).toEqual({
+      id: expect.any(String),
+      login: fourthUser.login,
+      email: fourthUser.email,
+      createdAt: expect.any(String),
+      banInfo: {
+        isBanned: false,
+        banDate: null,
+        banReason: null,
+      },
+    });
+
+    await request(server)
+      .get('/sa/users')
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .expect(HttpStatus.OK, {
+        pagesCount: 1,
+        page: 1,
+        pageSize: 10,
+        totalCount: 4,
+        items: [
+          fourthCreatedUser,
+          thirdCreatedUser,
+          secondCreatedUser,
+          firstCreatedUser,
+        ],
+      });
+
+    expect.setState({ fourthCreatedUser: fourthCreatedUser });
+  });
+
+  // 1 юзер создает блог и пост
+  // 1 юзер банит 2го для своего блога
+  // 2й юзер не может написать коммент под постом
+});

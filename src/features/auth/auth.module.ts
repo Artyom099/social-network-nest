@@ -32,16 +32,22 @@ import { SendRecoveryCodeUseCase } from './application/use.cases/send.recovery.c
 import { UpdatePasswordUseCase } from './application/use.cases/update.password.use.case';
 import { BloggerUsersController } from '../users/api/controllers/blogger.users.controller';
 import { BanUserCurrentBlogInputModel } from '../users/api/models/ban.user.current.blog.input.model';
+import {
+  BannedUserForBlog,
+  BannedUserForBlogSchema,
+} from '../users/banned.users.for.blogs.schema';
 
 const useCases = [
   BanUserUseCase,
   UnbanUserUseCase,
+
   DeleteUserUseCase,
   ConfirmEmailUseCase,
   RegisterUserUseCase,
   UpdatePasswordUseCase,
   SendRecoveryCodeUseCase,
   CreateUserByAdminUseCase,
+
   BanUserCurrentBlogInputModel,
   UpdateConfirmationCodeUseCase,
 ];
@@ -56,6 +62,7 @@ const useCases = [
       { name: User.name, schema: UserSchema },
       { name: Device.name, schema: DeviceSchema },
       { name: Request.name, schema: RequestSchema },
+      { name: BannedUserForBlog.name, schema: BannedUserForBlogSchema },
     ]),
   ],
   controllers: [

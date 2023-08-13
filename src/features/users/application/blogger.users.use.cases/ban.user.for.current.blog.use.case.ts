@@ -16,14 +16,30 @@ export class BanUserForCurrentBlogUseCase
   constructor(private usersRepository: UsersRepository) {}
 
   async execute(command: BanUserForCurrentBlogCommand) {
-    const user = await this.usersRepository.getUserDocumentById(command.userId);
+    const { userId, inputModel } = command;
+    const user = await this.usersRepository.getUserDocumentById(userId);
     if (!user) return null;
 
-    if (command.inputModel.isBanned) {
-      user.banUserForCurrentBlog(command.inputModel);
-    } else {
-      user.unbanUserForCurrentBlog(command.inputModel);
+    const bannedUser = await this.usersRepository.getBannedUserCurrentBlog(
+      userId,
+      inputModel.blogId,
+    );
+    if (bannedUser && inputModel.isBanned) {
+      bannedUser.banUserForCurrentBlog(user.accountData.login, inputModel);
     }
-    await this.usersRepository.save(user);
+    if (bannedUser && !inputModel.isBanned) {
+      bannedUser.unbanUserForCurrentBlog();
+    }
+
+    if (!bannedUser && inputModel.isBanned) {
+      const newBannedUser = await this.usersRepository.addUserToBanInBlog(
+        userId,
+        user.accountData.login,
+        inputModel,
+      );
+      await this.usersRepository.save(newBannedUser);
+    } else {
+      await this.usersRepository.save(bannedUser);
+    }
   }
 }

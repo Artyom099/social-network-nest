@@ -5,7 +5,6 @@ import add from 'date-fns/add';
 import { CreateUserInputModel } from './api/models/create.user.input.model';
 import { SAUserViewModel } from './api/models/sa.user.view.model';
 import { UserViewModel } from './api/models/user.view.model';
-import { BanUserCurrentBlogInputModel } from './api/models/ban.user.current.blog.input.model';
 
 @Schema({ _id: false, versionKey: false })
 class AccountData {
@@ -44,17 +43,6 @@ class EmailConfirmation {
 }
 const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
 
-@Schema({ _id: false, versionKey: false })
-class BlogsWhereBanned {
-  @Prop({ required: true, type: Boolean })
-  isBanned: boolean;
-  @Prop({ required: true, type: String })
-  banReason: string;
-  @Prop({ required: true, type: String })
-  blogId: string;
-}
-const BlogsWhereBannedSchema = SchemaFactory.createForClass(BlogsWhereBanned);
-
 export type UserDocument = HydratedDocument<User>;
 @Schema({ versionKey: false })
 export class User {
@@ -69,8 +57,6 @@ export class User {
   banInfo: BanInfo;
   @Prop({ required: true, type: EmailConfirmationSchema })
   emailConfirmation: EmailConfirmation;
-  @Prop({ required: false, type: [BlogsWhereBannedSchema] })
-  blogsWhereBanned: BlogsWhereBanned[];
 
   static createUserByAdmin(
     InputModel: CreateUserInputModel,
@@ -155,6 +141,7 @@ export class User {
       },
     };
   }
+
   confirmEmail(code: string): boolean {
     if (
       this &&
@@ -192,14 +179,6 @@ export class User {
     this.banInfo.isBanned = false;
     this.banInfo.banReason = null;
     this.banInfo.banDate = null;
-  }
-
-  banUserForCurrentBlog(inputModel: BanUserCurrentBlogInputModel) {
-    this.blogsWhereBanned.push(inputModel);
-  }
-  unbanUserForCurrentBlog(inputModel: BanUserCurrentBlogInputModel) {
-    const i = this.blogsWhereBanned.indexOf(inputModel);
-    this.blogsWhereBanned.splice(i, 1);
   }
 }
 export const UserSchema = SchemaFactory.createForClass(User);

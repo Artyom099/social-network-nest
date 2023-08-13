@@ -33,7 +33,7 @@ export class Blog {
   description: string;
   @Prop({ required: true, type: String })
   websiteUrl: string;
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   createdAt: string;
   @Prop({ required: true, type: Boolean, default: false })
   isMembership: boolean;
