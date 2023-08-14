@@ -35,6 +35,10 @@ import { CreateCommentUseCase } from './features/comments/application/use.cases/
 import { BanBlogUseCase } from './features/blogs/application/sa.use.cases/ban.blog.use.case';
 import { UpdateBlogUseCase } from './features/blogs/application/blogger.use.cases/update.blog.use.case';
 import { BlogExistsConstraint } from './features/users/api/models/ban.user.current.blog.input.model';
+import {
+  BannedUserForBlog,
+  BannedUserForBlogSchema,
+} from './features/users/banned.users.for.blog.schema';
 
 config();
 
@@ -60,6 +64,7 @@ const useCases = [
       { name: Device.name, schema: DeviceSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: Request.name, schema: RequestSchema },
+      { name: BannedUserForBlog.name, schema: BannedUserForBlogSchema },
     ]),
   ],
   controllers: [

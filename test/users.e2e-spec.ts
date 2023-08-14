@@ -3,6 +3,10 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
+import {
+  getRefreshTokenByResponse,
+  getRefreshTokenByResponseWithTokenName,
+} from '../src/infrastructure/utils/utils';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -757,7 +761,7 @@ describe('Ban users for different blogs', () => {
         items: [firstCreatedUser],
       });
 
-    expect.setState({ firstCreatedUser: firstCreatedUser });
+    expect.setState({ firstUser, firstCreatedUser });
   });
   it('2 – POST:/sa/users – return 201 & create 2nd user', async () => {
     const { firstCreatedUser } = expect.getState();
@@ -802,7 +806,7 @@ describe('Ban users for different blogs', () => {
         items: [secondCreatedUser, firstCreatedUser],
       });
 
-    expect.setState({ secondCreatedUser: secondCreatedUser });
+    expect.setState({ secondCreatedUser });
   });
   it('3 – POST:/sa/users – return 201 & create 3rd user', async () => {
     const { firstCreatedUser, secondCreatedUser } = expect.getState();
@@ -901,7 +905,107 @@ describe('Ban users for different blogs', () => {
     expect.setState({ fourthCreatedUser: fourthCreatedUser });
   });
 
-  // 1 юзер создает блог и пост
+  // 1 юзер логинится, создает блог и пост
+  it('5 – POST:/auth/login – return 200, 1st login and refreshToken', async () => {
+    const { firstUser } = expect.getState();
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: firstUser.login,
+      password: firstUser.password,
+    });
+
+    expect(loginResponse).toBeDefined();
+    expect(loginResponse.status).toBe(HttpStatus.OK);
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
+
+    const refreshToken = getRefreshTokenByResponse(loginResponse);
+    const refreshTokenWithName =
+      getRefreshTokenByResponseWithTokenName(loginResponse);
+    expect(refreshToken).toBeDefined();
+    expect(refreshToken).toEqual(expect.any(String));
+
+    expect.setState({
+      firstAccessToken: accessToken,
+      firstRefreshToken: refreshToken,
+      firstRefreshTokenWithName: refreshTokenWithName,
+    });
+  });
+  it('6 – POST:/blogger/blogs – return 201 & create blog', async () => {
+    const { firstAccessToken } = expect.getState();
+
+    const createBlogResponse = await request(server)
+      .post('/blogger/blogs')
+      .auth(firstAccessToken, { type: 'bearer' })
+      .send({
+        name: 'valid-blog',
+        description: 'valid-description',
+        websiteUrl: 'valid-websiteUrl.com',
+      });
+
+    expect(createBlogResponse).toBeDefined();
+    expect(createBlogResponse.status).toEqual(HttpStatus.CREATED);
+    expect.setState({ blogId: createBlogResponse.body.id });
+  });
+  it('7 – POST:/blogger/blogs/:id/posts – return 201 & create post', async () => {
+    const { firstAccessToken, blogId } = expect.getState();
+
+    const createPostResponse = await request(server)
+      .post(`/blogger/blogs/${blogId}/posts`)
+      .auth(firstAccessToken, { type: 'bearer' })
+      .send({
+        title: 'valid-title',
+        shortDescription: 'valid-shortDescription',
+        content: 'valid-content',
+      });
+
+    expect(createPostResponse).toBeDefined();
+    expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
+    expect.setState({ postId: createPostResponse.body.id });
+  });
+
   // 1 юзер банит 2го для своего блога
+  it('8 – PUT:/blogger/users/:id/ban – return 204 & ban 2nd user for blog', async () => {
+    const { secondCreatedUser, firstAccessToken, blogId } = expect.getState();
+
+    const banUserResponse = await request(server)
+      .put(`/blogger/users/${secondCreatedUser.id}/ban`)
+      .auth(firstAccessToken, { type: 'bearer' })
+      .send({
+        isBanned: true,
+        banReason: 'length_21-weqweqweqwq',
+        blogId,
+      });
+
+    expect(banUserResponse).toBeDefined();
+    expect(banUserResponse.status).toEqual(HttpStatus.NO_CONTENT);
+  });
+  it('9 – GET:/blogger/users/blog/:id – return 200 & banned 2nd user for blog', async () => {
+    const { secondCreatedUser, firstAccessToken, blogId } = expect.getState();
+
+    const getBannedUsersResponse = await request(server)
+      .get(`/blogger/users/blog/${blogId}`)
+      .auth(firstAccessToken, { type: 'bearer' });
+
+    expect(getBannedUsersResponse).toBeDefined();
+    expect(getBannedUsersResponse.status).toEqual(HttpStatus.OK);
+    expect(getBannedUsersResponse.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          id: secondCreatedUser.id,
+          login: secondCreatedUser.login,
+          banInfo: {
+            isBanned: true,
+            banDate: expect.any(String),
+            banReason: expect.any(String),
+          },
+        },
+      ],
+    });
+  });
+
   // 2й юзер не может написать коммент под постом
 });

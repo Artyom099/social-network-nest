@@ -51,8 +51,8 @@ export class SaUsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') userId: string) {
-    const foundUser = await this.usersQueryRepository.getUserById(userId);
-    if (!foundUser) {
+    const user = await this.usersQueryRepository.getUserById(userId);
+    if (!user) {
       throw new NotFoundException('User not found');
     } else {
       return this.commandBus.execute(new DeleteUserCommand(userId));

@@ -10,7 +10,7 @@ import { PagingViewModel } from '../../../infrastructure/types/paging.view.model
 import {
   BannedUserForBlog,
   BannedUserForBlogModelType,
-} from '../banned.users.for.blogs.schema';
+} from '../banned.users.for.blog.schema';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -19,7 +19,6 @@ export class UsersQueryRepository {
     @InjectModel(BannedUserForBlog.name)
     private BannedUserForBlogModel: BannedUserForBlogModelType,
   ) {}
-
   getViewModel(user): UserViewModel {
     return {
       id: user.id,
@@ -34,16 +33,7 @@ export class UsersQueryRepository {
     blogId: string,
     query: UsersPaginationInput,
   ): Promise<PagingViewModel<BloggerUserViewModel[]>> {
-    // todo - blogId должен быть в массиве blogsWhereBanned
     const filter = { blogId };
-
-    // достать из массива юзеров только тех, которые забанены в данном блоге
-    // достать весь массив забаненых юзеров, которые лежать в конкретном блоге
-
-    //у каждого блога есть забаненые юзеры - варианты хранения:
-    //1. массив забаненных userId в сущности блога
-    //2. массив blogId, где забанен юзер в сущности юзера
-    //3. коллекция готовых объектов
 
     const totalCount = await this.BannedUserForBlogModel.countDocuments(filter);
     const sortedUsers = await this.BannedUserForBlogModel.find(filter)

@@ -10,6 +10,10 @@ import {
   Request,
   RequestDocument,
 } from '../../infrastructure/services/ip.schema';
+import {
+  BannedUserForBlog,
+  BannedUserForBlogModelType,
+} from '../users/banned.users.for.blog.schema';
 
 @Injectable()
 export class TestRepository {
@@ -20,6 +24,8 @@ export class TestRepository {
     @InjectModel(Device.name) private devicesModel: Model<DeviceDocument>,
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(Request.name) private requestModel: Model<RequestDocument>,
+    @InjectModel(BannedUserForBlog.name)
+    private BannedUserForBlogModel: BannedUserForBlogModelType,
   ) {}
 
   async deleteAllData() {

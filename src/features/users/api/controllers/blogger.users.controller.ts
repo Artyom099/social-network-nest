@@ -8,14 +8,17 @@ import {
   Param,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { UsersPaginationInput } from '../../../../infrastructure/utils/common.models';
 import { UsersQueryRepository } from '../../infrastructure/users.query.repository';
 import { BanUserCurrentBlogInputModel } from '../models/ban.user.current.blog.input.model';
 import { BanUserForCurrentBlogCommand } from '../../application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
+import { BearerAuthGuard } from '../../../../infrastructure/guards/bearer-auth.guard';
 
 @Controller('blogger/users')
+@UseGuards(BearerAuthGuard)
 export class BloggerUsersController {
   constructor(
     private commandBus: CommandBus,

@@ -13,11 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { DevicesService } from '../../devices/application/devices.service';
-import {
-  AuthInputModel,
-  EmailInputModel,
-  SetNewPasswordInputModel,
-} from './auth.models';
+
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 import { JwtService } from '@nestjs/jwt';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
@@ -29,6 +25,9 @@ import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.
 import { UpdatePasswordCommand } from '../application/use.cases/update.password.use.case';
 import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
+import { AuthInputModel } from './models/auth.input.model';
+import { EmailInputModel } from './models/email.input.model';
+import { SetNewPasswordInputModel } from './models/set.new.password.input.model';
 
 @Controller('auth')
 export class AuthController {

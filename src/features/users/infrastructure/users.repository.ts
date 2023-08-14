@@ -6,7 +6,7 @@ import {
   BannedUserForBlog,
   BannedUserForBlogDocument,
   BannedUserForBlogModelType,
-} from '../banned.users.for.blogs.schema';
+} from '../banned.users.for.blog.schema';
 import { BanUserCurrentBlogInputModel } from '../api/models/ban.user.current.blog.input.model';
 
 @Injectable()
