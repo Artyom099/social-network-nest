@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PostsRepository } from '../infrastucture/posts.repository';
 import { PostInputModel } from '../api/models/post.input.model';
 import { LikeStatus } from '../../../infrastructure/utils/constants';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
 
 @Injectable()
 export class PostsService {

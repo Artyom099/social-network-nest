@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../../users/infrastructure/users.repository';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../auth.service';
+import { UsersRepository } from '../../../users/infrastructure/users.repository';
 
 export class UpdatePasswordCommand {
   constructor(public code: string, public password: string) {}

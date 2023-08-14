@@ -806,7 +806,7 @@ describe('Ban users for different blogs', () => {
         items: [secondCreatedUser, firstCreatedUser],
       });
 
-    expect.setState({ secondCreatedUser });
+    expect.setState({ secondUser, secondCreatedUser });
   });
   it('3 – POST:/sa/users – return 201 & create 3rd user', async () => {
     const { firstCreatedUser, secondCreatedUser } = expect.getState();
@@ -1008,4 +1008,40 @@ describe('Ban users for different blogs', () => {
   });
 
   // 2й юзер не может написать коммент под постом
+  it('9 – POST:/auth/login – return 200, 2nd user login', async () => {
+    const { secondUser } = expect.getState();
+
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: secondUser.login,
+      password: secondUser.password,
+    });
+
+    expect(loginResponse).toBeDefined();
+    expect(loginResponse.status).toBe(HttpStatus.OK);
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
+
+    const refreshToken = getRefreshTokenByResponse(loginResponse);
+    const refreshTokenWithName =
+      getRefreshTokenByResponseWithTokenName(loginResponse);
+    expect(refreshToken).toBeDefined();
+    expect(refreshToken).toEqual(expect.any(String));
+
+    expect.setState({
+      secondAccessToken: accessToken,
+      secondRefreshToken: refreshToken,
+      secondRefreshTokenWithName: refreshTokenWithName,
+    });
+  });
+  it('10 – GET:/posts/:id/comments – return 200 & banned 2nd user for blog', async () => {
+    const { secondAccessToken, postId } = expect.getState();
+
+    const createCommentCurrentPost = await request(server)
+      .post(`/posts/${postId}/comments`)
+      .auth(secondAccessToken, { type: 'bearer' })
+      .send({ content: 'valid-comment------21' });
+
+    expect(createCommentCurrentPost).toBeDefined();
+    expect(createCommentCurrentPost.status).toEqual(HttpStatus.FORBIDDEN);
+  });
 });

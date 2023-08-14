@@ -3,11 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../../users/application/users.service';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { EmailManager } from '../../../infrastructure/services/email.manager';
 import { jwtConstants } from '../../../infrastructure/utils/settings';
 import { CreateUserInputModel } from '../../users/api/models/create.user.input.model';
 import { UserViewModel } from '../../users/api/models/user.view.model';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
 
 @Injectable()
 export class AuthService {

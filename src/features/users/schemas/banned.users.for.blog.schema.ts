@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { BanUserCurrentBlogInputModel } from './api/models/ban.user.current.blog.input.model';
+import { BanUserCurrentBlogInputModel } from '../api/models/ban.user.current.blog.input.model';
 
 @Schema({ _id: false, versionKey: false })
 class BanInfo {

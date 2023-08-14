@@ -3,7 +3,7 @@ import { TestRepository } from './test.repository';
 
 @Controller('testing/all-data')
 export class TestController {
-  constructor(protected testRepository: TestRepository) {}
+  constructor(private testRepository: TestRepository) {}
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)

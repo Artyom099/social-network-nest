@@ -4,7 +4,7 @@ import { LikeStatus } from '../../../infrastructure/utils/constants';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../posts.schema';
 import { Model } from 'mongoose';
-import { User, UserDocument } from '../../users/users.schema';
+import { User, UserDocument } from '../../users/schemas/users.schema';
 import {
   NewestLikesViewModel,
   PostViewModel,
@@ -23,9 +23,7 @@ export class PostsQueryRepository {
     id: string,
     currentUserId?: string | null,
   ): Promise<PostViewModel | null> {
-    const post = await this.postModel
-      .findOne({ id, 'banInfo.isBanned': false })
-      .exec();
+    const post = await this.postModel.findOne({ id }).exec();
 
     if (!post) return null;
     let myStatus = LikeStatus.None;

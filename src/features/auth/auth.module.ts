@@ -2,8 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './api/auth.controller';
 import { AuthService } from './application/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from '../users/users.schema';
-import { UsersRepository } from '../users/infrastructure/users.repository';
+import { User, UserSchema } from '../users/schemas/users.schema';
 import { DevicesService } from '../devices/application/devices.service';
 import { DevicesRepository } from '../devices/infrastructure/devices.repository';
 import { Device, DeviceSchema } from '../devices/devices.schema';
@@ -34,8 +33,10 @@ import { BloggerUsersController } from '../users/api/controllers/blogger.users.c
 import {
   BannedUserForBlog,
   BannedUserForBlogSchema,
-} from '../users/banned.users.for.blog.schema';
+} from '../users/schemas/banned.users.for.blog.schema';
 import { BanUserForCurrentBlogUseCase } from '../users/application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
+import { UsersRepository } from '../users/infrastructure/users.repository';
+import { BannedUsersForBlogRepository } from '../users/infrastructure/banned.users.for.blog.repository';
 
 const useCases = [
   BanUserUseCase,
@@ -85,11 +86,18 @@ const useCases = [
     UsersService,
     UsersRepository,
     UsersQueryRepository,
+    BannedUsersForBlogRepository,
 
     DevicesService,
     DevicesRepository,
     DevicesQueryRepository,
   ],
-  exports: [AuthService, UsersService, UsersRepository, UsersQueryRepository],
+  exports: [
+    AuthService,
+    UsersService,
+    UsersRepository,
+    UsersQueryRepository,
+    BannedUsersForBlogRepository,
+  ],
 })
 export class AuthModule {}

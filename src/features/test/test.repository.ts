@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Blog, BlogDocument } from '../blogs/blogs.schema';
-import { User, UserDocument } from '../users/users.schema';
+import { User, UserDocument } from '../users/schemas/users.schema';
 import { Post, PostDocument } from '../posts/posts.schema';
 import { Comment, CommentDocument } from '../comments/comments.schema';
 import { Device, DeviceDocument } from '../devices/devices.schema';
@@ -13,7 +13,7 @@ import {
 import {
   BannedUserForBlog,
   BannedUserForBlogModelType,
-} from '../users/banned.users.for.blog.schema';
+} from '../users/schemas/banned.users.for.blog.schema';
 
 @Injectable()
 export class TestRepository {
@@ -36,6 +36,7 @@ export class TestRepository {
       this.devicesModel.deleteMany(),
       this.commentModel.deleteMany(),
       this.requestModel.deleteMany(),
+      this.BannedUserForBlogModel.deleteMany(),
     ]);
   }
 }

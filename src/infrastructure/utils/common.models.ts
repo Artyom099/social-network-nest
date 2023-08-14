@@ -15,13 +15,11 @@ export class DefaultPaginationInput {
     return value === SortDirection.asc ? SortDirection.asc : SortDirection.desc;
   })
   sortDirection: 'asc' | 'desc' = 'desc';
-  // @IsInt()
   @IsOptional()
   @Transform(({ value }) => {
     return value < 1 || value % 1 !== 0 ? 1 : value;
   })
   pageNumber = 1;
-  // @IsInt()
   @IsOptional()
   @Transform(({ value }) => {
     return value < 1 || value % 1 !== 0 ? 10 : value;

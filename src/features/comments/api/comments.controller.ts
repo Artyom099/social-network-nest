@@ -17,9 +17,9 @@ import { CommentInputModel } from './models/comment.input.model';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { CheckUserIdGuard } from '../../../infrastructure/guards/check-userId.guard';
 import { CommentsQueryRepository } from '../infrastructure/comments.query.repository';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { CommentViewModel } from './models/comment.view.model';
 import { LikeStatusInputModel } from './models/like.status.input.model';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
 
 @Controller('comments')
 export class CommentsController {

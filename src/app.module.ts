@@ -14,7 +14,7 @@ import { CommentsService } from './features/comments/application/comments.servic
 import { CommentsRepository } from './features/comments/infrastructure/comments.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './features/blogs/blogs.schema';
-import { User, UserSchema } from './features/users/users.schema';
+import { User, UserSchema } from './features/users/schemas/users.schema';
 import { CommentsQueryRepository } from './features/comments/infrastructure/comments.query.repository';
 import { PostsQueryRepository } from './features/posts/infrastucture/posts.query.repository';
 import { BlogsQueryRepository } from './features/blogs/infrastructure/blogs.query.repository';
@@ -38,7 +38,7 @@ import { BlogExistsConstraint } from './features/users/api/models/ban.user.curre
 import {
   BannedUserForBlog,
   BannedUserForBlogSchema,
-} from './features/users/banned.users.for.blog.schema';
+} from './features/users/schemas/banned.users.for.blog.schema';
 
 config();
 

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -23,14 +24,18 @@ import { UsersQueryRepository } from '../../users/infrastructure/users.query.rep
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentCommand } from '../../comments/application/use.cases/create.comment.use.case';
 import { LikeStatusInputModel } from '../../comments/api/models/like.status.input.model';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { BannedUsersForBlogRepository } from '../../users/infrastructure/banned.users.for.blog.repository';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private postsService: PostsService,
+    private usersRepository: UsersRepository,
     private postsQueryRepository: PostsQueryRepository,
     private usersQueryRepository: UsersQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
+    private bannedUsersForBlogRepository: BannedUsersForBlogRepository,
 
     private commandBus: CommandBus,
   ) {}
@@ -87,8 +92,20 @@ export class PostsController {
   ) {
     const post = await this.postsQueryRepository.getPost(postId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
+    // console.log({ post: post }, { user: user });
     if (!post || !user) {
       throw new NotFoundException('user or post not found');
+    }
+
+    const isUserBannedForBlog =
+      await this.bannedUsersForBlogRepository.getBannedUserCurrentBlog(
+        user.id,
+        post.blogId,
+      );
+    // console.log({ isUserBannedForBlog: isUserBannedForBlog });
+    if (isUserBannedForBlog) {
+      //todo - какой статус отдавать, если юзер забанен в блоге и пишет коммент?
+      throw new ForbiddenException();
     } else {
       const model = {
         postId,

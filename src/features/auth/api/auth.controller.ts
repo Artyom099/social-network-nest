@@ -23,11 +23,11 @@ import { CreateUserInputModel } from '../../users/api/models/create.user.input.m
 import { ConfirmEmailCommand } from '../application/use.cases/confirm.email.use.case';
 import { SendRecoveryCodeCommand } from '../application/use.cases/send.recovery.code.use.case';
 import { UpdatePasswordCommand } from '../application/use.cases/update.password.use.case';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { AuthInputModel } from './models/auth.input.model';
 import { EmailInputModel } from './models/email.input.model';
 import { SetNewPasswordInputModel } from './models/set.new.password.input.model';
+import { UsersRepository } from '../../users/infrastructure/users.repository';
 
 @Controller('auth')
 export class AuthController {
