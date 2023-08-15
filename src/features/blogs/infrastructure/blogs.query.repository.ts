@@ -20,6 +20,7 @@ export class BlogsQueryRepository {
   ): Promise<PagingViewModel<SABlogViewModel[]>> {
     const filter = {
       name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
+      'banInfo.isBanned': false,
     };
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel

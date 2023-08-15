@@ -1014,7 +1014,7 @@ describe('Ban users for different blogs', () => {
     });
   });
 
-  // 2й юзер не может написать коммент под постом
+  // 2й юзер создает свой блог и не может написать коммент под постом
   it('9 – POST:/auth/login – return 200, 2nd user login', async () => {
     const { secondUser } = expect.getState();
 
@@ -1050,6 +1050,22 @@ describe('Ban users for different blogs', () => {
 
     expect(createCommentCurrentPost).toBeDefined();
     expect(createCommentCurrentPost.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+  it('11 – POST:/blogger/blogs – return 201 & create blog', async () => {
+    const { secondAccessToken } = expect.getState();
+
+    const createBlogResponse = await request(server)
+      .post('/blogger/blogs')
+      .auth(secondAccessToken, { type: 'bearer' })
+      .send({
+        name: 'valid-blog-2',
+        description: 'valid-description-2',
+        websiteUrl: '2-valid-websiteUrl.com',
+      });
+
+    expect(createBlogResponse).toBeDefined();
+    expect(createBlogResponse.status).toEqual(HttpStatus.CREATED);
+    expect.setState({ secondBLog: createBlogResponse.body });
   });
 
   // 3й юзер пишет коммент под постом
@@ -1091,7 +1107,7 @@ describe('Ban users for different blogs', () => {
   });
 
   // 1й юзер смотрит забаненых юзеров своего блога
-  it('13 – GET:blogger/users/blog/:id – return 201 & ', async () => {
+  it('13 – GET:/blogger/users/blog/:id – return 201', async () => {
     const { firstRefreshToken, blogId, secondCreatedUser } = expect.getState();
 
     const getCommentsCurrentBlog = await request(server)
@@ -1120,7 +1136,7 @@ describe('Ban users for different blogs', () => {
   });
 
   // 1й юзер смотрит все комменты своего блога
-  it('14 – GET:blogger/blogs/comments – return 201 & ', async () => {
+  it('14 – GET:/blogger/blogs/comments – return 201', async () => {
     const { firstRefreshToken, thirdCreatedUser, createdPost, createdBLog } =
       expect.getState();
 
@@ -1155,6 +1171,45 @@ describe('Ban users for different blogs', () => {
             blogId: createdBLog.id,
             blogName: createdBLog.name,
           },
+        },
+      ],
+    });
+  });
+
+  // админ банит 2й блог
+  it('16 – PUT:/blogger/users/:id/ban – return 204', async () => {
+    const { secondBLog } = expect.getState();
+
+    const banUserResponse = await request(server)
+      .put(`/sa/blogs/${secondBLog.id}/ban`)
+      .auth('admin', 'qwerty', { type: 'basic' })
+      .send({ isBanned: true });
+
+    expect(banUserResponse).toBeDefined();
+    expect(banUserResponse.status).toEqual(HttpStatus.NO_CONTENT);
+  });
+
+  // незареганый юзер видит 1й блог и не видит 2й
+  it('17 – GET:/blogs – return 201', async () => {
+    const { firstCreatedBlog } = expect.getState();
+
+    const getCommentsCurrentBlog = await request(server).get(`/blogs`);
+
+    expect(getCommentsCurrentBlog).toBeDefined();
+    expect(getCommentsCurrentBlog.status).toEqual(HttpStatus.OK);
+    expect(getCommentsCurrentBlog.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          id: firstCreatedBlog.id,
+          name: firstCreatedBlog.name,
+          description: firstCreatedBlog.description,
+          websiteUrl: firstCreatedBlog.websiteUrl,
+          createdAt: firstCreatedBlog.createdAt,
+          isMembership: firstCreatedBlog.isMembership,
         },
       ],
     });
