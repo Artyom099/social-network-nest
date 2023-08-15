@@ -5,12 +5,12 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { SAUserViewModel } from '../api/models/sa.user.view.model';
 import { UserViewModel } from '../api/models/user.view.model';
-import { BloggerUserViewModel } from '../api/models/blogger.user.view.model';
 import { PagingViewModel } from '../../../infrastructure/types/paging.view.model';
 import {
   BannedUserForBlog,
   BannedUserForBlogModelType,
 } from '../schemas/banned.users.for.blog.schema';
+import { BannedUserForBlogViewModel } from '../api/models/banned.user.for.blog.view.model';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -32,7 +32,7 @@ export class UsersQueryRepository {
   async getBannedUsersCurrentBlog(
     blogId: string,
     query: UsersPaginationInput,
-  ): Promise<PagingViewModel<BloggerUserViewModel[]>> {
+  ): Promise<PagingViewModel<BannedUserForBlogViewModel[]>> {
     const filter = { blogId };
 
     const totalCount = await this.BannedUserForBlogModel.countDocuments(filter);

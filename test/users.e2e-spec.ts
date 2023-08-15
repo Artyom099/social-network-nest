@@ -7,6 +7,7 @@ import {
   getRefreshTokenByResponse,
   getRefreshTokenByResponseWithTokenName,
 } from '../src/infrastructure/utils/utils';
+import { LikeStatus } from '../src/infrastructure/utils/constants';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -851,7 +852,7 @@ describe('Ban users for different blogs', () => {
         items: [thirdCreatedUser, secondCreatedUser, firstCreatedUser],
       });
 
-    expect.setState({ thirdCreatedUser: thirdCreatedUser });
+    expect.setState({ thirdUser, thirdCreatedUser });
   });
   it('4 – POST:/sa/users – return 201 & create 4th user', async () => {
     const { firstCreatedUser, secondCreatedUser, thirdCreatedUser } =
@@ -902,7 +903,7 @@ describe('Ban users for different blogs', () => {
         ],
       });
 
-    expect.setState({ fourthCreatedUser: fourthCreatedUser });
+    expect.setState({ fourthUser, fourthCreatedUser });
   });
 
   // 1 юзер логинится, создает блог и пост
@@ -944,7 +945,10 @@ describe('Ban users for different blogs', () => {
 
     expect(createBlogResponse).toBeDefined();
     expect(createBlogResponse.status).toEqual(HttpStatus.CREATED);
-    expect.setState({ blogId: createBlogResponse.body.id });
+    expect.setState({
+      blogId: createBlogResponse.body.id,
+      createdBLog: createBlogResponse.body,
+    });
   });
   it('7 – POST:/blogger/blogs/:id/posts – return 201 & create post', async () => {
     const { firstAccessToken, blogId } = expect.getState();
@@ -960,7 +964,10 @@ describe('Ban users for different blogs', () => {
 
     expect(createPostResponse).toBeDefined();
     expect(createPostResponse.status).toEqual(HttpStatus.CREATED);
-    expect.setState({ postId: createPostResponse.body.id });
+    expect.setState({
+      postId: createPostResponse.body.id,
+      createdPost: createPostResponse.body,
+    });
   });
 
   // 1 юзер банит 2го для своего блога
@@ -1033,7 +1040,7 @@ describe('Ban users for different blogs', () => {
       secondRefreshTokenWithName: refreshTokenWithName,
     });
   });
-  it('10 – GET:/posts/:id/comments – return 200 & banned 2nd user for blog', async () => {
+  it("10 – POST:/posts/:id/comments – return 403 & 2nd user can't comment post", async () => {
     const { secondAccessToken, postId } = expect.getState();
 
     const createCommentCurrentPost = await request(server)
@@ -1043,5 +1050,113 @@ describe('Ban users for different blogs', () => {
 
     expect(createCommentCurrentPost).toBeDefined();
     expect(createCommentCurrentPost.status).toEqual(HttpStatus.FORBIDDEN);
+  });
+
+  // 3й юзер пишет коммент под постом
+  it('11 – POST:/auth/login – return 200, 3rd user login', async () => {
+    const { thirdUser } = expect.getState();
+
+    const loginResponse = await request(server).post('/auth/login').send({
+      loginOrEmail: thirdUser.login,
+      password: thirdUser.password,
+    });
+
+    expect(loginResponse).toBeDefined();
+    expect(loginResponse.status).toBe(HttpStatus.OK);
+    expect(loginResponse.body).toEqual({ accessToken: expect.any(String) });
+    const { accessToken } = loginResponse.body;
+
+    const refreshToken = getRefreshTokenByResponse(loginResponse);
+    const refreshTokenWithName =
+      getRefreshTokenByResponseWithTokenName(loginResponse);
+    expect(refreshToken).toBeDefined();
+    expect(refreshToken).toEqual(expect.any(String));
+
+    expect.setState({
+      thirdAccessToken: accessToken,
+      thirdRefreshToken: refreshToken,
+      thirdRefreshTokenWithName: refreshTokenWithName,
+    });
+  });
+  it('12 – POST:/posts/:id/comments – return 201 & ', async () => {
+    const { thirdRefreshToken, postId } = expect.getState();
+
+    const createCommentCurrentPost = await request(server)
+      .post(`/posts/${postId}/comments`)
+      .auth(thirdRefreshToken, { type: 'bearer' })
+      .send({ content: 'valid-comment------21' });
+
+    expect(createCommentCurrentPost).toBeDefined();
+    expect(createCommentCurrentPost.status).toEqual(HttpStatus.CREATED);
+  });
+
+  // 1й юзер смотрит забаненых юзеров своего блога
+  it('13 – GET:blogger/users/blog/:id – return 201 & ', async () => {
+    const { firstRefreshToken, blogId, secondCreatedUser } = expect.getState();
+
+    const getCommentsCurrentBlog = await request(server)
+      .get(`/blogger/users/blog/${blogId}`)
+      .auth(firstRefreshToken, { type: 'bearer' });
+
+    expect(getCommentsCurrentBlog).toBeDefined();
+    expect(getCommentsCurrentBlog.status).toEqual(HttpStatus.OK);
+    expect(getCommentsCurrentBlog.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          id: secondCreatedUser.id,
+          login: secondCreatedUser.login,
+          banInfo: {
+            isBanned: true,
+            banDate: expect.any(String),
+            banReason: expect.any(String),
+          },
+        },
+      ],
+    });
+  });
+
+  // 1й юзер смотрит все комменты своего блога
+  it('14 – GET:blogger/blogs/comments – return 201 & ', async () => {
+    const { firstRefreshToken, thirdCreatedUser, createdPost, createdBLog } =
+      expect.getState();
+
+    const getCommentsCurrentBlog = await request(server)
+      .get(`/blogger/blogs/comments`)
+      .auth(firstRefreshToken, { type: 'bearer' });
+
+    expect(getCommentsCurrentBlog).toBeDefined();
+    expect(getCommentsCurrentBlog.status).toEqual(HttpStatus.OK);
+    expect(getCommentsCurrentBlog.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          id: expect.any(String),
+          content: expect.any(String),
+          createdAt: expect.any(String),
+          commentatorInfo: {
+            userId: thirdCreatedUser.id,
+            userLogin: thirdCreatedUser.login,
+          },
+          likesInfo: {
+            likesCount: 0,
+            dislikesCount: 0,
+            myStatus: LikeStatus.None,
+          },
+          postInfo: {
+            id: createdPost.id,
+            title: createdPost.title,
+            blogId: createdBLog.id,
+            blogName: createdBLog.name,
+          },
+        },
+      ],
+    });
   });
 });

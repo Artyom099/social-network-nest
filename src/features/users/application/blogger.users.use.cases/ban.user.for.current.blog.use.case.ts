@@ -30,10 +30,13 @@ export class BanUserForCurrentBlogUseCase
         inputModel.blogId,
       );
     if (bannedUser && inputModel.isBanned) {
-      bannedUser.banUserForCurrentBlog(user.accountData.login, inputModel);
+      await bannedUser.banUserForCurrentBlog(
+        user.accountData.login,
+        inputModel,
+      );
     }
     if (bannedUser && !inputModel.isBanned) {
-      bannedUser.unbanUserForCurrentBlog();
+      await bannedUser.unbanUserForCurrentBlog();
     }
 
     if (!bannedUser && inputModel.isBanned) {

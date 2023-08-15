@@ -1,4 +1,4 @@
-export type BloggerUserViewModel = {
+export type BannedUserForBlogViewModel = {
   id: string;
   login: string;
   banInfo: {
