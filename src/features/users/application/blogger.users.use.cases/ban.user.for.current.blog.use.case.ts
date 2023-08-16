@@ -29,16 +29,6 @@ export class BanUserForCurrentBlogUseCase
         userId,
         inputModel.blogId,
       );
-    if (bannedUser && inputModel.isBanned) {
-      await bannedUser.banUserForCurrentBlog(
-        user.accountData.login,
-        inputModel,
-      );
-    }
-    if (bannedUser && !inputModel.isBanned) {
-      await bannedUser.unbanUserForCurrentBlog();
-    }
-
     if (!bannedUser && inputModel.isBanned) {
       const newBannedUser =
         await this.bannedUsersForBlogRepository.addUserToBanInBlog(
@@ -46,9 +36,12 @@ export class BanUserForCurrentBlogUseCase
           user.accountData.login,
           inputModel,
         );
-      await this.bannedUsersForBlogRepository.save(newBannedUser);
-    } else {
-      await this.bannedUsersForBlogRepository.save(bannedUser);
+      return this.bannedUsersForBlogRepository.save(newBannedUser);
     }
+    if (bannedUser && !inputModel.isBanned) {
+      await bannedUser.unbanUserForCurrentBlog();
+      return this.bannedUsersForBlogRepository.save(bannedUser);
+    }
+    return;
   }
 }

@@ -30,7 +30,7 @@ export class BannedUserForBlog {
     login: string,
     inputModel: BanUserCurrentBlogInputModel,
     BannedUserForBlogModel: BannedUserForBlogModelType,
-  ) {
+  ): BannedUserForBlogDocument {
     const data = {
       id: userId,
       blogId: inputModel.blogId,

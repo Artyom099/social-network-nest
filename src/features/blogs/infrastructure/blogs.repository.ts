@@ -42,7 +42,13 @@ export class BlogsRepository {
     );
   }
 
-  async banBlog(id: string, banStatus: boolean) {
-    await this.blogModel.updateOne({ id }, { 'banInfo.isBanned': banStatus });
+  async banBlog(id: string) {
+    await this.blogModel.updateOne(
+      { id },
+      { 'banInfo.isBanned': true, 'banInfo.banDate': new Date().toISOString() },
+    );
+  }
+  async unbanBlog(id: string) {
+    await this.blogModel.updateOne({ id }, { 'banInfo.isBanned': false });
   }
 }

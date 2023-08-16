@@ -25,10 +25,6 @@ export class BannedUsersForBlogRepository {
     return this.BannedUserForBlogModel.findOne({ id, blogId });
   }
 
-  // async getBannedUsers(id: string): Promise<BannedUserForBlogDocument | null> {
-  //   return this.BannedUserForBlogModel.findOne({ id });
-  // }
-
   async addUserToBanInBlog(
     userId: string,
     login: string,

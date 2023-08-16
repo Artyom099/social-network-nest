@@ -26,12 +26,14 @@ import { CreateCommentCommand } from '../../comments/application/use.cases/creat
 import { LikeStatusInputModel } from '../../comments/api/models/like.status.input.model';
 import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { BannedUsersForBlogRepository } from '../../users/infrastructure/banned.users.for.blog.repository';
+import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private postsService: PostsService,
     private usersRepository: UsersRepository,
+    private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
     private usersQueryRepository: UsersQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
@@ -51,14 +53,15 @@ export class PostsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getPost(@Req() req, @Param('id') postId: string) {
-    const foundPost = await this.postsQueryRepository.getPost(
-      postId,
-      req.userId,
-    );
-    if (!foundPost) {
+    const post = await this.postsQueryRepository.getPost(postId, req.userId);
+    if (!post) {
       throw new NotFoundException('post not found');
+    }
+    const blog = await this.blogsQueryRepository.getBlogSA(post.blogId);
+    if (!blog || blog.banInfo.isBanned) {
+      throw new NotFoundException('blog not found or banned');
     } else {
-      return foundPost;
+      return post;
     }
   }
 

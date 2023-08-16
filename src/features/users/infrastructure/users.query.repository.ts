@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { UsersPaginationInput } from '../../../infrastructure/utils/common.models';
+import {
+  BannedUsersPaginationInput,
+  UsersPaginationInput,
+} from '../../../infrastructure/utils/common.models';
 import { User, UserDocument } from '../schemas/users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -31,13 +34,12 @@ export class UsersQueryRepository {
   // blogger methods
   async getBannedUsersCurrentBlog(
     blogId: string,
-    query: UsersPaginationInput,
+    query: BannedUsersPaginationInput,
   ): Promise<PagingViewModel<BannedUserForBlogViewModel[]>> {
-    const filter = { blogId };
-
+    const filter = { blogId, 'banInfo.isBanned': true };
     const totalCount = await this.BannedUserForBlogModel.countDocuments(filter);
     const sortedUsers = await this.BannedUserForBlogModel.find(filter)
-      .sort(query.sortUsers())
+      .sort(query.sortBannedUsers())
       .skip(query.skip())
       .limit(query.pageSize)
       .lean()

@@ -10,6 +10,10 @@ export class BanBlogUseCase implements ICommandHandler<BanBlogCommand> {
   constructor(private blogsRepository: BlogsRepository) {}
 
   async execute(command: BanBlogCommand) {
-    await this.blogsRepository.banBlog(command.blogId, command.banStatus);
+    if (command.banStatus) {
+      await this.blogsRepository.banBlog(command.blogId);
+    } else {
+      await this.blogsRepository.unbanBlog(command.blogId);
+    }
   }
 }

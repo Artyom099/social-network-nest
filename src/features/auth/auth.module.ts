@@ -37,6 +37,8 @@ import {
 import { BanUserForCurrentBlogUseCase } from '../users/application/blogger.users.use.cases/ban.user.for.current.blog.use.case';
 import { UsersRepository } from '../users/infrastructure/users.repository';
 import { BannedUsersForBlogRepository } from '../users/infrastructure/banned.users.for.blog.repository';
+import { BlogsQueryRepository } from '../blogs/infrastructure/blogs.query.repository';
+import { Blog, BlogSchema } from '../blogs/blogs.schema';
 
 const useCases = [
   BanUserUseCase,
@@ -61,6 +63,7 @@ const useCases = [
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
+      { name: Blog.name, schema: BlogSchema },
       { name: Device.name, schema: DeviceSchema },
       { name: Request.name, schema: RequestSchema },
       { name: BannedUserForBlog.name, schema: BannedUserForBlogSchema },
@@ -82,6 +85,7 @@ const useCases = [
 
     EmailAdapter,
     EmailManager,
+    BlogsQueryRepository,
 
     UsersService,
     UsersRepository,

@@ -17,12 +17,12 @@ export class DefaultPaginationInput {
   sortDirection: 'asc' | 'desc' = 'desc';
   @IsOptional()
   @Transform(({ value }) => {
-    return value < 1 || value % 1 !== 0 ? 1 : value;
+    return value < 1 || value % 1 !== 0 ? 1 : Number(value);
   })
   pageNumber = 1;
   @IsOptional()
   @Transform(({ value }) => {
-    return value < 1 || value % 1 !== 0 ? 10 : value;
+    return value < 1 || value % 1 !== 0 ? 10 : Number(value);
   })
   pageSize = 10;
 
@@ -69,5 +69,17 @@ export class UsersPaginationInput extends DefaultPaginationInput {
 
   sortUsers() {
     return { ['accountData.' + this.sortBy]: this.sortDirection };
+  }
+}
+
+export class BannedUsersPaginationInput extends DefaultPaginationInput {
+  @IsOptional()
+  @Transform(({ value }) => {
+    return !isNil(value) ? value : '';
+  })
+  searchLoginTerm: string;
+
+  sortBannedUsers() {
+    return { [this.sortBy]: this.sortDirection };
   }
 }

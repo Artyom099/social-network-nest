@@ -20,7 +20,6 @@ export class BlogsQueryRepository {
   ): Promise<PagingViewModel<SABlogViewModel[]>> {
     const filter = {
       name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
-      'banInfo.isBanned': false,
     };
     const totalCount = await this.blogModel.countDocuments(filter);
     const items = await this.blogModel
@@ -30,6 +29,25 @@ export class BlogsQueryRepository {
       .limit(query.pageSize)
       .lean()
       .exec();
+
+    // const items = sortedBlogs.map((b) => {
+    //   return {
+    //     id: b.id,
+    //     name: b.name,
+    //     description: b.description,
+    //     websiteUrl: b.websiteUrl,
+    //     createdAt: b.createdAt,
+    //     isMembership: b.isMembership,
+    //     blogOwnerInfo: {
+    //       userId: b.blogOwnerInfo.userId,
+    //       userLogin: b.blogOwnerInfo.userLogin,
+    //     },
+    //     banInfo: {
+    //       isBanned: b.banInfo.isBanned,
+    //       banDate: b.banInfo.banDate,
+    //     },
+    //   };
+    // });
 
     return {
       pagesCount: query.pagesCount(totalCount), // общее количество страниц
@@ -43,7 +61,7 @@ export class BlogsQueryRepository {
   //regular user
   async getBlog(id: string): Promise<BlogViewModel | null> {
     return this.blogModel.findOne(
-      { id },
+      { id, 'banInfo.isBanned': false },
       { _id: 0, blogOwnerInfo: 0, banInfo: 0 },
     );
   }
@@ -51,6 +69,7 @@ export class BlogsQueryRepository {
     query: BlogsPaginationInput,
   ): Promise<PagingViewModel<BlogViewModel[]>> {
     const filter = {
+      'banInfo.isBanned': false,
       name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
     };
     const totalCount = await this.blogModel.countDocuments(filter);
@@ -77,6 +96,7 @@ export class BlogsQueryRepository {
     query: BlogsPaginationInput,
   ): Promise<PagingViewModel<BlogViewModel[]>> {
     const filter = {
+      'banInfo.isBanned': false,
       'blogOwnerInfo.userId': userId,
       name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
     };
