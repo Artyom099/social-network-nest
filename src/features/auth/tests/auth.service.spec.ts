@@ -35,9 +35,7 @@ describe('AuthService – integration test', () => {
 
   // const usersRepository = new UsersRepository();
   // const usersQueryRepository = new UsersQueryRepository();
-
   // const emailAdapter = new EmailAdapter();
-
   // const jwtService = new JwtService();
   // const emailManager = new EmailManager(emailAdapterMock);
   // const usersService = new UsersService();
