@@ -1,9 +1,6 @@
 import { AuthService } from '../application/auth.service';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../../users/application/users.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import { EmailManager } from '../../../infrastructure/services/email.manager';
 import { EmailAdapter } from '../../../infrastructure/adapters/email.adapter';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../../app.module';
@@ -41,16 +38,15 @@ describe('AuthService – integration test', () => {
 
   // const emailAdapter = new EmailAdapter();
 
-  const jwtService = new JwtService();
-  const emailManager = new EmailManager(emailAdapterMock);
-  const usersService = new UsersService();
-  const authService = new AuthService(
-    jwtService,
-    emailManager,
-    usersService,
-    usersRepository,
-    usersQueryRepository,
-  );
+  // const jwtService = new JwtService();
+  // const emailManager = new EmailManager(emailAdapterMock);
+  // const usersService = new UsersService();
+  // const authService = new AuthService(
+  //   jwtService,
+  //   emailManager,
+  //   usersService,
+  //   usersRepository,
+  // );
 
   describe('Create user', () => {
     it('1 – this.emailAdapter.sendEmail should be called', async () => {
@@ -60,7 +56,7 @@ describe('AuthService – integration test', () => {
         password: 'qwerty',
       };
       //todo - как здесь тестить,  когда вместо сервиса use case
-      const result = await authService.createUser(inputModel);
+      // const result = await authService.createUser(inputModel);
 
       expect(emailAdapterMock.sendEmail).toBeCalled();
     });

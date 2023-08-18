@@ -24,7 +24,6 @@ import { UsersQueryRepository } from '../../users/infrastructure/users.query.rep
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentCommand } from '../../comments/application/use.cases/create.comment.use.case';
 import { LikeStatusInputModel } from '../../comments/api/models/like.status.input.model';
-import { UsersRepository } from '../../users/infrastructure/users.repository';
 import { BannedUsersForBlogRepository } from '../../users/infrastructure/banned.users.for.blog.repository';
 import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
 
@@ -32,7 +31,6 @@ import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.rep
 export class PostsController {
   constructor(
     private postsService: PostsService,
-    private usersRepository: UsersRepository,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
     private usersQueryRepository: UsersQueryRepository,
@@ -54,9 +52,8 @@ export class PostsController {
   @HttpCode(HttpStatus.OK)
   async getPost(@Req() req, @Param('id') postId: string) {
     const post = await this.postsQueryRepository.getPost(postId, req.userId);
-    if (!post) {
-      throw new NotFoundException('post not found');
-    }
+    if (!post) throw new NotFoundException('post not found');
+
     const blog = await this.blogsQueryRepository.getBlogSA(post.blogId);
     if (!blog || blog.banInfo.isBanned) {
       throw new NotFoundException('blog not found or banned');
@@ -73,8 +70,8 @@ export class PostsController {
     @Param('id') postId: string,
     @Query() query: DefaultPaginationInput,
   ) {
-    const foundPost = await this.postsQueryRepository.getPost(postId);
-    if (!foundPost) {
+    const post = await this.postsQueryRepository.getPost(postId);
+    if (!post) {
       throw new NotFoundException('post not found');
     } else {
       return this.commentsQueryRepository.getCommentsCurrentPost(
@@ -95,19 +92,15 @@ export class PostsController {
   ) {
     const post = await this.postsQueryRepository.getPost(postId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
-    // console.log({ post: post }, { user: user });
-    if (!post || !user) {
-      throw new NotFoundException('user or post not found');
-    }
+    if (!post || !user) throw new NotFoundException('user or post not found');
 
     const isUserBannedForBlog =
       await this.bannedUsersForBlogRepository.getBannedUserCurrentBlog(
         user.id,
         post.blogId,
       );
-    // console.log({ isUserBannedForBlog: isUserBannedForBlog });
     if (isUserBannedForBlog) {
-      //todo - какой статус отдавать, если юзер забанен в блоге и пишет коммент?
+      //todo -1 какой статус отдавать, если юзер забанен в блоге и пишет коммент?
       throw new ForbiddenException();
     } else {
       const model = {
@@ -131,8 +124,8 @@ export class PostsController {
     @Param('id') postId: string,
     @Body() inputModel: LikeStatusInputModel,
   ) {
-    const foundPost = await this.postsQueryRepository.getPost(postId);
-    if (!foundPost) {
+    const post = await this.postsQueryRepository.getPost(postId);
+    if (!post) {
       throw new NotFoundException('post not found');
     } else {
       return this.postsService.updatePostLikes(

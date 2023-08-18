@@ -28,4 +28,4 @@ export class RateLimitGuard implements CanActivate {
     }
   }
 }
-//todo заменить этот гард декоратором trottle
+//этот гард можно заменить этот гард декоратором trottle
