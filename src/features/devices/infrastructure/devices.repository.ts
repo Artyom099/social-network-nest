@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { DeviceDBModel, DeviceViewModel } from '../api/models/devices.models';
+import { DeviceDBModel } from '../api/models/device.db.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceDocument } from '../devices.schema';
 import { Model } from 'mongoose';
+import { DeviceViewModel } from '../api/models/device.view.model';
 
 @Injectable()
 export class DevicesRepository {

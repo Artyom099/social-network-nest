@@ -26,6 +26,7 @@ import { CreateCommentCommand } from '../../comments/application/use.cases/creat
 import { LikeStatusInputModel } from '../../comments/api/models/like.status.input.model';
 import { BannedUsersForBlogRepository } from '../../users/infrastructure/banned.users.for.blog.repository';
 import { BlogsQueryRepository } from '../../blogs/infrastructure/blogs.query.repository';
+import { CreateCommentModel } from '../../comments/api/models/create.comment.model';
 
 @Controller('posts')
 export class PostsController {
@@ -43,14 +44,14 @@ export class PostsController {
   @Get()
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
-  async getPosts(@Req() req, @Query() query: DefaultPaginationInput) {
+  async getPosts(@Req() req: any, @Query() query: DefaultPaginationInput) {
     return this.postsQueryRepository.getSortedPosts(req.userId, query);
   }
 
   @Get(':id')
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
-  async getPost(@Req() req, @Param('id') postId: string) {
+  async getPost(@Req() req: any, @Param('id') postId: string) {
     const post = await this.postsQueryRepository.getPost(postId, req.userId);
     if (!post) throw new NotFoundException('post not found');
 
@@ -66,7 +67,7 @@ export class PostsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getCommentsCurrentPost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') postId: string,
     @Query() query: DefaultPaginationInput,
   ) {
@@ -86,7 +87,7 @@ export class PostsController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.CREATED)
   async createCommentCurrentPost(
-    @Req() req,
+    @Req() req: any,
     @Param('id') postId: string,
     @Body() inputModel: CommentInputModel,
   ) {
@@ -103,7 +104,7 @@ export class PostsController {
       //todo -1 какой статус отдавать, если юзер забанен в блоге и пишет коммент?
       throw new ForbiddenException();
     } else {
-      const model = {
+      const model: CreateCommentModel = {
         postId,
         content: inputModel.content,
         userId: user.id,
@@ -120,7 +121,7 @@ export class PostsController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
-    @Req() req,
+    @Req() req: any,
     @Param('id') postId: string,
     @Body() inputModel: LikeStatusInputModel,
   ) {

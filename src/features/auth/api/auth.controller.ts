@@ -15,7 +15,6 @@ import { AuthService } from '../application/auth.service';
 import { DevicesService } from '../../devices/application/devices.service';
 
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
-import { JwtService } from '@nestjs/jwt';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { RegisterUserCommand } from '../application/use.cases/register.user.use.case';
 import { CommandBus } from '@nestjs/cqrs';
@@ -28,11 +27,11 @@ import { AuthInputModel } from './models/auth.input.model';
 import { EmailInputModel } from './models/email.input.model';
 import { SetNewPasswordInputModel } from './models/set.new.password.input.model';
 import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { CreateDeviceModel } from '../../devices/api/models/create.device.model';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private jwtService: JwtService,
     private authService: AuthService,
     private securityService: DevicesService,
     private usersRepository: UsersRepository,
@@ -45,7 +44,6 @@ export class AuthController {
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
   async getMyInfo(@Req() req) {
-    console.log(req.userId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
     return {
       email: user?.email,
@@ -67,24 +65,25 @@ export class AuthController {
       InputModel.password,
     );
     if (!token) throw new UnauthorizedException();
+
     const payload = await this.authService.getTokenPayload(token.refreshToken);
     const user = await this.usersRepository.getUserDocumentById(payload.userId);
 
     if (user?.banInfo.isBanned) {
       throw new UnauthorizedException();
     } else {
-      const title = req.headers['host'];
       const payload = await this.authService.getTokenPayload(
         token.refreshToken,
       );
-      const lastActiveDate = new Date(payload.iat * 1000);
-      await this.securityService.createSession(
-        req.ip,
-        title,
-        lastActiveDate,
-        payload.deviceId,
-        payload.userId,
-      );
+      const dto: CreateDeviceModel = {
+        ip: req.ip,
+        title: req.headers['host'],
+        lastActiveDate: new Date(payload.iat * 1000),
+        deviceId: payload.deviceId,
+        userId: payload.userId,
+      };
+      await this.securityService.createSession(dto);
+
       res.cookie('refreshToken', token.refreshToken, {
         httpOnly: true,
         secure: true,
@@ -96,7 +95,7 @@ export class AuthController {
   @Post('refresh-token')
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
-  async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
+  async refreshToken(@Req() req: any, @Res({ passthrough: true }) res: any) {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
@@ -123,11 +122,11 @@ export class AuthController {
   @Post('logout')
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async logout(@Req() req) {
+  async logout(@Req() req: any) {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
-    await this.securityService.deleteCurrentSession(payload.deviceId);
+    return this.securityService.deleteCurrentSession(payload.deviceId);
   }
 
   @Post('new-password')
@@ -170,9 +169,8 @@ export class AuthController {
       await this.usersRepository.getUserDocumentByLoginOrEmail(
         inputModel.email,
       );
-    if (existUserEmail) {
-      throw new BadRequestException('email exist=>email');
-    }
+    if (existUserEmail) throw new BadRequestException('email exist=>email');
+
     const existUserLogin =
       await this.usersRepository.getUserDocumentByLoginOrEmail(
         inputModel.login,
@@ -180,7 +178,7 @@ export class AuthController {
     if (existUserLogin) {
       throw new BadRequestException('login exist=>login');
     } else {
-      await this.commandBus.execute(new RegisterUserCommand(inputModel));
+      return this.commandBus.execute(new RegisterUserCommand(inputModel));
     }
   }
 

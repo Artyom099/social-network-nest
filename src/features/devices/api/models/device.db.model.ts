@@ -5,9 +5,3 @@ export type DeviceDBModel = {
   deviceId: string;
   userId: string;
 };
-export type DeviceViewModel = {
-  ip: string;
-  title: string;
-  lastActiveDate: string;
-  deviceId: string;
-};

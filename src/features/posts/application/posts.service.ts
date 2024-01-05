@@ -26,6 +26,7 @@ export class PostsService {
   ) {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) return null;
+
     const addedAt = new Date();
     return this.postsRepository.updatePostLikes(
       postId,

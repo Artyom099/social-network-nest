@@ -32,7 +32,7 @@ export class BloggerUsersController {
   @Get('blog/:id')
   @HttpCode(HttpStatus.OK)
   async getBannedUsers(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Query() query: BannedUsersPaginationInput,
   ) {
@@ -49,7 +49,7 @@ export class BloggerUsersController {
   @Put(':id/ban')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateUserBanStatus(
-    @Req() req,
+    @Req() req: any,
     @Param('id') userId: string,
     @Body() inputModel: BanUserCurrentBlogInputModel,
   ) {
