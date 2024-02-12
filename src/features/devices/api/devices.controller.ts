@@ -30,6 +30,7 @@ export class DevicesController {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
     return this.devicesQueryRepository.getSessions(payload.userId);
   }
 
@@ -40,6 +41,7 @@ export class DevicesController {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
     if (payload)
       await this.devicesService.deleteOtherSessions(payload.deviceId);
   }
@@ -56,14 +58,14 @@ export class DevicesController {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
     const activeSessions = await this.devicesQueryRepository.getSessions(
       payload.userId,
     );
 
-    if (!activeSessions.find((s) => s.deviceId === currentSession.deviceId)) {
+    if (!activeSessions.find((s) => s.deviceId === currentSession.deviceId))
       throw new ForbiddenException();
-    } else {
-      await this.devicesService.deleteCurrentSession(deviceId);
-    }
+
+    return this.devicesService.deleteCurrentSession(deviceId);
   }
 }

@@ -14,26 +14,24 @@ export class DevicesQueryRepository {
   async getSession(deviceId: string): Promise<DeviceViewModel | null> {
     const device = await this.devicesModel.findOne({ deviceId }).exec();
     if (!device) return null;
-    else
-      return {
-        ip: device.ip,
-        title: device.title,
-        lastActiveDate: device.lastActiveDate.toISOString(),
-        deviceId: device.deviceId,
-      };
+
+    return this.mapToView(device);
   }
 
   async getSessions(userId: string): Promise<DeviceViewModel[]> {
     const devices = await this.devicesModel
       .find({ userId }, { projection: { _id: 0, userId: 0 } })
       .exec();
-    return devices.map((d) => {
-      return {
-        ip: d.ip,
-        title: d.title,
-        lastActiveDate: d.lastActiveDate.toISOString(),
-        deviceId: d.deviceId,
-      };
-    });
+
+    return devices.map((d) => this.mapToView(d));
+  }
+
+  mapToView(device): DeviceViewModel {
+    return {
+      ip: device.ip,
+      title: device.title,
+      deviceId: device.deviceId,
+      lastActiveDate: device.lastActiveDate.toISOString(),
+    };
   }
 }

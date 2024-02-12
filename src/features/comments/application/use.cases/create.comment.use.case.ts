@@ -15,8 +15,9 @@ export class CreateCommentUseCase
   constructor(private commentsRepository: CommentsRepository) {}
 
   async execute(command: CreateCommentCommand): Promise<CommentViewModel> {
-    //todo -1 добавить проверку не забанен ли пользователь в текущем блоге
+    //todo - добавить проверку не забанен ли пользователь в текущем блоге
     const { inputModel } = command;
+
     const createdComment = Comment.create(inputModel);
     return this.commentsRepository.createComment(createdComment);
   }

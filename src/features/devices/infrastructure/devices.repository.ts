@@ -11,15 +11,12 @@ export class DevicesRepository {
     @InjectModel(Device.name) private sessionModel: Model<DeviceDocument>,
   ) {}
 
-  async createSession(session: DeviceDBModel): Promise<DeviceViewModel> {
-    await this.sessionModel.create(session);
-    return {
-      ip: session.ip,
-      title: session.title,
-      lastActiveDate: session.lastActiveDate.toISOString(),
-      deviceId: session.deviceId,
-    };
+  async createSession(device: DeviceDBModel): Promise<DeviceViewModel> {
+    await this.sessionModel.create(device);
+
+    return this.mapToView(device);
   }
+
   async updateLastActiveDate(deviceId: string, date: string) {
     return this.sessionModel.updateOne(
       { deviceId },
@@ -30,10 +27,21 @@ export class DevicesRepository {
   async deleteCurrentSession(deviceId: string) {
     await this.sessionModel.deleteOne({ deviceId });
   }
+
   async deleteOtherSessions(deviceId: string) {
     await this.sessionModel.deleteMany({ $nor: [{ deviceId }] });
   }
+
   async deleteAllSessions(userId: string) {
     return this.sessionModel.deleteMany({ userId });
+  }
+
+  mapToView(device): DeviceViewModel {
+    return {
+      ip: device.ip,
+      title: device.title,
+      deviceId: device.deviceId,
+      lastActiveDate: device.lastActiveDate.toISOString(),
+    };
   }
 }

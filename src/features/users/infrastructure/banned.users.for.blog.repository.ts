@@ -28,12 +28,12 @@ export class BannedUsersForBlogRepository {
   async addUserToBanInBlog(
     userId: string,
     login: string,
-    inputModel: BanUserCurrentBlogInputModel,
+    dto: BanUserCurrentBlogInputModel,
   ) {
     return BannedUserForBlog.addUserToBanInBlog(
       userId,
       login,
-      inputModel,
+      dto,
       this.BannedUserForBlogModel,
     );
   }

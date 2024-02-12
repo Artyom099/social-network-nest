@@ -4,6 +4,7 @@ import { PostInputModel } from '../api/models/post.input.model';
 import { LikeStatus } from '../../../infrastructure/utils/constants';
 import { UsersQueryRepository } from '../../users/infrastructure/users.query.repository';
 import { UsersRepository } from '../../users/infrastructure/users.repository';
+import { UpdatePostLikesModel } from '../api/models/update.post.likes.model';
 
 @Injectable()
 export class PostsService {
@@ -13,12 +14,14 @@ export class PostsService {
     protected usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async updatePost(postId: string, InputModel: PostInputModel) {
-    return this.postsRepository.updatePost(postId, InputModel);
+  async updatePost(postId: string, inputModel: PostInputModel) {
+    return this.postsRepository.updatePost(postId, inputModel);
   }
+
   async deletePost(postId: string) {
     return this.postsRepository.deletePost(postId);
   }
+
   async updatePostLikes(
     postId: string,
     userId: string,
@@ -27,13 +30,13 @@ export class PostsService {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) return null;
 
-    const addedAt = new Date();
-    return this.postsRepository.updatePostLikes(
+    const dto: UpdatePostLikesModel = {
       postId,
       userId,
-      likeStatus,
-      addedAt,
-      user.login,
-    );
+      newLikeStatus: likeStatus,
+      addedAt: new Date(),
+      login: user.login,
+    };
+    return this.postsRepository.updatePostLikes(dto);
   }
 }

@@ -31,6 +31,7 @@ export class CommentsQueryRepository {
       .find({ 'banInfo.isBanned': true })
       .lean()
       .exec();
+
     const idBannedUsers = bannedUsers.map((u) => u.id);
 
     comment.likesInfo.forEach((l) => {
@@ -39,6 +40,7 @@ export class CommentsQueryRepository {
       if (l.status === LikeStatus.Like) likesCount++;
       if (l.status === LikeStatus.Dislike) dislikesCount++;
     });
+
     return {
       id: comment.id,
       content: comment.content,
@@ -69,6 +71,7 @@ export class CommentsQueryRepository {
     const filter = { postId };
 
     const totalCount = await this.commentModel.countDocuments(filter);
+
     const sortedComments = await this.commentModel
       .find(filter)
       .sort(query.sort())
@@ -81,18 +84,21 @@ export class CommentsQueryRepository {
       .find({ 'banInfo.isBanned': true })
       .lean()
       .exec();
+
     const idBannedUsers = bannedUsers.map((u) => u.id);
 
     const items = sortedComments.map((c) => {
       let myStatus = LikeStatus.None;
       let likesCount = 0;
       let dislikesCount = 0;
+
       c.likesInfo.forEach((l) => {
         if (l.userId === currentUserId) myStatus = l.status;
         if (idBannedUsers.includes(l.userId)) return;
         if (l.status === LikeStatus.Like) likesCount++;
         if (l.status === LikeStatus.Dislike) dislikesCount++;
       });
+
       return {
         id: c.id,
         content: c.content,
@@ -114,6 +120,7 @@ export class CommentsQueryRepository {
         },
       };
     });
+
     return {
       pagesCount: query.pagesCount(totalCount), // общее количество страниц
       page: query.pageNumber, // текущая страница
@@ -128,10 +135,13 @@ export class CommentsQueryRepository {
     query: DefaultPaginationInput,
   ): Promise<PagingViewModel<CommentViewModel[]>> {
     const blogFilter = { 'blogOwnerInfo.userId': currentUserId };
+
     const sortedBlogs = await this.blogModel.find(blogFilter).lean().exec();
+
     const blogsId = sortedBlogs.map((b) => b.id);
 
     const totalCount = await this.commentModel.countDocuments();
+
     const sortedComments = await this.commentModel
       .find()
       .sort(query.sort())
@@ -144,6 +154,7 @@ export class CommentsQueryRepository {
       .find({ 'banInfo.isBanned': true })
       .lean()
       .exec();
+
     const idBannedUsers = bannedUsers.map((u) => u.id);
 
     const items = sortedComments
@@ -152,12 +163,14 @@ export class CommentsQueryRepository {
         let myStatus = LikeStatus.None;
         let likesCount = 0;
         let dislikesCount = 0;
+
         c.likesInfo.forEach((l) => {
           if (l.userId === currentUserId) myStatus = l.status;
           if (idBannedUsers.includes(l.userId)) return;
           if (l.status === LikeStatus.Like) likesCount++;
           if (l.status === LikeStatus.Dislike) dislikesCount++;
         });
+
         return {
           id: c.id,
           content: c.content,

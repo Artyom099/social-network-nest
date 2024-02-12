@@ -56,11 +56,10 @@ export class PostsController {
     if (!post) throw new NotFoundException('post not found');
 
     const blog = await this.blogsQueryRepository.getBlogSA(post.blogId);
-    if (!blog || blog.banInfo.isBanned) {
+    if (!blog || blog.banInfo.isBanned)
       throw new NotFoundException('blog not found or banned');
-    } else {
-      return post;
-    }
+
+    return post;
   }
 
   @Get(':id/comments')
@@ -72,15 +71,13 @@ export class PostsController {
     @Query() query: DefaultPaginationInput,
   ) {
     const post = await this.postsQueryRepository.getPost(postId);
-    if (!post) {
-      throw new NotFoundException('post not found');
-    } else {
-      return this.commentsQueryRepository.getCommentsCurrentPost(
-        req.userId,
-        postId,
-        query,
-      );
-    }
+    if (!post) throw new NotFoundException('post not found');
+
+    return this.commentsQueryRepository.getCommentsCurrentPost(
+      req.userId,
+      postId,
+      query,
+    );
   }
 
   @Post(':id/comments')
@@ -89,7 +86,7 @@ export class PostsController {
   async createCommentCurrentPost(
     @Req() req: any,
     @Param('id') postId: string,
-    @Body() inputModel: CommentInputModel,
+    @Body() body: CommentInputModel,
   ) {
     const post = await this.postsQueryRepository.getPost(postId);
     const user = await this.usersQueryRepository.getUserById(req.userId);
@@ -100,21 +97,18 @@ export class PostsController {
         user.id,
         post.blogId,
       );
-    if (isUserBannedForBlog) {
-      //todo -1 какой статус отдавать, если юзер забанен в блоге и пишет коммент?
-      throw new ForbiddenException();
-    } else {
-      const model: CreateCommentModel = {
-        postId,
-        content: inputModel.content,
-        userId: user.id,
-        userLogin: user.login,
-        title: post.title,
-        blogId: post.blogId,
-        blogName: post.blogName,
-      };
-      return this.commandBus.execute(new CreateCommentCommand(model));
-    }
+    if (isUserBannedForBlog) throw new ForbiddenException();
+
+    const dto: CreateCommentModel = {
+      postId,
+      content: body.content,
+      userId: user.id,
+      userLogin: user.login,
+      title: post.title,
+      blogId: post.blogId,
+      blogName: post.blogName,
+    };
+    return this.commandBus.execute(new CreateCommentCommand(dto));
   }
 
   @Put(':id/like-status')
@@ -123,17 +117,15 @@ export class PostsController {
   async updateLikeStatus(
     @Req() req: any,
     @Param('id') postId: string,
-    @Body() inputModel: LikeStatusInputModel,
+    @Body() body: LikeStatusInputModel,
   ) {
     const post = await this.postsQueryRepository.getPost(postId);
-    if (!post) {
-      throw new NotFoundException('post not found');
-    } else {
-      return this.postsService.updatePostLikes(
-        postId,
-        req.userId,
-        inputModel.likeStatus,
-      );
-    }
+    if (!post) throw new NotFoundException('post not found');
+
+    return this.postsService.updatePostLikes(
+      postId,
+      req.userId,
+      body.likeStatus,
+    );
   }
 }

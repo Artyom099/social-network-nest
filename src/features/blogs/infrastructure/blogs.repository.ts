@@ -21,8 +21,9 @@ export class BlogsRepository {
       isMembership: blog.isMembership,
     };
   }
+
   async updateBlog(id: string, InputModel: BlogInputModel) {
-    await this.blogModel.updateOne(
+    return this.blogModel.updateOne(
       { id },
       {
         name: InputModel.name,
@@ -31,24 +32,26 @@ export class BlogsRepository {
       },
     );
   }
+
   async deleteBlog(id: string) {
-    await this.blogModel.deleteOne({ id });
+    return this.blogModel.deleteOne({ id });
   }
 
   async updateBlogOwner(id: string, userId: string, login: string) {
-    await this.blogModel.updateOne(
+    return this.blogModel.updateOne(
       { id },
       { 'blogOwnerInfo.userId': userId, 'blogOwnerInfo.userLogin': login },
     );
   }
 
   async banBlog(id: string) {
-    await this.blogModel.updateOne(
+    return this.blogModel.updateOne(
       { id },
       { 'banInfo.isBanned': true, 'banInfo.banDate': new Date().toISOString() },
     );
   }
+
   async unbanBlog(id: string) {
-    await this.blogModel.updateOne({ id }, { 'banInfo.isBanned': false });
+    return this.blogModel.updateOne({ id }, { 'banInfo.isBanned': false });
   }
 }

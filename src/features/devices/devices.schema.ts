@@ -32,4 +32,5 @@ export class Device {
     return device;
   }
 }
+
 export const DeviceSchema = SchemaFactory.createForClass(Device);

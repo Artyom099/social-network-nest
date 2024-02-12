@@ -15,13 +15,16 @@ export class BlogsQueryRepository {
   async getBlogSA(id: string): Promise<SABlogViewModel | null> {
     return this.blogModel.findOne({ id }, { _id: 0 });
   }
+
   async getSortedBlogsSA(
     query: BlogsPaginationInput,
   ): Promise<PagingViewModel<SABlogViewModel[]>> {
     const filter = {
       name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
     };
+
     const totalCount = await this.blogModel.countDocuments(filter);
+
     const items = await this.blogModel
       .find(filter, { _id: 0 })
       .sort(query.sort())
@@ -72,7 +75,9 @@ export class BlogsQueryRepository {
       'banInfo.isBanned': false,
       name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
     };
+
     const totalCount = await this.blogModel.countDocuments(filter);
+
     const items = await this.blogModel
       .find(filter, { _id: 0, blogOwnerInfo: 0, banInfo: 0 })
       .sort(query.sort())
@@ -100,7 +105,9 @@ export class BlogsQueryRepository {
       'blogOwnerInfo.userId': userId,
       name: { $regex: query.searchNameTerm ?? '', $options: 'i' },
     };
+
     const totalCount = await this.blogModel.countDocuments(filter);
+
     const items = await this.blogModel
       .find(filter, { _id: 0, blogOwnerInfo: 0, banInfo: 0 })
       .sort(query.sort())

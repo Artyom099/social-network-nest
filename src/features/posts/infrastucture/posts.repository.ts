@@ -6,6 +6,7 @@ import { Post, PostDocument } from '../posts.schema';
 import { Model } from 'mongoose';
 import { PostViewModel } from '../api/models/post.view.model';
 import { PostDBModel } from '../api/models/post.db.model';
+import { UpdatePostLikesModel } from '../api/models/update.post.likes.model';
 
 @Injectable()
 export class PostsRepository {
@@ -30,35 +31,35 @@ export class PostsRepository {
       },
     };
   }
-  async updatePost(id: string, InputModel: PostInputModel) {
+
+  async updatePost(id: string, dto: PostInputModel) {
     return this.postModel.updateOne(
       { id },
       {
-        title: InputModel.title,
-        shortDescription: InputModel.shortDescription,
-        content: InputModel.content,
+        title: dto.title,
+        shortDescription: dto.shortDescription,
+        content: dto.content,
       },
     );
   }
+
   async deletePost(id: string) {
     return this.postModel.deleteOne({ id });
   }
 
-  async updatePostLikes(
-    id: string,
-    userId: string,
-    newLikeStatus: LikeStatus,
-    addedAt: Date,
-    login: string,
-  ) {
-    const post = await this.postModel.findOne({ id });
+  async updatePostLikes(dto: UpdatePostLikesModel) {
+    const { postId, userId, newLikeStatus, addedAt, login } = dto;
+
+    const post = await this.postModel.findOne({ postId });
     if (!post) return false;
+
     // если юзер есть в массиве, обновляем его статус
     for (const s of post.extendedLikesInfo) {
-      if (s.userId === userId) {
-        if (s.status === newLikeStatus) return true;
+      if (s.userId === dto.userId) {
+        if (s.status === dto.newLikeStatus) return true;
+
         return this.postModel.updateOne(
-          { id },
+          { postId },
           {
             extendedLikesInfo: {
               addedAt,
@@ -70,9 +71,10 @@ export class PostsRepository {
         );
       }
     }
+
     // иначе добавляем юзера, его лайк статус, дату и логин в массив
     return this.postModel.updateOne(
-      { id },
+      { postId },
       {
         $addToSet: {
           extendedLikesInfo: {

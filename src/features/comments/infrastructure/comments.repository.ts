@@ -38,9 +38,11 @@ export class CommentsRepository {
   async updateComment(id: string, content: string) {
     await this.commentModel.updateOne({ id }, { content });
   }
+
   async deleteComment(id: string) {
     await this.commentModel.deleteOne({ id });
   }
+
   async updateCommentLikes(
     id: string,
     currentUserId: string,
@@ -48,10 +50,12 @@ export class CommentsRepository {
   ): Promise<boolean> {
     const comment = await this.commentModel.findOne({ id });
     if (!comment) return false;
+
     // если юзер есть в массиве likesInfo, обновляем его статус
     for (const s of comment.likesInfo) {
       if (s.userId === currentUserId) {
         if (s.status === newLikeStatus) return true;
+
         await this.commentModel.updateOne(
           { id },
           {
@@ -64,6 +68,7 @@ export class CommentsRepository {
         return true;
       }
     }
+
     // иначе добавляем юзера и его статус в массив
     await this.commentModel.updateOne(
       { id },
@@ -73,6 +78,7 @@ export class CommentsRepository {
         },
       },
     );
+
     return true;
   }
 }
