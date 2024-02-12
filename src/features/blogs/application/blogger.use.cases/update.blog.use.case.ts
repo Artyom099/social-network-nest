@@ -11,6 +11,8 @@ export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
   constructor(private blogsRepository: BlogsRepository) {}
 
   async execute(command: UpdateBlogCommand) {
-    await this.blogsRepository.updateBlog(command.blogId, command.inputModel);
+    const { blogId, inputModel } = command;
+
+    return this.blogsRepository.updateBlog(blogId, inputModel);
   }
 }

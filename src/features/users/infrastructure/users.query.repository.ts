@@ -22,7 +22,7 @@ export class UsersQueryRepository {
     @InjectModel(BannedUserForBlog.name)
     private BannedUserForBlogModel: BannedUserForBlogModelType,
   ) {}
-  getViewModel(user): UserViewModel {
+  mapToView(user): UserViewModel {
     return {
       id: user.id,
       login: user.accountData.login,
@@ -37,7 +37,9 @@ export class UsersQueryRepository {
     query: BannedUsersPaginationInput,
   ): Promise<PagingViewModel<BannedUserForBlogViewModel[]>> {
     const filter = { blogId, 'banInfo.isBanned': true };
+
     const totalCount = await this.BannedUserForBlogModel.countDocuments(filter);
+
     const sortedUsers = await this.BannedUserForBlogModel.find(filter)
       .sort(query.sortBannedUsers())
       .skip(query.skip())
@@ -72,9 +74,10 @@ export class UsersQueryRepository {
     if (!user) {
       return null;
     } else {
-      return this.getViewModel(user);
+      return this.mapToView(user);
     }
   }
+
   async getSortedUsersToSA(
     query: UsersPaginationInput,
   ): Promise<PagingViewModel<SAUserViewModel[]>> {
@@ -99,6 +102,7 @@ export class UsersQueryRepository {
       filter['banInfo.isBanned'] = query.banStatus;
 
     const totalCount = await this.userModel.countDocuments(filter);
+
     const sortedUsers = await this.userModel
       .find(filter)
       .sort(query.sortUsers())
@@ -120,6 +124,7 @@ export class UsersQueryRepository {
         },
       };
     });
+
     return {
       pagesCount: query.pagesCount(totalCount), // общее количество страниц
       page: query.pageNumber, // текущая страница

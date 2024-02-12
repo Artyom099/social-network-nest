@@ -17,12 +17,12 @@ export class UpdatePasswordUseCase
   ) {}
 
   async execute(command: UpdatePasswordCommand) {
-    const salt = await bcrypt.genSalt(10);
-    const hash = await this.authService.generateHash(command.password, salt);
+    const { code, password } = command;
 
-    const user = await this.usersRepository.getUserDocumentByRecoveryCode(
-      command.code,
-    );
+    const salt = await bcrypt.genSalt(10);
+    const hash = await this.authService.generateHash(password, salt);
+
+    const user = await this.usersRepository.getUserDocumentByRecoveryCode(code);
     if (!user) return null;
 
     user.updateSaltAndHash(salt, hash);

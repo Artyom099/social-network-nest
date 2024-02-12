@@ -14,12 +14,11 @@ export class BindBlogUseCase implements ICommandHandler<BindBlogCommand> {
   ) {}
 
   async execute(command: BindBlogCommand) {
-    const user = await this.userQueryRepository.getUserById(command.userId);
+    const { blogId, userId } = command;
+
+    const user = await this.userQueryRepository.getUserById(userId);
     if (!user) return null;
-    await this.blogsRepository.updateBlogOwner(
-      command.blogId,
-      command.userId,
-      user.login,
-    );
+
+    return this.blogsRepository.updateBlogOwner(blogId, userId, user.login);
   }
 }

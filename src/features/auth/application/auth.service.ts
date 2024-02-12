@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../../users/application/users.service';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { EmailManager } from '../../../infrastructure/services/email.manager';
@@ -14,7 +13,6 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private emailManager: EmailManager,
-    private usersService: UsersService,
     private usersRepository: UsersRepository,
   ) {}
 
@@ -56,29 +54,31 @@ export class AuthService {
       loginOrEmail,
     );
     if (!user) return null;
+
     const passwordHash = await this.generateHash(
       password,
       user.accountData.passwordSalt,
     );
-    if (user.accountData.passwordHash !== passwordHash) {
-      return null;
-    } else {
-      const payload = { userId: user.id, deviceId: randomUUID() };
-      return {
-        accessToken: await this.jwtService.signAsync(payload, {
-          secret: jwtConstants.accessSecret,
-          expiresIn: '5m',
-        }),
-        refreshToken: await this.jwtService.signAsync(payload, {
-          secret: jwtConstants.refreshSecret,
-          expiresIn: '20s',
-        }),
-      };
-    }
+    if (user.accountData.passwordHash !== passwordHash) return null;
+
+    const payload = { userId: user.id, deviceId: randomUUID() };
+
+    return {
+      accessToken: await this.jwtService.signAsync(payload, {
+        secret: jwtConstants.accessSecret,
+        expiresIn: '5m',
+      }),
+
+      refreshToken: await this.jwtService.signAsync(payload, {
+        secret: jwtConstants.refreshSecret,
+        expiresIn: '20s',
+      }),
+    };
   }
 
   async updateJWT(userId: string, deviceId: string) {
     const payload = { userId, deviceId };
+
     return {
       accessToken: await this.jwtService.signAsync(payload, {
         secret: jwtConstants.accessSecret,

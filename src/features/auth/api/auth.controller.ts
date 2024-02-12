@@ -58,38 +58,40 @@ export class AuthController {
   async login(
     @Req() req,
     @Res({ passthrough: true }) res,
-    @Body() InputModel: AuthInputModel,
+    @Body() body: AuthInputModel,
   ) {
+    const { loginOrEmail, password } = body;
+
     const token = await this.authService.checkCredentials(
-      InputModel.loginOrEmail,
-      InputModel.password,
+      loginOrEmail,
+      password,
     );
     if (!token) throw new UnauthorizedException();
 
     const payload = await this.authService.getTokenPayload(token.refreshToken);
     const user = await this.usersRepository.getUserDocumentById(payload.userId);
 
-    if (user?.banInfo.isBanned) {
-      throw new UnauthorizedException();
-    } else {
-      const payload = await this.authService.getTokenPayload(
-        token.refreshToken,
-      );
-      const dto: CreateDeviceModel = {
-        ip: req.ip,
-        title: req.headers['host'],
-        lastActiveDate: new Date(payload.iat * 1000),
-        deviceId: payload.deviceId,
-        userId: payload.userId,
-      };
-      await this.securityService.createSession(dto);
+    if (user?.banInfo.isBanned) throw new UnauthorizedException();
 
-      res.cookie('refreshToken', token.refreshToken, {
-        httpOnly: true,
-        secure: true,
-      });
-      return { accessToken: token.accessToken };
-    }
+    const newPayload = await this.authService.getTokenPayload(
+      token.refreshToken,
+    );
+
+    const dto: CreateDeviceModel = {
+      ip: req.ip,
+      title: req.headers['host'],
+      lastActiveDate: new Date(newPayload.iat * 1000),
+      deviceId: newPayload.deviceId,
+      userId: newPayload.userId,
+    };
+    await this.securityService.createSession(dto);
+
+    res.cookie('refreshToken', token.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken: token.accessToken };
   }
 
   @Post('refresh-token')
@@ -106,6 +108,7 @@ export class AuthController {
     const newPayload = await this.authService.getTokenPayload(
       token.refreshToken,
     );
+
     const lastActiveDate = new Date(newPayload.iat * 1000).toISOString();
     await this.securityService.updateLastActiveDate(
       payload.deviceId,

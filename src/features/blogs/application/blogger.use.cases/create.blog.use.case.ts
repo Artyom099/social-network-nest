@@ -18,6 +18,7 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
 
   async execute(command: CreateBlogCommand): Promise<BlogViewModel | null> {
     const { userId, inputModel } = command;
+
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) return null;
 

@@ -16,21 +16,23 @@ export class SendRecoveryCodeUseCase
   ) {}
 
   async execute(command: SendRecoveryCodeCommand): Promise<string | null> {
+    const { email } = command;
+
     const user = await this.usersRepository.getUserDocumentByLoginOrEmail(
-      command.email,
+      email,
     );
     if (!user) return null;
+
     const recoveryCode = user.updateRecoveryCode();
     await this.usersRepository.save(user);
+
     try {
       //await
-      await this.emailManager.sendEmailRecoveryCode(
-        command.email,
-        recoveryCode,
-      );
+      await this.emailManager.sendEmailRecoveryCode(email, recoveryCode);
     } catch (e) {
       return null;
     }
+
     return recoveryCode;
   }
 }

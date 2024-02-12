@@ -1,3 +1,6 @@
-import { SAUserViewModel } from './sa.user.view.model';
-
-export type UserViewModel = Omit<SAUserViewModel, 'banInfo'>;
+export type UserViewModel = {
+  id: string;
+  login: string;
+  email: string;
+  createdAt: string;
+};

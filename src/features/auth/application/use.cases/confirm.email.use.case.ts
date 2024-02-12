@@ -12,17 +12,15 @@ export class ConfirmEmailUseCase
   constructor(private usersRepository: UsersRepository) {}
 
   async execute(command: ConfirmEmailCommand): Promise<boolean> {
+    const { code } = command;
+
     const user = await this.usersRepository.getUserDocumentByConfirmationCode(
-      command.code,
+      code,
     );
-    if (!user || !user.confirmEmail(command.code)) {
-      return false;
-    } else {
-      await this.usersRepository.save(user);
-      await this.usersRepository.getUserDocumentByConfirmationCode(
-        command.code,
-      );
-      return true;
-    }
+    if (!user || !user.confirmEmail(code)) return false;
+
+    await this.usersRepository.save(user);
+    await this.usersRepository.getUserDocumentByConfirmationCode(code);
+    return true;
   }
 }

@@ -39,11 +39,10 @@ export class BloggerUsersController {
     const blog = await this.blogsQueryRepository.getBlogSA(blogId);
     if (!blog) throw new NotFoundException();
 
-    if (req.userId !== blog.blogOwnerInfo.userId) {
+    if (req.userId !== blog.blogOwnerInfo.userId)
       throw new ForbiddenException();
-    } else {
-      return this.usersQueryRepository.getBannedUsersCurrentBlog(blogId, query);
-    }
+
+    return this.usersQueryRepository.getBannedUsersCurrentBlog(blogId, query);
   }
 
   @Put(':id/ban')
@@ -51,18 +50,17 @@ export class BloggerUsersController {
   async updateUserBanStatus(
     @Req() req: any,
     @Param('id') userId: string,
-    @Body() inputModel: BanUserCurrentBlogInputModel,
+    @Body() body: BanUserCurrentBlogInputModel,
   ) {
     const user = await this.usersQueryRepository.getUserById(userId);
     if (!user) throw new NotFoundException();
 
-    const blog = await this.blogsQueryRepository.getBlogSA(inputModel.blogId);
-    if (!blog || req.userId !== blog.blogOwnerInfo.userId) {
+    const blog = await this.blogsQueryRepository.getBlogSA(body.blogId);
+    if (!blog || req.userId !== blog.blogOwnerInfo.userId)
       throw new ForbiddenException();
-    } else {
-      return this.commandBus.execute(
-        new BanUserForCurrentBlogCommand(userId, inputModel),
-      );
-    }
+
+    return this.commandBus.execute(
+      new BanUserForCurrentBlogCommand(userId, body),
+    );
   }
 }

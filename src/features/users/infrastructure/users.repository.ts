@@ -8,19 +8,19 @@ export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: UserModelType) {}
 
   async createUserByAdmin(
-    InputModel: CreateUserInputModel,
+    dto: CreateUserInputModel,
     salt: string,
     hash: string,
   ) {
-    return User.createUserByAdmin(InputModel, salt, hash, this.userModel);
+    return User.createUserByAdmin(dto, salt, hash, this.userModel);
   }
 
   async createUserBySelf(
-    InputModel: CreateUserInputModel,
+    dto: CreateUserInputModel,
     salt: string,
     hash: string,
   ) {
-    return User.createUserBySelf(InputModel, salt, hash, this.userModel);
+    return User.createUserBySelf(dto, salt, hash, this.userModel);
   }
 
   async save(model: any) {

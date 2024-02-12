@@ -5,7 +5,7 @@ import { UserViewModel } from '../../../users/api/models/user.view.model';
 import { UsersRepository } from '../../../users/infrastructure/users.repository';
 
 export class RegisterUserCommand {
-  constructor(public InputModel: CreateUserInputModel) {}
+  constructor(public inputModel: CreateUserInputModel) {}
 }
 
 @CommandHandler(RegisterUserCommand)
@@ -18,16 +18,19 @@ export class RegisterUserUseCase
   ) {}
 
   async execute(command: RegisterUserCommand): Promise<UserViewModel> {
-    const { InputModel } = command;
+    const { inputModel } = command;
+
     const { salt, hash } = await this.usersService.generateSaltAndHash(
-      InputModel.password,
+      inputModel.password,
     );
+
     // создание умного юзера через репозиторий
     const user = await this.usersRepository.createUserBySelf(
-      InputModel,
+      inputModel,
       salt,
       hash,
     );
+
     // сохранение умного юзера через репозиторий
     await this.usersRepository.save(user);
     return user.getViewModel();

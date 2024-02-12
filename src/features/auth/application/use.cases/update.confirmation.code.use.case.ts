@@ -18,10 +18,13 @@ export class UpdateConfirmationCodeUseCase
   async execute(
     command: UpdateConfirmationCodeCommand,
   ): Promise<string | null> {
+    const { email } = command;
+
     const user = await this.usersRepository.getUserDocumentByLoginOrEmail(
-      command.email,
+      email,
     );
     if (!user) return null;
+
     //обновили у него ConfirmationCode
     const newCode = user.updateConfirmationCode();
     //записали это обновление в БД
@@ -29,13 +32,11 @@ export class UpdateConfirmationCodeUseCase
 
     try {
       // убрал await, чтобы работал rateLimitMiddleware (10 секунд)
-      await this.emailManager.sendEmailConfirmationMessage(
-        command.email,
-        newCode,
-      );
-    } catch (error) {
+      await this.emailManager.sendEmailConfirmationMessage(email, newCode);
+    } catch (e) {
       return null;
     }
+
     return newCode;
   }
 }
