@@ -6,20 +6,22 @@ import { appSettings } from '../src/infrastructure/settings/app.settings';
 import {
   getRefreshTokenByResponse,
   getRefreshTokenByResponseWithTokenName,
-} from '../src/infrastructure/utils/utils';
-import { LikeStatus } from '../src/infrastructure/utils/constants';
+} from '../src/infrastructure/utils/helpers';
+import { LikeStatus } from '../src/infrastructure/utils/enums';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
   let server: any;
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
+
     server = app.getHttpServer();
     await request(server).delete('/testing/all-data');
   });
@@ -714,8 +716,9 @@ describe('Ban users for different blogs', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
+
     server = app.getHttpServer();
     await request(server).delete('/testing/all-data');
   });

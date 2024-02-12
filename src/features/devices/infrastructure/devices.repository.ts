@@ -8,35 +8,35 @@ import { DeviceViewModel } from '../api/models/device.view.model';
 @Injectable()
 export class DevicesRepository {
   constructor(
-    @InjectModel(Device.name) private sessionModel: Model<DeviceDocument>,
+    @InjectModel(Device.name) private devicesModel: Model<DeviceDocument>,
   ) {}
 
-  async createSession(device: DeviceDBModel): Promise<DeviceViewModel> {
-    await this.sessionModel.create(device);
+  async createSession(dto: DeviceDBModel): Promise<DeviceViewModel> {
+    const device = await this.devicesModel.create(dto);
 
     return this.mapToView(device);
   }
 
   async updateLastActiveDate(deviceId: string, date: string) {
-    return this.sessionModel.updateOne(
+    return this.devicesModel.updateOne(
       { deviceId },
       { $set: { lastActiveDate: date } },
     );
   }
 
   async deleteCurrentSession(deviceId: string) {
-    await this.sessionModel.deleteOne({ deviceId });
+    await this.devicesModel.deleteOne({ deviceId });
   }
 
   async deleteOtherSessions(deviceId: string) {
-    await this.sessionModel.deleteMany({ $nor: [{ deviceId }] });
+    await this.devicesModel.deleteMany({ $nor: [{ deviceId }] });
   }
 
   async deleteAllSessions(userId: string) {
-    return this.sessionModel.deleteMany({ userId });
+    return this.devicesModel.deleteMany({ userId });
   }
 
-  mapToView(device): DeviceViewModel {
+  mapToView(device: DeviceDocument): DeviceViewModel {
     return {
       ip: device.ip,
       title: device.title,

@@ -14,6 +14,7 @@ export class EmailAdapter {
         pass: settings.MAIL_PASSWORD,
       },
     });
+
     return transporter.sendMail({
       from: `"Fred Foo 👻" <${settings.MAIL_LOGIN}>`, // sender address
       to: email, // list of receivers
@@ -34,6 +35,7 @@ export class EmailAdapter {
           pass: settings.GMAIL_PASSWORD,
         },
       });
+
       return await transporter.sendMail({
         from: `"Blog Platform" <${settings.GMAIL_LOGIN}>`,
         to: to,

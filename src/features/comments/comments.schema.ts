@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { LikeStatus } from '../../infrastructure/utils/constants';
+import { LikeStatus } from '../../infrastructure/utils/enums';
 import { HydratedDocument } from 'mongoose';
 import { randomUUID } from 'crypto';
 import { CreateCommentModel } from './api/models/create.comment.model';

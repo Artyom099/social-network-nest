@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { BlogsPaginationInput } from '../../../infrastructure/utils/common.models';
+import { BlogsPaginationInput } from '../../../infrastructure/models/pagination.input';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument } from '../blogs.schema';
 import { Model } from 'mongoose';
 import { SABlogViewModel } from '../api/models/sa.blog.view.model';
 import { BlogViewModel } from '../api/models/blog.view.model';
-import { PagingViewModel } from '../../../infrastructure/types/paging.view.model';
+import { PagingViewModel } from '../../../infrastructure/models/paging.view.model';
 
 @Injectable()
 export class BlogsQueryRepository {

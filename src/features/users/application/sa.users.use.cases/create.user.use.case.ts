@@ -5,7 +5,7 @@ import { SAUserViewModel } from '../../api/models/sa.user.view.model';
 import { UsersRepository } from '../../infrastructure/users.repository';
 
 export class CreateUserByAdminCommand {
-  constructor(public InputModel: CreateUserInputModel) {}
+  constructor(public inputModel: CreateUserInputModel) {}
 }
 
 @CommandHandler(CreateUserByAdminCommand)
@@ -19,16 +19,19 @@ export class CreateUserByAdminUseCase
 
   async execute(command: CreateUserByAdminCommand): Promise<SAUserViewModel> {
     // здесь нельзя вызывать query репозиторий
-    const { InputModel } = command;
+    const { inputModel } = command;
+
     const { salt, hash } = await this.usersService.generateSaltAndHash(
-      InputModel.password,
+      inputModel.password,
     );
+
     // создание умного юзера через репозиторий
     const user = await this.usersRepository.createUserByAdmin(
-      InputModel,
+      inputModel,
       salt,
       hash,
     );
+
     // сохранение умного юзера через репозиторий
     await this.usersRepository.save(user);
     return user.getSAViewModel();

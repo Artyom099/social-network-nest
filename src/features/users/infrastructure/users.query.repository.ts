@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import {
   BannedUsersPaginationInput,
   UsersPaginationInput,
-} from '../../../infrastructure/utils/common.models';
+} from '../../../infrastructure/models/pagination.input';
 import { User, UserDocument } from '../schemas/users.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { SAUserViewModel } from '../api/models/sa.user.view.model';
 import { UserViewModel } from '../api/models/user.view.model';
-import { PagingViewModel } from '../../../infrastructure/types/paging.view.model';
+import { PagingViewModel } from '../../../infrastructure/models/paging.view.model';
 import {
   BannedUserForBlog,
   BannedUserForBlogModelType,
@@ -22,6 +22,7 @@ export class UsersQueryRepository {
     @InjectModel(BannedUserForBlog.name)
     private BannedUserForBlogModel: BannedUserForBlogModelType,
   ) {}
+
   mapToView(user): UserViewModel {
     return {
       id: user.id,

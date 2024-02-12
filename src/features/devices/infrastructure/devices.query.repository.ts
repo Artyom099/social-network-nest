@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Device, DeviceDocument } from '../devices.schema';
 import { Model } from 'mongoose';
-
 import { DeviceViewModel } from '../api/models/device.view.model';
 
 @Injectable()
@@ -23,10 +22,10 @@ export class DevicesQueryRepository {
       .find({ userId }, { projection: { _id: 0, userId: 0 } })
       .exec();
 
-    return devices.map((d) => this.mapToView(d));
+    return devices.map((d: DeviceDocument) => this.mapToView(d));
   }
 
-  mapToView(device): DeviceViewModel {
+  mapToView(device: DeviceDocument): DeviceViewModel {
     return {
       ip: device.ip,
       title: device.title,

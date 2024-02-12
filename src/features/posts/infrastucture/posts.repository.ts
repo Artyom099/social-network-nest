@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PostInputModel } from '../api/models/post.input.model';
-import { LikeStatus } from '../../../infrastructure/utils/constants';
+import { LikeStatus } from '../../../infrastructure/utils/enums';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../posts.schema';
 import { Model } from 'mongoose';

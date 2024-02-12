@@ -19,7 +19,7 @@ import { BlogsService } from '../../application/blogs.service';
 import {
   BlogsPaginationInput,
   DefaultPaginationInput,
-} from '../../../../infrastructure/utils/common.models';
+} from '../../../../infrastructure/models/pagination.input';
 import { PostsService } from '../../../posts/application/posts.service';
 import { PostInputModel } from '../../../posts/api/models/post.input.model';
 import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repository';

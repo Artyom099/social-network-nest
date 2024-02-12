@@ -54,6 +54,7 @@ export class BannedUserForBlog {
     this.banInfo.banDate = new Date();
     this.banInfo.banReason = inputModel.banReason;
   }
+
   unbanUserForCurrentBlog() {
     this.banInfo.isBanned = false;
   }
@@ -65,6 +66,7 @@ BannedUserForBlogSchema.methods = {
   banUserForCurrentBlog: BannedUserForBlog.prototype.banUserForCurrentBlog,
   unbanUserForCurrentBlog: BannedUserForBlog.prototype.unbanUserForCurrentBlog,
 };
+
 export type BannedUserForBlogModelStaticType = {
   addUserToBanInBlog: (
     userId: string,
@@ -73,9 +75,12 @@ export type BannedUserForBlogModelStaticType = {
     BannedUserForBlogModel: BannedUserForBlogModelType,
   ) => BannedUserForBlogDocument;
 };
+
 export type BannedUserForBlogModelType = Model<BannedUserForBlog> &
   BannedUserForBlogModelStaticType;
+
 const bannedUserForBlogStaticMethods: BannedUserForBlogModelStaticType = {
   addUserToBanInBlog: BannedUserForBlog.addUserToBanInBlog,
 };
+
 BannedUserForBlogSchema.statics = bannedUserForBlogStaticMethods;

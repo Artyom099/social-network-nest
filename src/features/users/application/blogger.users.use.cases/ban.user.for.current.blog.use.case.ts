@@ -21,6 +21,7 @@ export class BanUserForCurrentBlogUseCase
 
   async execute(command: BanUserForCurrentBlogCommand) {
     const { userId, inputModel } = command;
+
     const user = await this.usersRepository.getUserDocumentById(userId);
     if (!user) return null;
 
@@ -29,6 +30,7 @@ export class BanUserForCurrentBlogUseCase
         userId,
         inputModel.blogId,
       );
+
     if (!bannedUser && inputModel.isBanned) {
       const newBannedUser =
         await this.bannedUsersForBlogRepository.addUserToBanInBlog(
@@ -38,10 +40,12 @@ export class BanUserForCurrentBlogUseCase
         );
       return this.bannedUsersForBlogRepository.save(newBannedUser);
     }
+
     if (bannedUser && !inputModel.isBanned) {
       await bannedUser.unbanUserForCurrentBlog();
       return this.bannedUsersForBlogRepository.save(bannedUser);
     }
+
     return;
   }
 }

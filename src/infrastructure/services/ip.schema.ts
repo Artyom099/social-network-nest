@@ -20,4 +20,5 @@ export class Request {
     return request;
   }
 }
+
 export const RequestSchema = SchemaFactory.createForClass(Request);

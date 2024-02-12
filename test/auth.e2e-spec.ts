@@ -6,7 +6,7 @@ import { appSettings } from '../src/infrastructure/settings/app.settings';
 import {
   getRefreshTokenByResponse,
   getRefreshTokenByResponseWithTokenName,
-} from '../src/infrastructure/utils/utils';
+} from '../src/infrastructure/utils/helpers';
 
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
@@ -21,7 +21,7 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
     // repo = app.get()
 

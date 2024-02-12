@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { LikeStatus } from '../../../../infrastructure/utils/constants';
+import { LikeStatus } from '../../../../infrastructure/utils/enums';
 
 export class LikeStatusInputModel {
   @IsString()

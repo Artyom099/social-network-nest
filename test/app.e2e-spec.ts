@@ -13,7 +13,7 @@ describe('AppController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
   });
 

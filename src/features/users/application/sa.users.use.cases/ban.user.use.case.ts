@@ -11,10 +11,12 @@ export class BanUserUseCase implements ICommandHandler<BanUserCommand> {
   constructor(private usersRepository: UsersRepository) {}
 
   async execute(command: BanUserCommand) {
-    const user = await this.usersRepository.getUserDocumentById(command.userId);
+    const { userId, inputModel } = command;
+
+    const user = await this.usersRepository.getUserDocumentById(userId);
     if (!user) return null;
 
-    user.banUser(command.inputModel.banReason);
-    await this.usersRepository.save(user);
+    user.banUser(inputModel.banReason);
+    return this.usersRepository.save(user);
   }
 }

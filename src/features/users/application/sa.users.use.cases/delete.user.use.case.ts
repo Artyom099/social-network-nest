@@ -9,6 +9,6 @@ export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
   constructor(private usersRepository: UsersRepository) {}
 
   async execute(command: DeleteUserCommand) {
-    await this.usersRepository.deleteUser(command.userId);
+    return this.usersRepository.deleteUser(command.userId);
   }
 }

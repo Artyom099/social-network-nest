@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../../../infrastructure/utils/constants';
+import { LikeStatus } from '../../../../infrastructure/utils/enums';
 
 export type PostDBModel = {
   id: string;

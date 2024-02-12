@@ -59,4 +59,5 @@ export class Post {
     return post;
   }
 }
+
 export const PostSchema = SchemaFactory.createForClass(Post);

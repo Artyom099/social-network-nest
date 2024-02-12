@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { appSettings } from '../src/infrastructure/settings/app.settings';
 import request from 'supertest';
-import { getRefreshTokenByResponseWithTokenName } from '../src/infrastructure/utils/utils';
+import { getRefreshTokenByResponseWithTokenName } from '../src/infrastructure/utils/helpers';
 
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
@@ -11,13 +11,14 @@ const sleep = (seconds: number) =>
 describe('DevicesController (e2e)', () => {
   let app: INestApplication;
   let server: any;
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    appSettings(app);
+    appSettings(app, AppModule);
     await app.init();
 
     server = app.getHttpServer();

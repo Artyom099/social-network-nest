@@ -14,6 +14,6 @@ export class UnbanUserUseCase implements ICommandHandler<UnbanUserCommand> {
     if (!user) return null;
 
     user.unbanUser();
-    await this.usersRepository.save(user);
+    return this.usersRepository.save(user);
   }
 }

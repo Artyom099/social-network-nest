@@ -14,7 +14,7 @@ import { BlogsQueryRepository } from '../../infrastructure/blogs.query.repositor
 
 import { BindBlogCommand } from '../../application/sa.use.cases/bind.blog.use.case';
 import { BasicAuthGuard } from '../../../../infrastructure/guards/basic-auth.guard';
-import { BlogsPaginationInput } from '../../../../infrastructure/utils/common.models';
+import { BlogsPaginationInput } from '../../../../infrastructure/models/pagination.input';
 import { BanBlogCommand } from '../../application/sa.use.cases/ban.blog.use.case';
 import { CommandBus } from '@nestjs/cqrs';
 import { BanBlogInputModel } from '../../../users/api/models/ban.blog.input.model';

@@ -1,6 +1,6 @@
 import { CommentsRepository } from '../infrastructure/comments.repository';
 import { Injectable } from '@nestjs/common';
-import { LikeStatus } from '../../../infrastructure/utils/constants';
+import { LikeStatus } from '../../../infrastructure/utils/enums';
 
 @Injectable()
 export class CommentsService {

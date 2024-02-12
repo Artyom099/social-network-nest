@@ -3,6 +3,7 @@ export const getRefreshTokenByResponseWithTokenName = (response: {
 }) => {
   return response.headers['set-cookie'][0].split(';')[0];
 };
+
 export const getRefreshTokenByResponse = (response: {
   headers: { [x: string]: string[] };
 }) => {

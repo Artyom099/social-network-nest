@@ -18,6 +18,7 @@ export class CreatePostUseCase implements ICommandHandler<CreatePostCommand> {
 
   async execute(command: CreatePostCommand): Promise<PostViewModel> {
     const { bLog, inputModel } = command;
+
     const createdPost = Post.create(bLog, inputModel);
     return this.postsRepository.createPost(createdPost);
   }

@@ -126,6 +126,7 @@ export class User {
       createdAt: this.accountData.createdAt.toISOString(),
     };
   }
+
   getSAViewModel(): SAUserViewModel {
     return {
       id: this.id,
@@ -193,6 +194,7 @@ UserSchema.methods = {
   banUser: User.prototype.banUser,
   unbanUser: User.prototype.unbanUser,
 };
+
 export type UserModelStaticType = {
   createUserByAdmin: (
     InputModel: CreateUserInputModel,
@@ -207,9 +209,12 @@ export type UserModelStaticType = {
     UserModel: UserModelType,
   ) => UserDocument;
 };
+
 export type UserModelType = Model<User> & UserModelStaticType;
+
 const userStaticMethods: UserModelStaticType = {
   createUserByAdmin: User.createUserByAdmin,
   createUserBySelf: User.createUserBySelf,
 };
+
 UserSchema.statics = userStaticMethods;
