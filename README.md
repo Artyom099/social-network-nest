@@ -23,7 +23,6 @@ You can find swagger documentation [here](https://api.freedomindz.site/api/v1/sw
 ## Developers
 
  - [Artyom Golubev](https://github.com/Artyom099)
- - [Alexander Balaban](https://github.com/alexanderbalaban24)
 
 ## License
 
