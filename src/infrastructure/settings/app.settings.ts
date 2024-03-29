@@ -9,7 +9,6 @@ import { useContainer } from 'class-validator';
 import { HttpExceptionFilter } from '../exception-filters/exception.filter';
 
 export const appSettings = <T>(app: INestApplication, module: T) => {
-  app.use(cookieParser());
   useContainer(app.select(module as DynamicModule), { fallbackOnErrors: true });
 
   app.useGlobalPipes(
@@ -39,5 +38,6 @@ export const appSettings = <T>(app: INestApplication, module: T) => {
   );
 
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.use(cookieParser());
   app.enableCors();
 };

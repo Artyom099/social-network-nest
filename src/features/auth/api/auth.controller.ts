@@ -32,12 +32,11 @@ import { CreateDeviceModel } from '../../devices/api/models/create.device.model'
 @Controller('auth')
 export class AuthController {
   constructor(
+    private commandBus: CommandBus,
     private authService: AuthService,
     private securityService: DevicesService,
     private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
-
-    private commandBus: CommandBus,
   ) {}
 
   @Get('me')
