@@ -1,7 +1,7 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -23,7 +23,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const [message, field] = responseBody.message.split('=>');
         errorsMessages.push({ message, field });
       } else {
-        //todo можно ли оставить never?
         responseBody.message.forEach((m: never) => errorsMessages.push(m));
       }
 
@@ -43,8 +42,6 @@ export class ErrorExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    // const request = ctx.getRequest<Request>();
-    // const status = exception.getStatus();
 
     if (process.env.environment !== 'production') {
       response
