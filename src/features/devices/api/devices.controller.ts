@@ -15,7 +15,7 @@ import { AuthService } from '../../auth/application/auth.service';
 import { DevicesQueryRepository } from '../infrastructure/devices.query.repository';
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 
-@Controller('security')
+@Controller('security/devices')
 export class DevicesController {
   constructor(
     private authService: AuthService,
@@ -23,7 +23,7 @@ export class DevicesController {
     private devicesQueryRepository: DevicesQueryRepository,
   ) {}
 
-  @Get('devices')
+  @Get()
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
   async getActiveSessions(@Req() req) {
@@ -34,7 +34,7 @@ export class DevicesController {
     return this.devicesQueryRepository.getSessions(payload.userId);
   }
 
-  @Delete('devices')
+  @Delete()
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteOtherSessions(@Req() req) {
@@ -46,7 +46,7 @@ export class DevicesController {
       await this.devicesService.deleteOtherSessions(payload.deviceId);
   }
 
-  @Delete('devices/:id')
+  @Delete(':id')
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCurrentSession(@Req() req, @Param('id') deviceId: string) {

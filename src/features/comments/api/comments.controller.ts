@@ -25,8 +25,8 @@ import { UsersRepository } from '../../users/infrastructure/users.repository';
 export class CommentsController {
   constructor(
     private commentsService: CommentsService,
-    private commentsQueryRepository: CommentsQueryRepository,
     private usersRepository: UsersRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @Get(':id')
@@ -34,11 +34,11 @@ export class CommentsController {
   @HttpCode(HttpStatus.OK)
   async getComment(
     @Req() req,
-    @Param('id') commentId: string,
+    @Param('id') id: string,
   ): Promise<CommentViewModel | null> {
     // если юзер забанен, мы не можем получить его коммент
     const comment = await this.commentsQueryRepository.getComment(
-      commentId,
+      id,
       req.userId,
     );
     if (!comment) throw new NotFoundException();
@@ -56,11 +56,11 @@ export class CommentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateComment(
     @Req() req,
-    @Param('id') commentId: string,
+    @Param('id') id: string,
     @Body() body: CommentInputModel,
   ) {
     const comment = await this.commentsQueryRepository.getComment(
-      commentId,
+      id,
       req.userId,
     );
     if (!comment) throw new NotFoundException();
@@ -68,15 +68,15 @@ export class CommentsController {
     if (req.userId !== comment.commentatorInfo.userId)
       throw new ForbiddenException();
 
-    return this.commentsService.updateComment(commentId, body.content);
+    return this.commentsService.updateComment(id, body.content);
   }
 
   @Delete(':id')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteComment(@Req() req, @Param('id') commentId: string) {
+  async deleteComment(@Req() req, @Param('id') id: string) {
     const comment = await this.commentsQueryRepository.getComment(
-      commentId,
+      id,
       req.userId,
     );
     if (!comment) throw new NotFoundException();
@@ -84,7 +84,7 @@ export class CommentsController {
     if (req.userId !== comment.commentatorInfo.userId)
       throw new ForbiddenException();
 
-    return this.commentsService.deleteComment(commentId);
+    return this.commentsService.deleteComment(id);
   }
 
   @Put(':id/like-status')
@@ -92,14 +92,14 @@ export class CommentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateLikeStatus(
     @Req() req,
-    @Param('id') commentId: string,
+    @Param('id') id: string,
     @Body() body: LikeStatusInputModel,
   ) {
-    const comment = await this.commentsQueryRepository.getComment(commentId);
+    const comment = await this.commentsQueryRepository.getComment(id);
     if (!comment) throw new NotFoundException();
 
     return this.commentsService.updateCommentLikes(
-      commentId,
+      id,
       req.userId,
       body.likeStatus,
     );
