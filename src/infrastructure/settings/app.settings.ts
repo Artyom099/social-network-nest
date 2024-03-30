@@ -25,8 +25,8 @@ export const appSettings = <T>(app: INestApplication, module: T) => {
           keys.forEach((key) => {
             if (err.constraints) {
               errorsForResponse.push({
-                message: err.constraints[key],
                 field: err.property,
+                message: err.constraints[key],
               });
             }
           });

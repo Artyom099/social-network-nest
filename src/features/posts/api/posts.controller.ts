@@ -92,12 +92,12 @@ export class PostsController {
     const user = await this.usersQueryRepository.getUserById(req.userId);
     if (!post || !user) throw new NotFoundException('user or post not found');
 
-    const isUserBannedForBlog =
+    const bannedUser =
       await this.bannedUsersForBlogRepository.getBannedUserCurrentBlog(
         user.id,
         post.blogId,
       );
-    if (isUserBannedForBlog) throw new ForbiddenException();
+    if (bannedUser) throw new ForbiddenException();
 
     const dto: CreateCommentModel = {
       postId,
