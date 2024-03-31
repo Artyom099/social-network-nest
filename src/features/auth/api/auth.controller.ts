@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { DevicesService } from '../../devices/application/devices.service';
-
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 import { BearerAuthGuard } from '../../../infrastructure/guards/bearer-auth.guard';
 import { RegisterUserCommand } from '../application/use.cases/register.user.use.case';
@@ -55,7 +54,7 @@ export class AuthController {
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   async login(
-    @Req() req,
+    @Req() req: any,
     @Res({ passthrough: true }) res,
     @Body() body: AuthInputModel,
   ) {
@@ -134,31 +133,26 @@ export class AuthController {
   @Post('new-password')
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async setNewPassword(@Body() InputModel: SetNewPasswordInputModel) {
+  async setNewPassword(@Body() body: SetNewPasswordInputModel) {
     const isUserConfirm =
       await this.usersRepository.getUserDocumentByRecoveryCode(
-        InputModel.recoveryCode,
+        body.recoveryCode,
       );
-    if (!isUserConfirm) {
-      throw new BadRequestException();
-    } else {
-      await this.commandBus.execute(
-        new UpdatePasswordCommand(
-          InputModel.recoveryCode,
-          InputModel.newPassword,
-        ),
-      );
-    }
+    if (!isUserConfirm) throw new BadRequestException();
+
+    await this.commandBus.execute(
+      new UpdatePasswordCommand(body.recoveryCode, body.newPassword),
+    );
   }
 
   @Post('password-recovery')
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.OK)
   //todo -> для моих тестов статус OK, по документации NO_CONTENT
-  async passwordRecovery(@Body() InputModel: EmailInputModel) {
+  async passwordRecovery(@Body() body: EmailInputModel) {
     return {
       recoveryCode: await this.commandBus.execute(
-        new SendRecoveryCodeCommand(InputModel.email),
+        new SendRecoveryCodeCommand(body.email),
       ),
     };
   }
@@ -166,21 +160,17 @@ export class AuthController {
   @Post('registration')
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async registration(@Body() inputModel: CreateUserInputModel) {
+  async registration(@Body() body: CreateUserInputModel) {
     const existUserEmail =
-      await this.usersRepository.getUserDocumentByLoginOrEmail(
-        inputModel.email,
-      );
+      await this.usersRepository.getUserDocumentByLoginOrEmail(body.email);
     if (existUserEmail) throw new BadRequestException('email exist=>email');
 
     const existUserLogin =
-      await this.usersRepository.getUserDocumentByLoginOrEmail(
-        inputModel.login,
-      );
+      await this.usersRepository.getUserDocumentByLoginOrEmail(body.login);
     if (existUserLogin) {
       throw new BadRequestException('login exist=>login');
     } else {
-      return this.commandBus.execute(new RegisterUserCommand(inputModel));
+      return this.commandBus.execute(new RegisterUserCommand(body));
     }
   }
 
@@ -203,7 +193,7 @@ export class AuthController {
   @Post('registration-email-resending')
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async resendConfirmationEmail(@Body() body: { email: string }) {
+  async resendConfirmationEmail(@Body() body: EmailInputModel) {
     const existUser = await this.usersRepository.getUserDocumentByLoginOrEmail(
       body.email,
     );

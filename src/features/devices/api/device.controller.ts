@@ -14,6 +14,7 @@ import { DevicesService } from '../application/devices.service';
 import { AuthService } from '../../auth/application/auth.service';
 import { DevicesQueryRepository } from '../infrastructure/devices.query.repository';
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
+import { Request } from 'express';
 
 @Controller('security/devices')
 export class DeviceController {
@@ -26,7 +27,7 @@ export class DeviceController {
   @Get()
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
-  async getActiveDevices(@Req() req) {
+  async getActiveDevices(@Req() req: Request) {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
@@ -37,7 +38,7 @@ export class DeviceController {
   @Delete()
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOtherDevices(@Req() req) {
+  async deleteOtherDevices(@Req() req: Request) {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
@@ -49,7 +50,10 @@ export class DeviceController {
   @Delete(':id')
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteCurrentDevice(@Req() req, @Param('id') deviceId: string) {
+  async deleteCurrentDevice(
+    @Req() req: Request,
+    @Param('id') deviceId: string,
+  ) {
     const device = await this.devicesQueryRepository.getSession(deviceId);
     if (!device) throw new NotFoundException();
 
