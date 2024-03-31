@@ -23,6 +23,7 @@ export class CommentsQueryRepository {
   ): Promise<CommentViewModel | null> {
     const comment = await this.commentModel.findOne({ id }).exec();
     if (!comment) return null;
+
     let myStatus = LikeStatus.None;
     let likesCount = 0;
     let dislikesCount = 0;
@@ -41,26 +42,7 @@ export class CommentsQueryRepository {
       if (l.status === LikeStatus.Dislike) dislikesCount++;
     });
 
-    return {
-      id: comment.id,
-      content: comment.content,
-      createdAt: comment.createdAt.toISOString(),
-      commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin,
-      },
-      likesInfo: {
-        likesCount,
-        dislikesCount,
-        myStatus,
-      },
-      postInfo: {
-        id: comment.postInfo.id,
-        title: comment.postInfo.title,
-        blogId: comment.postInfo.blogId,
-        blogName: comment.postInfo.blogName,
-      },
-    };
+    return this.mapToView(comment, likesCount, dislikesCount, myStatus);
   }
 
   async getCommentsCurrentPost(
@@ -99,33 +81,14 @@ export class CommentsQueryRepository {
         if (l.status === LikeStatus.Dislike) dislikesCount++;
       });
 
-      return {
-        id: c.id,
-        content: c.content,
-        createdAt: c.createdAt.toISOString(),
-        commentatorInfo: {
-          userId: c.commentatorInfo.userId,
-          userLogin: c.commentatorInfo.userLogin,
-        },
-        likesInfo: {
-          likesCount,
-          dislikesCount,
-          myStatus,
-        },
-        postInfo: {
-          id: c.postInfo.id,
-          title: c.postInfo.title,
-          blogId: c.postInfo.blogId,
-          blogName: c.postInfo.blogName,
-        },
-      };
+      return this.mapToView(c, likesCount, dislikesCount, myStatus);
     });
 
     return {
       pagesCount: query.pagesCount(totalCount), // общее количество страниц
       page: query.pageNumber, // текущая страница
-      pageSize: query.pageSize, // количество пользователей на странице
-      totalCount, // общее количество пользователей
+      pageSize: query.pageSize, // количество комментов на странице
+      totalCount, // общее количество комментов
       items,
     };
   }
@@ -171,34 +134,43 @@ export class CommentsQueryRepository {
           if (l.status === LikeStatus.Dislike) dislikesCount++;
         });
 
-        return {
-          id: c.id,
-          content: c.content,
-          createdAt: c.createdAt.toISOString(),
-          commentatorInfo: {
-            userId: c.commentatorInfo.userId,
-            userLogin: c.commentatorInfo.userLogin,
-          },
-          likesInfo: {
-            likesCount,
-            dislikesCount,
-            myStatus,
-          },
-          postInfo: {
-            id: c.postInfo.id,
-            title: c.postInfo.title,
-            blogId: c.postInfo.blogId,
-            blogName: c.postInfo.blogName,
-          },
-        };
+        return this.mapToView(c, likesCount, dislikesCount, myStatus);
       });
 
     return {
       pagesCount: query.pagesCount(totalCount), // общее количество страниц
       page: query.pageNumber, // текущая страница
-      pageSize: query.pageSize, // количество блогов на странице
-      totalCount, // общее количество блогов
+      pageSize: query.pageSize, // количество комментов на странице
+      totalCount, // общее количество комментов
       items,
+    };
+  }
+
+  mapToView(
+    comment: Comment,
+    likesCount: number,
+    dislikesCount: number,
+    myStatus: LikeStatus,
+  ): CommentViewModel {
+    return {
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt.toISOString(),
+      commentatorInfo: {
+        userId: comment.commentatorInfo.userId,
+        userLogin: comment.commentatorInfo.userLogin,
+      },
+      likesInfo: {
+        likesCount,
+        dislikesCount,
+        myStatus,
+      },
+      postInfo: {
+        id: comment.postInfo.id,
+        title: comment.postInfo.title,
+        blogId: comment.postInfo.blogId,
+        blogName: comment.postInfo.blogName,
+      },
     };
   }
 }

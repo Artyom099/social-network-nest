@@ -16,7 +16,7 @@ import { DevicesQueryRepository } from '../infrastructure/devices.query.reposito
 import { CookieGuard } from '../../../infrastructure/guards/cookie.guard';
 
 @Controller('security/devices')
-export class DevicesController {
+export class DeviceController {
   constructor(
     private authService: AuthService,
     private devicesService: DevicesService,
@@ -26,7 +26,7 @@ export class DevicesController {
   @Get()
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.OK)
-  async getActiveSessions(@Req() req) {
+  async getActiveDevices(@Req() req) {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
@@ -37,7 +37,7 @@ export class DevicesController {
   @Delete()
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteOtherSessions(@Req() req) {
+  async deleteOtherDevices(@Req() req) {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
@@ -49,21 +49,19 @@ export class DevicesController {
   @Delete(':id')
   @UseGuards(CookieGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteCurrentSession(@Req() req, @Param('id') deviceId: string) {
-    const currentSession = await this.devicesQueryRepository.getSession(
-      deviceId,
-    );
-    if (!currentSession) throw new NotFoundException();
+  async deleteCurrentDevice(@Req() req, @Param('id') deviceId: string) {
+    const device = await this.devicesQueryRepository.getSession(deviceId);
+    if (!device) throw new NotFoundException();
 
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
 
-    const activeSessions = await this.devicesQueryRepository.getSessions(
+    const userDevices = await this.devicesQueryRepository.getSessions(
       payload.userId,
     );
 
-    if (!activeSessions.find((s) => s.deviceId === currentSession.deviceId))
+    if (!userDevices.find((d) => d.deviceId === device.deviceId))
       throw new ForbiddenException();
 
     return this.devicesService.deleteCurrentSession(deviceId);

@@ -33,7 +33,7 @@ export class DevicesRepository {
   }
 
   async deleteAllSessions(userId: string) {
-    return this.devicesModel.deleteMany({ userId });
+    await this.devicesModel.deleteMany({ userId });
   }
 
   mapToView(device: DeviceDocument): DeviceViewModel {

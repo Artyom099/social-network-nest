@@ -8,7 +8,7 @@ import { getRefreshTokenByResponseWithTokenName } from '../src/infrastructure/ut
 const sleep = (seconds: number) =>
   new Promise((r) => setTimeout(r, seconds * 1000));
 
-describe('DevicesController (e2e)', () => {
+describe('DeviceController (e2e)', () => {
   let app: INestApplication;
   let server: any;
 

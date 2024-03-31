@@ -14,7 +14,7 @@ import {
   RequestSchema,
 } from '../../infrastructure/services/ip.schema';
 import { JwtModule } from '@nestjs/jwt';
-import { DevicesController } from '../devices/api/devices.controller';
+import { DeviceController } from '../devices/api/device.controller';
 import { UsersService } from '../users/application/users.service';
 import { SaUsersController } from '../users/api/controllers/sa.users.controller';
 import { CreateUserByAdminUseCase } from '../users/application/sa.users.use.cases/create.user.use.case';
@@ -75,7 +75,7 @@ const useCases = [
     SaUsersController,
     BloggerUsersController,
 
-    DevicesController,
+    DeviceController,
   ],
   providers: [
     ...useCases,

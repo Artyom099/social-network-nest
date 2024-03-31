@@ -13,26 +13,8 @@ export class CommentsRepository {
 
   async createComment(comment: Comment): Promise<CommentViewModel> {
     await this.commentModel.create(comment);
-    return {
-      id: comment.id,
-      content: comment.content,
-      commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin,
-      },
-      createdAt: comment.createdAt.toISOString(),
-      likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: LikeStatus.None,
-      },
-      postInfo: {
-        id: comment.postInfo.id,
-        title: comment.postInfo.title,
-        blogId: comment.postInfo.blogId,
-        blogName: comment.postInfo.blogName,
-      },
-    };
+
+    return this.mapToView(comment);
   }
 
   async updateComment(id: string, content: string) {
@@ -80,5 +62,28 @@ export class CommentsRepository {
     );
 
     return true;
+  }
+
+  mapToView(comment: Comment): CommentViewModel {
+    return {
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt.toISOString(),
+      commentatorInfo: {
+        userId: comment.commentatorInfo.userId,
+        userLogin: comment.commentatorInfo.userLogin,
+      },
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: LikeStatus.None,
+      },
+      postInfo: {
+        id: comment.postInfo.id,
+        title: comment.postInfo.title,
+        blogId: comment.postInfo.blogId,
+        blogName: comment.postInfo.blogName,
+      },
+    };
   }
 }
