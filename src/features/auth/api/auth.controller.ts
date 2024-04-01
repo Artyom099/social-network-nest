@@ -41,7 +41,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async getMyInfo(@Req() req) {
+  async getMyInfo(@Req() req: any) {
     const user = await this.usersQueryRepository.getUserById(req.userId);
     return {
       email: user?.email,
@@ -55,7 +55,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Req() req: any,
-    @Res({ passthrough: true }) res,
+    @Res({ passthrough: true }) res: any,
     @Body() body: AuthInputModel,
   ) {
     const { loginOrEmail, password } = body;
@@ -127,6 +127,7 @@ export class AuthController {
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
+
     return this.securityService.deleteCurrentSession(payload.deviceId);
   }
 
@@ -194,10 +195,11 @@ export class AuthController {
   // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async resendConfirmationEmail(@Body() body: EmailInputModel) {
-    const existUser = await this.usersRepository.getUserDocumentByLoginOrEmail(
+    const user = await this.usersRepository.getUserDocumentByLoginOrEmail(
       body.email,
     );
-    if (!existUser || existUser.emailConfirmation.isConfirmed) {
+
+    if (!user || user.emailConfirmation.isConfirmed) {
       throw new BadRequestException('email not exist or confirm=>email');
     } else {
       return this.commandBus.execute(new ConfirmEmailCommand(body.email));
