@@ -26,7 +26,7 @@ export class CookieGuard implements CanActivate {
         secret: jwtConstants.refreshSecret,
       });
       const tokenIssuedAt = new Date(payload.iat * 1000).toISOString();
-      const lastActiveSession = await this.devicesQueryRepository.getSession(
+      const lastActiveSession = await this.devicesQueryRepository.getDevice(
         payload.deviceId,
       );
       if (

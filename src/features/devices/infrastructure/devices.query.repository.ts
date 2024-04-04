@@ -10,14 +10,14 @@ export class DevicesQueryRepository {
     @InjectModel(Device.name) private devicesModel: Model<DeviceDocument>,
   ) {}
 
-  async getSession(deviceId: string): Promise<DeviceViewModel | null> {
+  async getDevice(deviceId: string): Promise<DeviceViewModel | null> {
     const device = await this.devicesModel.findOne({ deviceId }).exec();
     if (!device) return null;
 
     return this.mapToView(device);
   }
 
-  async getSessions(userId: string): Promise<DeviceViewModel[]> {
+  async getDevices(userId: string): Promise<DeviceViewModel[]> {
     const devices = await this.devicesModel
       .find({ userId }, { projection: { _id: 0, userId: 0 } })
       .exec();

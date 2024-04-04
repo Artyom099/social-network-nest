@@ -8,7 +8,7 @@ import { DeviceViewModel } from '../api/models/device.view.model';
 export class DevicesService {
   constructor(private securityRepository: DevicesRepository) {}
 
-  async createSession(dto: CreateDeviceModel): Promise<DeviceViewModel> {
+  async createDevice(dto: CreateDeviceModel): Promise<DeviceViewModel> {
     const session: Device = Device.create(
       dto.ip,
       dto.title,
@@ -23,15 +23,15 @@ export class DevicesService {
     return this.securityRepository.updateLastActiveDate(deviceId, date);
   }
 
-  async deleteCurrentSession(deviceId: string) {
+  async deleteCurrentDevice(deviceId: string) {
     return this.securityRepository.deleteCurrentSession(deviceId);
   }
 
-  async deleteOtherSessions(deviceId: string) {
+  async deleteOtherDevices(deviceId: string) {
     return this.securityRepository.deleteOtherSessions(deviceId);
   }
 
-  async deleteAllSessions(userId: string) {
+  async deleteAllDevices(userId: string) {
     return this.securityRepository.deleteAllSessions(userId);
   }
 }

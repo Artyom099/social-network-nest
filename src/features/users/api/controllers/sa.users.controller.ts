@@ -64,7 +64,7 @@ export class SaUsersController {
 
     if (body.isBanned) {
       await this.commandBus.execute(new BanUserCommand(userId, body));
-      await this.devicesService.deleteAllSessions(userId);
+      await this.devicesService.deleteAllDevices(userId);
     } else {
       await this.commandBus.execute(new UnbanUserCommand(userId));
     }

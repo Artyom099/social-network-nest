@@ -32,7 +32,7 @@ export class DeviceController {
       req.cookies.refreshToken,
     );
 
-    return this.devicesQueryRepository.getSessions(payload.userId);
+    return this.devicesQueryRepository.getDevices(payload.userId);
   }
 
   @Delete()
@@ -43,8 +43,7 @@ export class DeviceController {
       req.cookies.refreshToken,
     );
 
-    if (payload)
-      await this.devicesService.deleteOtherSessions(payload.deviceId);
+    if (payload) await this.devicesService.deleteOtherDevices(payload.deviceId);
   }
 
   @Delete(':id')
@@ -54,20 +53,20 @@ export class DeviceController {
     @Req() req: Request,
     @Param('id') deviceId: string,
   ) {
-    const device = await this.devicesQueryRepository.getSession(deviceId);
+    const device = await this.devicesQueryRepository.getDevice(deviceId);
     if (!device) throw new NotFoundException();
 
     const payload = await this.authService.getTokenPayload(
       req.cookies.refreshToken,
     );
 
-    const userDevices = await this.devicesQueryRepository.getSessions(
+    const userDevices = await this.devicesQueryRepository.getDevices(
       payload.userId,
     );
 
     if (!userDevices.find((d) => d.deviceId === device.deviceId))
       throw new ForbiddenException();
 
-    return this.devicesService.deleteCurrentSession(deviceId);
+    return this.devicesService.deleteCurrentDevice(deviceId);
   }
 }

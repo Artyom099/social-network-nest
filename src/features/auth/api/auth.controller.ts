@@ -82,7 +82,7 @@ export class AuthController {
       deviceId: newPayload.deviceId,
       userId: newPayload.userId,
     };
-    await this.securityService.createSession(dto);
+    await this.securityService.createDevice(dto);
 
     res.cookie('refreshToken', token.refreshToken, {
       httpOnly: true,
@@ -128,7 +128,7 @@ export class AuthController {
       req.cookies.refreshToken,
     );
 
-    return this.securityService.deleteCurrentSession(payload.deviceId);
+    return this.securityService.deleteCurrentDevice(payload.deviceId);
   }
 
   @Post('new-password')
