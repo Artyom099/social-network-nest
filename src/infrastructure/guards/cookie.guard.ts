@@ -29,6 +29,7 @@ export class CookieGuard implements CanActivate {
       const lastActiveSession = await this.devicesQueryRepository.getDevice(
         payload.deviceId,
       );
+
       if (
         !lastActiveSession ||
         tokenIssuedAt !== lastActiveSession.lastActiveDate
