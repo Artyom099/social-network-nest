@@ -51,6 +51,20 @@ const useCases = [
   UpdateBlogUseCase,
 ];
 
+const repositories = [
+  TestRepository,
+
+  BlogsRepository,
+  BlogsQueryRepository,
+  BlogExistsConstraint,
+
+  PostsRepository,
+  PostsQueryRepository,
+
+  CommentsRepository,
+  CommentsQueryRepository,
+];
+
 @Module({
   imports: [
     AuthModule,
@@ -80,22 +94,12 @@ const useCases = [
   ],
   providers: [
     ...useCases,
+    ...repositories,
 
     AppService,
-    TestRepository,
-
     BlogsService,
-    BlogsRepository,
-    BlogsQueryRepository,
-    BlogExistsConstraint,
-
     PostsService,
-    PostsRepository,
-    PostsQueryRepository,
-
     CommentsService,
-    CommentsRepository,
-    CommentsQueryRepository,
   ],
 })
 export class AppModule {}

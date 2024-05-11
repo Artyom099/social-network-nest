@@ -36,6 +36,7 @@ class PostInfo {
 const PostInfoSchema = SchemaFactory.createForClass(PostInfo);
 
 export type CommentDocument = HydratedDocument<Comment>;
+
 @Schema({ versionKey: false })
 export class Comment {
   @Prop({ required: true, type: String })
