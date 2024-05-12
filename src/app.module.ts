@@ -65,6 +65,8 @@ const repositories = [
   CommentsQueryRepository,
 ];
 
+const services = [AppService, BlogsService, PostsService, CommentsService];
+
 @Module({
   imports: [
     AuthModule,
@@ -92,14 +94,6 @@ const repositories = [
     PostsController,
     CommentsController,
   ],
-  providers: [
-    ...useCases,
-    ...repositories,
-
-    AppService,
-    BlogsService,
-    PostsService,
-    CommentsService,
-  ],
+  providers: [...useCases, ...repositories, ...services],
 })
 export class AppModule {}
