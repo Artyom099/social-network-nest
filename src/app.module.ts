@@ -67,30 +67,30 @@ const repositories = [
 
 const services = [AppService, BlogsService, PostsService, CommentsService];
 
+const mongooseModels = [
+  { name: User.name, schema: UserSchema },
+  { name: Blog.name, schema: BlogSchema },
+  { name: Post.name, schema: PostSchema },
+  { name: Device.name, schema: DeviceSchema },
+  { name: Comment.name, schema: CommentSchema },
+  { name: Request.name, schema: RequestSchema },
+  { name: BannedUserForBlog.name, schema: BannedUserForBlogSchema },
+];
+
 @Module({
   imports: [
     AuthModule,
     CqrsModule,
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.MONGO_URL || ''),
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: Blog.name, schema: BlogSchema },
-      { name: Post.name, schema: PostSchema },
-      { name: Device.name, schema: DeviceSchema },
-      { name: Comment.name, schema: CommentSchema },
-      { name: Request.name, schema: RequestSchema },
-      { name: BannedUserForBlog.name, schema: BannedUserForBlogSchema },
-    ]),
+    MongooseModule.forFeature(mongooseModels),
   ],
   controllers: [
     AppController,
     TestController,
-
     PublicBlogsController,
     BloggerBlogsController,
     SABlogsController,
-
     PostsController,
     CommentsController,
   ],
