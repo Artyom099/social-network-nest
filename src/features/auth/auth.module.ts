@@ -43,16 +43,23 @@ import { Blog, BlogSchema } from '../blogs/blogs.schema';
 const useCases = [
   BanUserUseCase,
   UnbanUserUseCase,
-
   DeleteUserUseCase,
   ConfirmEmailUseCase,
   RegisterUserUseCase,
   UpdatePasswordUseCase,
   SendRecoveryCodeUseCase,
   CreateUserByAdminUseCase,
-
   BanUserForCurrentBlogUseCase,
   UpdateConfirmationCodeUseCase,
+];
+
+const repositories = [
+  BlogsQueryRepository,
+  DevicesRepository,
+  DevicesQueryRepository,
+  UsersRepository,
+  UsersQueryRepository,
+  BannedUsersForBlogRepository,
 ];
 
 @Module({
@@ -71,30 +78,19 @@ const useCases = [
   ],
   controllers: [
     AuthController,
-
     SaUsersController,
     BloggerUsersController,
-
     DeviceController,
   ],
   providers: [
     ...useCases,
-
+    ...repositories,
     IpService,
     AuthService,
-
     EmailAdapter,
     EmailManager,
-    BlogsQueryRepository,
-
     UsersService,
-    UsersRepository,
-    UsersQueryRepository,
-    BannedUsersForBlogRepository,
-
     DevicesService,
-    DevicesRepository,
-    DevicesQueryRepository,
   ],
   exports: [
     AuthService,
