@@ -53,6 +53,15 @@ const useCases = [
   UpdateConfirmationCodeUseCase,
 ];
 
+const services = [
+  IpService,
+  AuthService,
+  EmailAdapter,
+  EmailManager,
+  UsersService,
+  DevicesService,
+];
+
 const repositories = [
   BlogsQueryRepository,
   DevicesRepository,
@@ -82,16 +91,7 @@ const repositories = [
     BloggerUsersController,
     DeviceController,
   ],
-  providers: [
-    ...useCases,
-    ...repositories,
-    IpService,
-    AuthService,
-    EmailAdapter,
-    EmailManager,
-    UsersService,
-    DevicesService,
-  ],
+  providers: [...useCases, ...services, ...repositories],
   exports: [
     AuthService,
     UsersService,
