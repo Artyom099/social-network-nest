@@ -82,9 +82,7 @@ const mongooseModels = [
 @Module({
   imports: [
     CqrsModule,
-    JwtModule.register({
-      global: true,
-    }),
+    JwtModule.register({ global: true }),
     MongooseModule.forFeature(mongooseModels),
   ],
   controllers: [
