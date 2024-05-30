@@ -71,19 +71,21 @@ const repositories = [
   BannedUsersForBlogRepository,
 ];
 
+const mongooseModels = [
+  { name: User.name, schema: UserSchema },
+  { name: Blog.name, schema: BlogSchema },
+  { name: Device.name, schema: DeviceSchema },
+  { name: Request.name, schema: RequestSchema },
+  { name: BannedUserForBlog.name, schema: BannedUserForBlogSchema },
+];
+
 @Module({
   imports: [
     CqrsModule,
     JwtModule.register({
       global: true,
     }),
-    MongooseModule.forFeature([
-      { name: User.name, schema: UserSchema },
-      { name: Blog.name, schema: BlogSchema },
-      { name: Device.name, schema: DeviceSchema },
-      { name: Request.name, schema: RequestSchema },
-      { name: BannedUserForBlog.name, schema: BannedUserForBlogSchema },
-    ]),
+    MongooseModule.forFeature(mongooseModels),
   ],
   controllers: [
     AuthController,
