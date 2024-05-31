@@ -40,6 +40,13 @@ import { BannedUsersForBlogRepository } from '../users/infrastructure/banned.use
 import { BlogsQueryRepository } from '../blogs/infrastructure/blogs.query.repository';
 import { Blog, BlogSchema } from '../blogs/blogs.schema';
 
+const controllers = [
+  AuthController,
+  SaUsersController,
+  BloggerUsersController,
+  DeviceController,
+];
+
 const useCases = [
   BanUserUseCase,
   UnbanUserUseCase,
@@ -85,12 +92,7 @@ const mongooseModels = [
     JwtModule.register({ global: true }),
     MongooseModule.forFeature(mongooseModels),
   ],
-  controllers: [
-    AuthController,
-    SaUsersController,
-    BloggerUsersController,
-    DeviceController,
-  ],
+  controllers: [...controllers],
   providers: [...useCases, ...services, ...repositories],
   exports: [
     AuthService,
