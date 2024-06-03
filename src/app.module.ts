@@ -67,6 +67,16 @@ const repositories = [
 
 const services = [AppService, BlogsService, PostsService, CommentsService];
 
+const controllers = [
+  AppController,
+  TestController,
+  PublicBlogsController,
+  BloggerBlogsController,
+  SABlogsController,
+  PostsController,
+  CommentsController,
+];
+
 const mongooseModels = [
   { name: User.name, schema: UserSchema },
   { name: Blog.name, schema: BlogSchema },
@@ -85,15 +95,7 @@ const mongooseModels = [
     MongooseModule.forRoot(process.env.MONGO_URL || ''),
     MongooseModule.forFeature(mongooseModels),
   ],
-  controllers: [
-    AppController,
-    TestController,
-    PublicBlogsController,
-    BloggerBlogsController,
-    SABlogsController,
-    PostsController,
-    CommentsController,
-  ],
+  controllers: [...controllers],
   providers: [...useCases, ...repositories, ...services],
 })
 export class AppModule {}
