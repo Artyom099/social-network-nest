@@ -46,7 +46,7 @@ export class PublicBlogsController {
   @UseGuards(CheckUserIdGuard)
   @HttpCode(HttpStatus.OK)
   async getPostsCurrentBlog(
-    @Req() req,
+    @Req() req: any,
     @Param('id') blogId: string,
     @Query() query: DefaultPaginationInput,
   ) {

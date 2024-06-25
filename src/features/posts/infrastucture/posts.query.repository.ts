@@ -50,6 +50,7 @@ export class PostsQueryRepository {
         });
       }
     });
+
     return {
       id: post.id,
       title: post.title,
@@ -145,6 +146,7 @@ export class PostsQueryRepository {
     const filter = { blogId, 'banInfo.isBanned': true };
 
     const totalCount = await this.postModel.countDocuments(filter);
+
     const sortedPosts = await this.postModel
       .find(filter)
       .sort(query.sort())
@@ -177,6 +179,7 @@ export class PostsQueryRepository {
           });
         }
       });
+
       return {
         id: p.id,
         title: p.title,
@@ -214,6 +217,7 @@ export class PostsQueryRepository {
     const filter = { blogId };
 
     const totalCount = await this.postModel.countDocuments(filter);
+
     const sortedPosts = await this.postModel
       .find(filter)
       .sort(query.sort())
@@ -246,6 +250,7 @@ export class PostsQueryRepository {
           });
         }
       });
+
       return {
         id: p.id,
         title: p.title,
