@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class EmailAdapter {
   async sendEmail(email: string, subject: string, message: string) {
-    const transporter = await nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       host: 'smtp.mail.ru',
       port: 465,
       secure: true,
@@ -16,7 +16,7 @@ export class EmailAdapter {
     });
 
     return transporter.sendMail({
-      from: `"Fred Foo 👻" <${settings.MAIL_LOGIN}>`, // sender address
+      from: `"Blog Platform 👻" <${settings.MAIL_LOGIN}>`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: message, // html body
@@ -36,8 +36,8 @@ export class EmailAdapter {
         },
       });
 
-      return await transporter.sendMail({
-        from: `"Blog Platform" <${settings.GMAIL_LOGIN}>`,
+      return transporter.sendMail({
+        from: `"Blog Platform 👻" <${settings.GMAIL_LOGIN}>`,
         to: to,
         subject: subject,
         html: message,

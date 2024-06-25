@@ -78,6 +78,7 @@ export class PostsQueryRepository {
     const filter = { 'banInfo.isBanned': false };
 
     const totalCount = await this.postModel.countDocuments(filter);
+
     const sortedPosts = await this.postModel
       .find(filter)
       .sort(query.sort())
