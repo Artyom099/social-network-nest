@@ -28,7 +28,7 @@ export class UsersRepository {
   }
 
   async deleteUser(id: string) {
-    await this.userModel.deleteOne({ id });
+    return this.userModel.deleteOne({ id });
   }
 
   async getUserDocumentById(id: string): Promise<UserDocument | null> {
