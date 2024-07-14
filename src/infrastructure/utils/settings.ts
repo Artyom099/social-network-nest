@@ -9,8 +9,3 @@ export const jwtConstants = {
   accessSecret: 'SECRET_KEY',
   refreshSecret: 'SECRET_KEY',
 };
-
-export const basicAuthConstants = {
-  userName: process.env.SA_LOGIN || 'admin',
-  password: process.env.SA_PASSWORD || 'qwerty',
-};
